@@ -1,4 +1,3 @@
-// app/auth/verify/VerifyClient.tsx
 "use client";
 
 import { useEffect } from "react";
