@@ -3,94 +3,56 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
+import { Button } from "../ui/Button";
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
 
-  const isActive = (path: string) => pathname === path;
+  const navigation = [
+    { name: "Accueil", href: "/" },
+    { name: "Marketplace", href: "/marketplace" },
+    { name: "Annonces", href: "/annonces" },
+    { name: "Actualités", href: "/actualites" },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/"
-            className="text-lg font-semibold text-slate-800 hover:text-teal-600 transition-colors"
-          >
-            Guyane Marketplace
-          </Link>
-          {user && (
-            <nav className="hidden md:flex items-center space-x-2">
-              <Link
-                href="/marketplace"
-                className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive("/marketplace")
-                    ? "bg-slate-100 text-slate-900 font-medium"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                Services
-              </Link>
-              <Link
-                href="/annonces"
-                className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive("/annonces")
-                    ? "bg-slate-100 text-slate-900 font-medium"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                Annonces
-              </Link>
-              <Link
-                href="/actualites"
-                className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive("/actualites")
-                    ? "bg-slate-100 text-slate-900 font-medium"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                Actualités
-              </Link>
-              <Link
-                href="/messages"
-                className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive("/messages")
-                    ? "bg-slate-100 text-slate-900 font-medium"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                Messages
-              </Link>
-            </nav>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          {user ? (
-            <>
-              <span className="hidden md:inline text-sm text-slate-600">
-                {user.email}
-              </span>
-              <Button
-                variant="outline"
-                onClick={() => signOut()}
-                className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-              >
-                Déconnexion
+    <header className="bg-white shadow-sm">
+      <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <Link href="/" className="text-xl font-bold text-gray-900">
+              Guyane Marketplace
+            </Link>
+            <div className="ml-10 hidden space-x-8 md:block">
+              {navigation.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-sm font-medium ${
+                    pathname === link.href
+                      ? "text-blue-600"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="ml-10 space-x-4">
+            {user ? (
+              <Button variant="outline" asChild>
+                <Link href="/profile">Mon Profil</Link>
               </Button>
-            </>
-          ) : (
-            <Button
-              asChild
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-            >
-              <Link href="/auth">Connexion</Link>
-            </Button>
-          )}
+            ) : (
+              <Button asChild>
+                <Link href="/auth">Connexion</Link>
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 }

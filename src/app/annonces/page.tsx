@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ProtectedLayout } from "@/components/layout/protected-layout";
-import { Button } from "@/components/ui/Button";
-import { createClient } from "@supabase/supabase-js";
+import { ProtectedLayout } from "@components/layout/protected-layout";
+import { Button } from "@components/ui/button";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClientComponentClient();
 
 type Announcement = {
   id: string;

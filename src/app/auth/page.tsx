@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp }: any = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut }: any = useAuth();
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;

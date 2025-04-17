@@ -1,29 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Header } from "@/components/layout/Header";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Button } from "@/components/ui/Button";
-import AnnouncementForm from "@/components/announcements/AnnouncementForm";
-import AnnouncementCard from "@/components/announcements/AnnouncementCard";
-import { useAuth } from "@/hooks/useAuth";
+import { createClient } from "@supabase/supabase-js";
 
-interface Announcement {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+type Announcement = {
   id: string;
+  created_at: string;
   title: string;
   description: string;
-  price: number | null;
-  category: string;
+  price?: number;
+  location?: string;
+  category?: string;
   user_id: string;
-  created_at: string;
-}
+};
 
-export default function Annonces() {
+export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const { user } = useAuth();
-  const supabase = createClientComponentClient();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   const fetchAnnouncements = async () => {
     try {
@@ -33,80 +38,66 @@ export default function Annonces() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setAnnouncements(data || []);
+      setAnnouncements(data);
     } catch (error) {
       console.error("Erreur lors du chargement des annonces:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchAnnouncements();
-
-    const channel = supabase
-      .channel("announcements")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "announcements",
-        },
-        () => {
-          fetchAnnouncements();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const handleAnnouncementCreated = () => {
-    setShowForm(false);
-    fetchAnnouncements();
-  };
+  if (loading) {
+    return (
+      <ProtectedLayout>
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+        </div>
+      </ProtectedLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="container py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1>Annonces</h1>
-          {user && (
-            <Button onClick={() => setShowForm(!showForm)}>
-              {showForm ? "Fermer" : "Créer une annonce"}
-            </Button>
-          )}
+    <ProtectedLayout>
+      <div className="container py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Petites Annonces</h1>
+          <Button asChild>
+            <Link href="/annonces/nouvelle">Publier une annonce</Link>
+          </Button>
         </div>
 
-        {showForm && (
-          <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Nouvelle annonce</h2>
-            <AnnouncementForm onSuccess={handleAnnouncementCreated} />
-          </div>
-        )}
-
-        {isLoading ? (
-          <div className="text-center py-8">Chargement des annonces...</div>
-        ) : announcements.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            Aucune annonce pour le moment
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {announcements.map((announcement) => (
-              <AnnouncementCard
-                key={announcement.id}
-                announcement={announcement}
-                onDelete={fetchAnnouncements}
-              />
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {announcements.map((announcement) => (
+            <div
+              key={announcement.id}
+              className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
+            >
+              <div className="p-6">
+                <div className="mb-2 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800">
+                  {announcement.category}
+                </div>
+                <h3 className="text-2xl font-semibold">{announcement.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {announcement.description}
+                </p>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-lg font-bold">
+                    {announcement.price
+                      ? `${announcement.price} €`
+                      : "Prix sur demande"}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {announcement.location}
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <Button className="w-full">Contacter</Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </ProtectedLayout>
   );
 }

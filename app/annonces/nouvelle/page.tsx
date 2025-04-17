@@ -4,22 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
-
-import { ProtectedLayout } from "@/components/layout/protected-layout";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 
+import { ProtectedLayout } from "src/components/layout/ProtectedLayout";
+import { Button } from "@/components/ui/Button";
+
 const categories = [
-  "Services à domicile",
-  "Cours et formations",
-  "Artisanat",
-  "Transport",
-  "Informatique",
-  "Événementiel",
+  "Véhicules",
+  "Immobilier",
+  "Emploi",
+  "Mode",
+  "Maison",
+  "Multimédia",
+  "Loisirs",
+  "Matériel Professionnel",
   "Autres",
 ];
 
-export default function NewServicePage() {
+export default function NewAnnouncementPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -37,16 +39,16 @@ export default function NewServicePage() {
 
     try {
       setLoading(true);
-      const { error } = await supabase.from("services").insert({
+      const { error } = await supabase.from("announcements").insert({
         ...formData,
         price: formData.price ? parseFloat(formData.price) : null,
         user_id: user.id,
       });
 
       if (error) throw error;
-      router.push("/marketplace");
+      router.push("/annonces");
     } catch (error) {
-      console.error("Erreur lors de la création du service:", error);
+      console.error("Erreur lors de la création de l'annonce:", error);
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,9 @@ export default function NewServicePage() {
   return (
     <ProtectedLayout>
       <div className="container max-w-2xl py-8">
-        <h1 className="mb-8 text-3xl font-bold">Publier un nouveau service</h1>
+        <h1 className="mb-8 text-3xl font-bold">
+          Publier une nouvelle annonce
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -167,7 +171,7 @@ export default function NewServicePage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/marketplace")}
+              onClick={() => router.push("/annonces")}
             >
               Annuler
             </Button>

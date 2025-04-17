@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Button } from "@/components/ui/Button";
+
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "../ui/button";
 
 interface AnnouncementFormProps {
   onSuccess?: () => void;

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
-import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/types/supabase";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Button } from "@/components/ui/button";
 
-type Service = Database["public"]["Tables"]["services"]["Row"];
+// type Service = Database["public"]["Tables"]["services"]["Row"];
+
+type Service = Database["public"]["Tables"];
 
 export default function MarketplacePage() {
   const [services, setServices] = useState<Service[]>([]);
