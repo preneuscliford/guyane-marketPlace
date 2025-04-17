@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@/hooks/useAuth";
 
 const categories = [
