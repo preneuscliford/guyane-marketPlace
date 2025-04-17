@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/lib/supabase";
 import { type User } from "@supabase/supabase-js";
 
 export function useAuth() {

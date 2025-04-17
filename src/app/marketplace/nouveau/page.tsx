@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/lib/supabase";
 
 const categories = [
   "Services à domicile",

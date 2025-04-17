@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/types/supabase";
 import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-type PostBase = Database["public"]["Tables"]["posts"]["Row"];
+type PostBase = Database["public"]["Tables"];
 
 type Post = PostBase & {
   profiles: Profile;

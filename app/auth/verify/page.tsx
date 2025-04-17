@@ -3,7 +3,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 
 export default function VerifyPage() {
