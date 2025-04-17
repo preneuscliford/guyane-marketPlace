@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
+    "@next-tools/dynamic": "^0.0.11",
     "@radix-ui/react-slot": "^1.2.0",
     "@stripe/stripe-js": "^7.1.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
