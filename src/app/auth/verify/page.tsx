@@ -5,7 +5,7 @@ const VerifyClient = dynamic(() => import("./verifyClient"), { ssr: false });
 
 export default function Page() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Chargement...</div>}>
       <VerifyClient />
     </Suspense>
   );
