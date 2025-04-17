@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 
-import { ProtectedLayout } from "src/components/layout/ProtectedLayout";
 import { Button } from "@/components/ui/Button";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
 
 const categories = [
   "Véhicules",

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProtectedLayout } from "@components/layout/protected-layout";
-import { Button } from "@components/ui/button";
+
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Button } from "@/components/ui/Button";
 
 const supabase = createClientComponentClient();
 

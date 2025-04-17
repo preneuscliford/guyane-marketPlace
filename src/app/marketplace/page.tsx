@@ -5,7 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/types/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 // type Service = Database["public"]["Tables"]["services"]["Row"];
 
