@@ -1,17 +1,7 @@
 import dynamic from "next/dynamic";
 
-// Import sans SSR pour éviter les erreurs
-const ClientVerifier = dynamic(
-  () => import("../../../components/ClientVerifier"),
-  {
-    ssr: false,
-  }
-);
+const VerifyClient = dynamic(() => import("./verifyClient"), { ssr: false });
 
-export default function VerifyPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <ClientVerifier />
-    </div>
-  );
+export default function Page() {
+  return <VerifyClient />;
 }
