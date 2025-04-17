@@ -1,8 +1,19 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    serverActions: {}, // à garder si vous en avez besoin
+    serverActions: {
+      bodySizeLimit: "10mb", // Augmentez si nécessaire
+      allowedOrigins: [
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        process.env.NEXT_PUBLIC_SITE_URL || "",
+      ].filter(Boolean),
+    },
+    optimizePackageImports: [
+      "@supabase/supabase-js",
+      "@radix-ui/react-dropdown-menu",
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -10,16 +21,22 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  webpack(config, { isServer }) {
+  webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Empêche webpack de chercher le module 'fs' dans le bundle client
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
+        net: false,
+        tls: false,
+        dns: false, // Ajout important pour Netlify
       };
     }
     return config;
   },
+  transpilePackages: [
+    "@supabase/supabase-js",
+    "react-hot-toast", // Exemple de package supplémentaire
+  ],
 };
 
 export default nextConfig;
