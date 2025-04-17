@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 
@@ -8,18 +9,28 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState("");
+
   const { signIn, signUp }: any = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const message = searchParams.get("message");
+  const error = searchParams.get("error");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
+
     try {
       if (isLogin) {
         await signIn(email, password);
+        router.push("/annonces");
       } else {
         await signUp(email, password);
       }
-    } catch (error) {
-      console.error("Erreur:", error);
+    } catch (err: any) {
+      setFormError(err?.message || "Une erreur est survenue");
     }
   };
 
@@ -31,6 +42,16 @@ export default function AuthPage() {
             {isLogin ? "Connexion à votre compte" : "Créer un compte"}
           </h2>
         </div>
+
+        {/* Message global */}
+        {message && (
+          <p className="text-green-600 text-sm text-center">{message}</p>
+        )}
+        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+        {formError && (
+          <p className="text-red-500 text-sm text-center">{formError}</p>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
