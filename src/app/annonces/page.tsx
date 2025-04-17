@@ -2,12 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/lib/supabase";
-import type { Database } from "@/types/supabase";
+import { createClient } from "@supabase/supabase-js";
 
-type Announcement = Database["public"]["Tables"]["announcements"]["Row"];
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+type Announcement = {
+  id: string;
+  created_at: string;
+  title: string;
+  description: string;
+  price?: number;
+  location?: string;
+  category?: string;
+  user_id: string;
+};
 
 export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
