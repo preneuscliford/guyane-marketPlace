@@ -1,56 +1,77 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
+// Type sécurité renforcée
+type VerificationType =
+  | "signup"
+  | "magiclink"
+  | "recovery"
+  | "invite"
+  | "email_change";
 
 export default function VerifyClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const handleEmailVerification = async () => {
+    const verifyToken = async () => {
       try {
         const token_hash = searchParams.get("token_hash");
-        const type = searchParams.get("type") as
-          | "signup"
-          | "magiclink"
-          | "recovery"
-          | "invite"
-          | "email_change";
-        const next = searchParams.get("next") ?? "/";
+        const type = searchParams.get("type") as VerificationType;
+        const next = searchParams.get("next") || "/";
 
-        if (token_hash && type) {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash,
-            type,
-          });
-
-          if (error) {
-            console.error("Erreur lors de la vérification:", error.message);
-            router.push(
-              "/auth?error=Erreur lors de la vérification de votre email"
-            );
-          } else {
-            router.push("/auth?message=Email vérifié avec succès");
-          }
+        if (!token_hash || !type) {
+          throw new Error("Paramètres de vérification manquants");
         }
+
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash,
+          type,
+        });
+
+        startTransition(() => {
+          if (error) {
+            console.error("Erreur de vérification:", error.message);
+            router.push(`/auth?error=${encodeURIComponent(error.message)}`);
+          } else {
+            router.push(
+              `/auth?message=${encodeURIComponent("Vérification réussie!")}`
+            );
+          }
+        });
       } catch (error) {
-        console.error("Erreur lors de la vérification:", error);
-        router.push("/auth?error=Une erreur est survenue");
+        console.error("Erreur critique:", error);
+        startTransition(() => {
+          router.push(
+            "/auth?error=" +
+              encodeURIComponent("Erreur système - Veuillez réessayer")
+          );
+        });
       }
     };
 
-    handleEmailVerification();
+    verifyToken();
   }, [router, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900 mx-auto"></div>
-        <h1 className="text-xl font-semibold mb-2">Vérification en cours...</h1>
-        <p className="text-gray-600">
-          Veuillez patienter pendant que nous vérifions votre email.
+      <div className="text-center space-y-4">
+        <div
+          className="mx-auto h-12 w-12 animate-spin rounded-full 
+          border-4 border-blue-500 border-t-transparent"
+        />
+
+        <h1 className="text-2xl font-bold text-gray-900">
+          {isPending ? "Finalisation..." : "Vérification en cours"}
+        </h1>
+
+        <p className="text-gray-600 max-w-md">
+          Patientez pendant que nous sécurisons votre compte. Cette opération
+          peut prendre quelques secondes.
         </p>
       </div>
     </div>
