@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useAuth } from "@/hooks/useAuth";
 
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "@components/ui/Button";
 
 interface AnnouncementCardProps {
   announcement: {

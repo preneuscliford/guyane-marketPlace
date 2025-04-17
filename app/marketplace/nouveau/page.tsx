@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
+
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
 
 const categories = [
   "Services à domicile",

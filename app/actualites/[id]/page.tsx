@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
+
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/types/supabase";
+import { ProtectedLayout } from "@/components/layout/protected-layout";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   profiles: Database["public"]["Tables"]["profiles"]["Row"];

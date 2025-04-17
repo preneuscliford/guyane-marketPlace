@@ -10,7 +10,8 @@ import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-type PostBase = Database["public"]["Tables"]["posts"]["Row"];
+// type PostBase = Database["public"]["Tables"]["posts"]["Row"];
+type PostBase = Database["public"]["Tables"];
 
 type Post = PostBase & {
   profiles: Profile;
@@ -54,7 +55,7 @@ export default function ActualitesPage() {
       console.log("Publications chargées avec succès:", data);
 
       // Transformer les données pour correspondre au type Post
-      const formattedPosts = data.map((post: any) => ({
+      const formattedPosts = data.map((post) => ({
         ...post,
         profiles: post.profiles,
         likes: post.likes || [],
@@ -245,7 +246,7 @@ export default function ActualitesPage() {
               <div className="space-y-6">
                 {posts.map((post: Post) => (
                   <div
-                    key={post.id}
+                    key={post?.id}
                     className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                   >
                     <div className="p-6">
