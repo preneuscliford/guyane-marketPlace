@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/utils/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/types/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";

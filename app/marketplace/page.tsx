@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/utils/supabaseClient";
 import type { Database } from "@/types/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 
