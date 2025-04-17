@@ -8,13 +8,15 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/types/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+// // type Post = Database["public"]["Tables"]["posts"]["Row"]
+// type Comment = Database["public"]["Tables"]["comments"]["Row"]
 
-type Post = Database["public"]["Tables"]["posts"]["Row"] & {
+type Post = Database["public"]["Tables"] & {
   profiles: Database["public"]["Tables"]["profiles"]["Row"];
   likes: { user_id: string }[];
 };
 
-type Comment = Database["public"]["Tables"]["comments"]["Row"] & {
+type Comment = Database["public"]["Tables"] & {
   profiles: Database["public"]["Tables"]["profiles"]["Row"];
 };
 
