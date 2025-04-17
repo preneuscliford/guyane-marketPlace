@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@providers/AuthProvider";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Suspense>{children}</Suspense>
+        </AuthProvider>
       </body>
     </html>
   );
