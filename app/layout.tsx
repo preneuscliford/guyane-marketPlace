@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@providers/AuthProvider";
-import { Suspense } from "react";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,11 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className="h-full">
-      <body
-        className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white`}
-      >
+      <body className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white`}>
         <AuthProvider>
-          <Suspense>{children}</Suspense>
+          {children}
         </AuthProvider>
       </body>
     </html>

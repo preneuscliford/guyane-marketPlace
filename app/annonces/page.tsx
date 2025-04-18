@@ -2,45 +2,43 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ProtectedLayout } from "@/components/layout/protected-layout";
+
 import { Button } from "@/components/ui/Button";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+import { Plus, MapPin } from "lucide-react";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { Skeleton } from "@/components/ui/Skeleton";
+import { formatDate, formatPrice } from "lib/utils";
 
-type Announcement = {
-  id: string;
-  created_at: string;
-  title: string;
-  description: string;
-  price?: number;
-  location?: string;
-  category?: string;
-  user_id: string;
-};
+
 
 export default function AnnouncementsPage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAnnouncements();
   }, []);
 
+  
+
   const fetchAnnouncements = async () => {
     try {
       const { data, error } = await supabase
         .from("announcements")
-        .select("*")
+        .select(`
+          *,
+          profiles:user_id(
+            username,
+            avatar_url
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setAnnouncements(data);
+      setAnnouncements(data || []);
     } catch (error) {
-      console.error("Erreur lors du chargement des annonces:", error);
+      console.error("Error loading announcements:", error);
     } finally {
       setLoading(false);
     }
@@ -48,56 +46,108 @@ export default function AnnouncementsPage() {
 
   if (loading) {
     return (
-      <ProtectedLayout>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-        </div>
-      </ProtectedLayout>
-    );
-  }
-
-  return (
-    <ProtectedLayout>
-      <div className="container py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Petites Annonces</h1>
-          <Button asChild>
-            <Link href="/annonces/nouvelle">Publier une annonce</Link>
-          </Button>
-        </div>
-
+      <div className="container py-16 px-8">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {announcements.map((announcement) => (
-            <div
-              key={announcement.id}
-              className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
-            >
-              <div className="p-6">
-                <div className="mb-2 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800">
-                  {announcement.category}
-                </div>
-                <h3 className="text-2xl font-semibold">{announcement.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {announcement.description}
-                </p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-bold">
-                    {announcement.price
-                      ? `${announcement.price} €`
-                      : "Prix sur demande"}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {announcement.location}
-                  </span>
-                </div>
-                <div className="mt-4">
-                  <Button className="w-full">Contacter</Button>
-                </div>
-              </div>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-lg border p-4">
+              <Skeleton className="h-4 w-32 mb-4" />
+              <Skeleton className="h-6 w-full mb-4" />
+              <Skeleton className="h-20 w-full mb-4" />
+              <Skeleton className="h-4 w-24" />
             </div>
           ))}
         </div>
       </div>
-    </ProtectedLayout>
+    );
+  }
+
+  return (
+    <div className="container py-8 px-8">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Marché Guyanais</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Votre marché communautaire en ligne
+          </p>
+        </div>
+        <Button asChild className="w-full md:w-auto">
+          <Link href="/annonces/nouvelle" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Déposer une annonce
+          </Link>
+        </Button>
+      </div>
+
+      {announcements.length === 0 ? (
+        <div className="flex h-96 flex-col items-center justify-center rounded-lg border">
+          <p className="text-xl text-muted-foreground">
+            Aucune annonce disponible pour le moment
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {announcements.map((announcement) => (
+            <Link
+              key={announcement.id}
+              href={`/annonces/${announcement.id}`}
+              className="group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md"
+            >
+              {/* Image Gallery */}
+              {announcement.images?.length > 0 && (
+                <div className="relative aspect-video w-full">
+                  <Image
+                    src={announcement.images[0]}
+                    alt={announcement.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+              )}
+
+              <div className="p-5">
+                {/* Category and User */}
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                    {announcement.category}
+                  </span>
+                  {announcement.profiles && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {announcement.profiles.username}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Title and Description */}
+                <h3 className="mb-2 text-xl font-bold text-foreground">
+                  {announcement.title}
+                </h3>
+                <p className="mb-4 line-clamp-2 text-muted-foreground">
+                  {announcement.description}
+                </p>
+
+                {/* Price and Location */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-primary">
+                      {announcement.price ? formatPrice(announcement.price) : "Prix sur demande"}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {formatDate(announcement.created_at)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    {announcement.location}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

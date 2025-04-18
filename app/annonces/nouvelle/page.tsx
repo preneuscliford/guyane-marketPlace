@@ -7,7 +7,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+
+
+
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Textarea } from "@/components/ui/Textarea";
+import { Label } from "@/components/ui/Label";
 
 const categories = [
   "Véhicules",
@@ -65,121 +71,109 @@ export default function NewAnnouncementPage() {
 
   return (
     <ProtectedLayout>
-      <div className="container max-w-2xl py-8">
-        <h1 className="mb-8 text-3xl font-bold">
-          Publier une nouvelle annonce
-        </h1>
+      <div className="container py-8">
+        <div className="mx-auto max-w-2xl">
+          <h1 className="mb-6 text-3xl font-bold">Publier une nouvelle annonce</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Titre
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              value={formData.title}
-              onChange={handleChange}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Titre */}
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="title">Titre</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  required
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Ex: iPhone 13 Pro Max - 256GB"
+                />
+              </div>
 
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </div>
+              {/* Catégorie et Prix */}
+              <div className="space-y-2">
+                <Label htmlFor="category">Catégorie</Label>
+                <select
+                  id="category"
+                  name="category"
+                  required
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  <option value="">Sélectionnez une catégorie</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Prix (€)
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              step="0.01"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              value={formData.price}
-              onChange={handleChange}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Prix (€)</Label>
+                <Input
+                  type="number"
+                  id="price"
+                  name="price"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="Ex: 299.99"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Catégorie
-            </label>
-            <select
-              id="category"
-              name="category"
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Sélectionnez une catégorie</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+              
+                id="description"
+                name="description"
+                rows={5}
+                required
+                className="min-h-[120px]"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Décrivez votre annonce en détail..."
+              />
+            </div>
 
-          <div>
-            <label
-              htmlFor="location"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Localisation
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              value={formData.location}
-              onChange={handleChange}
-            />
-          </div>
+            {/* Localisation */}
+            <div className="space-y-2">
+              <Label htmlFor="location">Localisation</Label>
+              <Input
+                type="text"
+                id="location"
+                name="location"
+                required
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="Ex: Cayenne, Guyane"
+              />
+            </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("/annonces")}
-            >
-              Annuler
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Publication..." : "Publier"}
-            </Button>
-          </div>
-        </form>
+            {/* Boutons */}
+            <div className="flex flex-col-reverse gap-4 md:flex-row md:justify-end md:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push("/annonces")}
+                className="w-full md:w-auto bg-white text-primary border-primary hover:bg-gray-50"
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={loading} 
+                className="w-full md:w-auto bg-primary hover:bg-primary-dark text-white"
+              >
+                {loading ? "Publication..." : "Publier l'annonce"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </ProtectedLayout>
   );

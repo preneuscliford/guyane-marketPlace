@@ -1,86 +1,93 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/Button";
+import { ProductGrid } from "@/components/marketplace/ProductGrid";
+import { FilterBar } from "@/components/marketplace/FilterBar";
+import { SearchBar } from "@/components/ui/SearchBar";
 import { supabase } from "@/lib/supabase";
-import type { Database } from "@/types/supabase";
-import { ProtectedLayout } from "@/components/layout/protected-layout";
-
-type Service = Database["public"]["Tables"]["services"]["Row"];
 
 export default function MarketplacePage() {
-  const [services, setServices] = useState<Service[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    priceRange: [0, 1000],
+    category: "",
+    location: "",
+    sortBy: "recent"
+  });
 
   useEffect(() => {
-    fetchServices();
-  }, []);
+    fetchProducts();
+  }, [filters, searchQuery]);
 
-  const fetchServices = async () => {
+  const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from("services")
-        .select("*")
-        .order("created_at", { ascending: false });
+      setLoading(true);
+      let query = supabase
+        .from('products')
+        .select('*')
+        .gte('price', filters.priceRange[0])
+        .lte('price', filters.priceRange[1]);
+
+      if (searchQuery) {
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+      }
+
+      if (filters.category && filters.category !== "Tous") {
+        query = query.eq('category', filters.category);
+      }
+
+      if (filters.location && filters.location !== "Toute la Guyane") {
+        query = query.eq('location', filters.location);
+      }
+
+      switch (filters.sortBy) {
+        case 'price-asc':
+          query = query.order('price', { ascending: true });
+          break;
+        case 'price-desc':
+          query = query.order('price', { ascending: false });
+          break;
+        default:
+          query = query.order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      setServices(data);
+      setProducts(data || []);
     } catch (error) {
-      console.error("Erreur lors du chargement des services:", error);
+      console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <ProtectedLayout>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-        </div>
-      </ProtectedLayout>
-    );
-  }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
 
   return (
-    <ProtectedLayout>
-      <div className="container py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Marketplace de Services</h1>
-          <Button asChild>
-            <Link href="/marketplace/nouveau">Publier un service</Link>
-          </Button>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <div
-              key={service.id}
-              className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
-            >
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold">{service.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {service.description}
-                </p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-bold">
-                    {service.price ? `${service.price} €` : "Prix sur demande"}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {service.location}
-                  </span>
-                </div>
-                <div className="mt-4">
-                  <Button className="w-full">Contacter</Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-4">Marketplace</h1>
+        <SearchBar 
+          className="max-w-2xl" 
+          onSearch={handleSearch}
+          placeholder="Rechercher dans le marketplace..."
+        />
       </div>
-    </ProtectedLayout>
+
+      <FilterBar onFilterChange={setFilters} />
+
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <ProductGrid products={products} />
+      )}
+    </div>
   );
 }
