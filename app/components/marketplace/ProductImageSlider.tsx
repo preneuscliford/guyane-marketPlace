@@ -36,12 +36,12 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square">
+      <div className="relative aspect-square overflow-hidden rounded-2xl shadow-soft hover:shadow-hover transition-shadow duration-300">
         <Image
           src={images[currentImage]}
           alt={`${title} - Image ${currentImage + 1}`}
           fill
-          className="object-cover rounded-lg"
+          className="object-cover transform transition-transform duration-500 hover:scale-105"
           priority
         />
         
@@ -49,30 +49,30 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
           <>
             <button
               onClick={previousImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur-md hover:bg-white/95 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-5 w-5 text-gray-800" />
             </button>
             
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur-md hover:bg-white/95 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               aria-label="Next image"
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-5 w-5 text-gray-800" />
             </button>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full">
               {images.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImage(index)}
                   className={cn(
-                    "w-2 h-2 rounded-full transition-colors",
+                    "w-2.5 h-2.5 rounded-full transition-all duration-300 transform hover:scale-110",
                     currentImage === index
-                      ? "bg-white"
-                      : "bg-white/50 hover:bg-white/75"
+                      ? "bg-primary shadow-lg"
+                      : "bg-white/70 hover:bg-white"
                   )}
                   aria-label={`Go to image ${index + 1}`}
                 />
