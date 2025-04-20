@@ -50,12 +50,12 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4 mb-6">
-      <div className="flex items-center justify-between">
+    <div className="bg-background/80 border border-border rounded-lg p-4 mb-6 backdrop-blur-sm">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <Button
           variant="outline"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 w-full md:w-auto hover:bg-accent"
         >
           <Filter className="h-4 w-4" />
           Filtres

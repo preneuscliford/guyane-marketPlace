@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input"; 
-
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/Textarea";
 
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/ImageUpload";
-import { Database } from "@/types/supabase";
+import type { Database } from "@/types/supabase";
 
 const CATEGORIES = [
   "Véhicules",
@@ -29,7 +30,10 @@ interface AnnouncementFormProps {
   initialData?: Database["public"]["Tables"]["announcements"]["Row"];
 }
 
-export default function AnnouncementForm({ onSuccess, initialData }: AnnouncementFormProps) {
+export default function AnnouncementForm({
+  onSuccess,
+  initialData,
+}: AnnouncementFormProps) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const [isLoading, setIsLoading] = useState(false);
@@ -48,15 +52,32 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
 
     try {
       setIsLoading(true);
-      const { error } = await supabase.from("announcements").insert({
-        title: formData.title,
-        description: formData.description,
-        price: formData.price ? Number(formData.price) : null,
-        category: formData.category,
-        location: formData.location,
-        user_id: user.id,
-        images: images.length > 0 ? images : null,
-      });
+      let error;
+      if (initialData?.id) {
+        // Update existing announcement
+        ({ error } = await supabase
+          .from("announcements")
+          .update({
+            title: formData.title,
+            description: formData.description,
+            price: formData.price ? Number(formData.price) : null,
+            category: formData.category,
+            location: formData.location,
+            images: images.length > 0 ? images : null,
+          })
+          .eq("id", initialData.id));
+      } else {
+        // Create new announcement
+        ({ error } = await supabase.from("announcements").insert({
+          title: formData.title,
+          description: formData.description,
+          price: formData.price ? Number(formData.price) : null,
+          category: formData.category,
+          location: formData.location,
+          user_id: user.id,
+          images: images.length > 0 ? images : null,
+        }));
+      }
 
       if (error) throw error;
       toast.success("Annonce publiée avec succès!");
@@ -77,7 +98,9 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
           <ImageUpload
             value={images}
             onChange={(urls) => setImages(urls)}
-            onRemove={(url) => setImages((prev) => prev.filter((u) => u !== url))}
+            onRemove={(url) =>
+              setImages((prev) => prev.filter((u) => u !== url))
+            }
           />
         </div>
         <div>
@@ -85,7 +108,9 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
           <Input
             id="title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             required
             placeholder="Ex: iPhone 13 Pro Max - 256GB"
           />
@@ -96,29 +121,34 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
           <select
             id="category"
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             required
           >
             <option value="">Sélectionnez une catégorie</option>
             {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
         </div>
 
         <div>
           <Label htmlFor="description">Description</Label>
-          <Textareakk
+          <Textarea
             id="description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             required
-            placeholder="Décrivez votre annonce en détail"
+            placeholder="Décrivez votre annonce en détail (minimum 20 caractères)"
             rows={5}
           />
         </div>
-        
 
         <div>
           <Label htmlFor="price">Prix (€)</Label>
@@ -126,7 +156,9 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
             id="price"
             type="number"
             value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, price: e.target.value })
+            }
             placeholder="Ex: 299.99"
             min="0"
             step="0.01"
@@ -138,7 +170,9 @@ export default function AnnouncementForm({ onSuccess, initialData }: Announcemen
           <Input
             id="location"
             value={formData.location}
-            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, location: e.target.value })
+            }
             required
             placeholder="Ex: Cayenne, Guyane"
           />

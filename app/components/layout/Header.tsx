@@ -8,10 +8,11 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import { Menu, Bell, User, LogOut, Plus, ShoppingBag, Search } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
-export function Header() {
+export function Header({ className }: { className?: string }) {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const isCreateAnnouncePage = pathname === '/annonces/nouvelle';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +49,7 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-200 shadow-sm">
+    <header className={`fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-200 shadow-sm ${className || ''}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
@@ -57,17 +58,19 @@ export function Header() {
               <span className="ml-2 text-xl font-bold text-purple-700">Guyane Market</span>
             </Link>
             
-            <nav className="hidden md:ml-8 md:flex md:space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`text-gray-700 hover:text-purple-600 font-medium ${pathname === item.href ? 'text-purple-600' : ''}`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+            {!isCreateAnnouncePage && (
+              <nav className="hidden md:ml-8 md:flex md:space-x-8">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`text-gray-700 hover:text-purple-600 font-medium ${pathname === item.href ? 'text-purple-600' : ''}`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            )}
           </div>
 
           <div className="hidden md:block w-full max-w-md mx-4">
@@ -136,7 +139,7 @@ export function Header() {
                 </div>
               </>
             ) : (
-              <div className="space-x-2">
+              <div className="flex space-x-2">
                 <Button variant="outline" size="sm" className="text-purple-600 border-purple-200 hover:bg-purple-50" asChild>
                   <Link href="/auth">Connexion</Link>
                 </Button>

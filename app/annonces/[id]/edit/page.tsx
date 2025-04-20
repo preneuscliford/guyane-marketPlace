@@ -101,8 +101,8 @@ export default function EditAnnouncement({
     <div className="min-h-screen">
       <Header />
       <main className="container py-8">
-        <h1 className="mb-8">Modifier l'annonce</h1>
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <h1 className="mb-8 text-3xl font-bold">Modifier l'annonce</h1>
+        <div className="mx-auto max-w-2xl bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <AnnouncementForm
             initialData={announcement}
             onSuccess={() => router.push("/annonces")}

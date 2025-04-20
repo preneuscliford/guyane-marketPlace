@@ -2,6 +2,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    domains: [
+      'oidmaqovylsvbewsrlcb.supabase.co'
+    ],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb", // Augmentez si nécessaire

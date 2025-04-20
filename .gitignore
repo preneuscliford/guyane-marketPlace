@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /exemple
+/guide
 /.pnp
 .pnp.*
 .yarn/*

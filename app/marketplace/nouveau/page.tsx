@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 
 const categories = [
   "Services à domicile",
@@ -29,6 +30,7 @@ export default function NewServicePage() {
     category: "",
     location: "",
   });
+  const [images, setImages] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +42,7 @@ export default function NewServicePage() {
         ...formData,
         price: formData.price ? parseFloat(formData.price) : null,
         user_id: user.id,
+        images: images.length > 0 ? images : null,
       });
 
       if (error) throw error;
@@ -66,6 +69,18 @@ export default function NewServicePage() {
         <h1 className="mb-8 text-3xl font-bold">Publier un nouveau service</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Images
+            </label>
+            <ImageUpload
+              value={images}
+              onChange={(urls) => setImages(urls)}
+              onRemove={(url) =>
+                setImages((prev) => prev.filter((u) => u !== url))
+              }
+            />
+          </div>
           <div>
             <label
               htmlFor="title"

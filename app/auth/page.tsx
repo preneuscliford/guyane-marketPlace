@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -41,75 +42,75 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-      <main className="container max-w-md mx-auto py-12">
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-6">
-            {isSignUp ? "Créer un compte" : "Se connecter"}
-          </h1>
-
-          {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email
-              </label>
+      <Header className="fixed top-0 w-full bg-white shadow-sm z-50" />
+      
+      <div className="mt-32 max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+          {isSignUp ? "Créer un compte" : "Bienvenue"}
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <div className="relative rounded-md shadow-sm">
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all"
+                placeholder="email@example.com"
                 required
               />
             </div>
+          </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Mot de passe
-              </label>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Mot de passe
+            </label>
+            <div className="relative rounded-md shadow-sm">
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all"
+                placeholder="••••••••"
                 required
               />
             </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading
-                ? "Chargement..."
-                : isSignUp
-                ? "S'inscrire"
-                : "Se connecter"}
-            </Button>
-          </form>
-
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-teal-600 hover:text-teal-700"
-            >
-              {isSignUp
-                ? "Déjà un compte ? Se connecter"
-                : "Pas de compte ? S'inscrire"}
-            </button>
           </div>
-        </div>
-      </main>
+
+          {error && (
+            <div className="p-3 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
+              <ExclamationTriangleIcon className="h-5 w-5" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all hover:shadow-lg"
+            disabled={isLoading}
+          >
+            {isLoading ? "Traitement..." : (isSignUp ? "S'inscrire" : "Se connecter")}
+          </Button>
+
+          <p className="text-center text-sm text-gray-600 mt-4">
+            {isSignUp ? "Déjà un compte?" : "Pas encore de compte?"}{" "}
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-purple-600 hover:text-purple-700 font-medium underline"
+            >
+              {isSignUp ? "Se connecter" : "Créer un compte"}
+            </button>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

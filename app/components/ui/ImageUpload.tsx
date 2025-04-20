@@ -13,62 +13,82 @@ interface ImageUploadProps {
   onRemove: (value: string) => void;
 }
 
-export function ImageUpload({
-  value,
-  onChange,
-  onRemove
-}: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const supabase = createClientComponentClient();
 
-  const onDrop = useCallback(async (acceptedFiles: FileWithPath[]) => {
-    try {
-      setIsUploading(true);
-      const newImages = [];
+  const onDrop = useCallback(
+    async (acceptedFiles: FileWithPath[]) => {
+      try {
+        setIsUploading(true);
+        const newImages = [];
+        const toastId = toast.loading("Téléchargement des images...");
 
-      for (const file of acceptedFiles) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `announcements/${fileName}`;
+        for (const [index, file] of acceptedFiles.entries()) {
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}.${fileExt}`;
+          const filePath = `announcements/${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(filePath, file);
+          toast.loading(
+            `Téléchargement de l&#39;image ${index + 1}/${
+              acceptedFiles.length
+            }...`,
+            {
+              id: toastId,
+            }
+          );
 
-        if (uploadError) {
-          throw uploadError;
+          const { error: uploadError } = await supabase.storage
+            .from("announcements-images")
+            .upload(filePath, file, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+          const {
+            data: { publicUrl },
+          } = supabase.storage
+            .from("announcements-images")
+            .getPublicUrl(filePath);
+
+          newImages.push(publicUrl);
         }
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-
-        newImages.push(publicUrl);
+        onChange([...value, ...newImages]);
+        toast.success("Images téléchargées avec succès", { id: toastId });
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Erreur lors du téléchargement des images";
+        toast.error(message, { duration: 5000 });
+      } finally {
+        setIsUploading(false);
       }
-
-      onChange([...value, ...newImages]);
-      toast.success("Images téléchargées avec succès");
-    } catch (error) {
-      toast.error("Erreur lors du téléchargement des images");
-    } finally {
-      setIsUploading(false);
-    }
-  }, [value, onChange]);
+    },
+    [value, onChange]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+      "image/*": [".png", ".jpg", ".jpeg", ".webp"],
     },
     maxFiles: 5,
-    maxSize: 5 * 1024 * 1024 // 5MB
+    maxSize: 5 * 1024 * 1024, // 5MB
   });
 
   return (
     <div className="space-y-4">
       <div
         {...getRootProps()}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition"
+        className="border-2 border-dashed border-border/50 rounded-lg p-6 text-center cursor-pointer bg-background/50 backdrop-blur-sm hover:border-primary/30 transition-colors duration-200"
       >
         <input {...getInputProps()} />
         {isUploading ? (
@@ -79,12 +99,14 @@ export function ImageUpload({
         ) : (
           <div>
             {isDragActive ? (
-              <p>Déposez les images ici...</p>
+              <p>Déposez les images ici&#8230;</p>
             ) : (
-              <p>Glissez-déposez des images ici, ou cliquez pour sélectionner</p>
+              <p>
+                Glissez-déposez des images ici, ou cliquez pour sélectionner
+              </p>
             )}
             <p className="text-xs text-gray-500 mt-2">
-              PNG, JPG, JPEG jusqu'à 5MB
+              PNG, JPG, JPEG jusqu&#39;à 5MB
             </p>
           </div>
         )}
@@ -98,11 +120,16 @@ export function ImageUpload({
                 fill
                 src={url}
                 alt="Uploaded image"
-                className="object-cover rounded-lg"
+                className="object-cover rounded-lg transition-transform duration-200 hover:scale-105"
               />
               <button
-                onClick={() => onRemove(url)}
-                className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm("Supprimer cette image ?")) {
+                    onRemove(url);
+                  }
+                }}
+                className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
-import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Header } from "@/components/layout/Header";
 import Link from "next/link";
 
 type Conversation = {
@@ -158,8 +158,9 @@ export default function MessagesPage() {
   };
 
   return (
-    <ProtectedLayout>
-      <div className="container py-8">
+    <div className="min-h-screen">
+      <Header />
+      <div className="container mx-auto px-4 py-8 pt-24">
         <h1 className="text-3xl font-bold mb-8">Messages</h1>
 
         {loading ? (
@@ -230,6 +231,6 @@ export default function MessagesPage() {
           </div>
         )}
       </div>
-    </ProtectedLayout>
+    </div>
   );
 }

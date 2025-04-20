@@ -5,6 +5,7 @@ import { ProductGrid } from "@/components/marketplace/ProductGrid";
 import { FilterBar } from "@/components/marketplace/FilterBar";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { supabase } from "@/lib/supabase";
+import { Header } from "@/components/layout/Header";
 
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,25 +70,28 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Marketplace</h1>
-        <SearchBar 
-          className="max-w-2xl" 
-          onSearch={handleSearch}
-          placeholder="Rechercher dans le marketplace..."
-        />
-      </div>
-
-      <FilterBar onFilterChange={setFilters} />
-
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    <div className="min-h-screen">
+      <Header />
+      <div className="container mx-auto px-4 py-8 pt-24">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-4">Marketplace</h1>
+          <SearchBar 
+            className="max-w-2xl" 
+            onSearch={handleSearch}
+            placeholder="Rechercher dans le marketplace..."
+          />
         </div>
-      ) : (
-        <ProductGrid products={products} />
-      )}
+
+        <FilterBar onFilterChange={setFilters} />
+
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
+      </div>
     </div>
   );
 }
