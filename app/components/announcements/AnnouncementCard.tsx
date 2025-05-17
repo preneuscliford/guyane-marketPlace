@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import Link from "next/link";
 import { Button } from "@components/ui/Button";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 interface AnnouncementCardProps {
   announcement: {
@@ -50,8 +51,13 @@ export default function AnnouncementCard({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-start">
+    <div className="bg-white p-6 rounded-lg shadow-md relative">
+      {/* Bouton de favoris */}
+      <div className="absolute top-4 right-4">
+        <FavoriteButton announcementId={announcement.id} size="sm" />
+      </div>
+      
+      <div className="flex justify-between items-start pr-10">
         <div>
           <h3 className="text-xl font-semibold text-gray-900">
             {announcement.title}

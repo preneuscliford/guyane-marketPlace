@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { Menu, Bell, User, LogOut, Plus, ShoppingBag, Search } from "lucide-react";
+import { Menu, Bell, User, LogOut, Plus, ShoppingBag } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export function Header({ className }: { className?: string }) {
@@ -55,7 +56,7 @@ export function Header({ className }: { className?: string }) {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-8 w-8 text-purple-600" />
-              <span className="ml-2 text-xl font-bold text-purple-700">Guyane Market</span>
+              <span className="ml-2 text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent">Blada Market</span>
             </Link>
             
             {!isCreateAnnouncePage && (
@@ -105,11 +106,15 @@ export function Header({ className }: { className?: string }) {
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-full hover:bg-purple-50 transition-all duration-300"
                   >
-                    <img
-                      src={user.profile?.avatar_url || "/default-avatar.png"}
-                      alt="Avatar"
-                      className="h-8 w-8 rounded-full object-cover ring-2 ring-purple-100"
-                    />
+                    <div className="relative h-8 w-8 rounded-full overflow-hidden ring-2 ring-purple-100">
+                      <Image
+                        src={user.profile?.avatar_url || "/default-avatar.png"}
+                        alt="Avatar"
+                        fill
+                        sizes="32px"
+                        className="object-cover"
+                      />
+                    </div>
                     <span className="hidden md:block text-gray-700">
                       {user.profile?.username || 'User'}
                     </span>

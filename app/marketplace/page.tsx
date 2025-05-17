@@ -1,28 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ProductGrid } from "@/components/marketplace/ProductGrid";
-import { FilterBar } from "@/components/marketplace/FilterBar";
-import { SearchBar } from "@/components/ui/SearchBar";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Header } from "@/components/layout/Header";
+import { HeroSection } from "@/components/marketplace/HeroSection";
+import { FeaturedCategories } from "@/components/marketplace/FeaturedCategories";
+import { FeaturedServices } from "@/components/marketplace/FeaturedServices";
+import { HowItWorks } from "@/components/marketplace/HowItWorks";
+import { Testimonials } from "@/components/marketplace/Testimonials";
+import { ProductGrid } from "@/components/marketplace/ProductGrid";
+import { FilterBar } from "@/components/marketplace/FilterBar";
+
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  images: string[];
+  category: string;
+  location: string;
+  created_at: string;
+  // Ajoutez d'autres propriétés selon votre modèle de données
+}
+
+interface FilterState {
+  priceRange: [number, number];
+  category: string;
+  location: string;
+  sortBy: string;
+}
 
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [showAllProducts, setShowAllProducts] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 1000],
     category: "",
     location: "",
     sortBy: "recent"
   });
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters, searchQuery]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       let query = supabase
@@ -63,35 +83,97 @@ export default function MarketplacePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, searchQuery]);
+
+  useEffect(() => {
+    if (searchQuery || showAllProducts) {
+      fetchProducts();
+    } else {
+      setLoading(false);
+    }
+  }, [fetchProducts, searchQuery, showAllProducts]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    setShowAllProducts(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleFilterChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setShowAllProducts(true);
   };
 
   return (
     <div className="min-h-screen">
       <Header />
-      <div className="container mx-auto px-4 py-8 pt-24">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">Marketplace</h1>
-          <SearchBar 
-            className="max-w-2xl" 
-            onSearch={handleSearch}
-            placeholder="Rechercher dans le marketplace..."
-          />
-        </div>
-
-        <FilterBar onFilterChange={setFilters} />
-
-        {loading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      
+      {/* Afficher l'interface de recherche ou l'interface de navigation principale */}
+      {showAllProducts || searchQuery ? (
+        // Interface de recherche
+        <div className="container mx-auto px-4 py-8 pt-24">
+          <div className="mb-8">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">Résultats de recherche</h1>
+              <button 
+                onClick={() => {
+                  setShowAllProducts(false);
+                  setSearchQuery("");
+                }}
+                className="px-4 py-2 text-purple-600 border border-purple-600 rounded-lg hover:bg-purple-50 transition-colors"
+              >
+                Retour à l&apos;accueil
+              </button>
+            </div>
+            
+            <div className="mt-6">
+              <FilterBar onFilterChange={handleFilterChange} />
+            </div>
           </div>
-        ) : (
-          <ProductGrid products={products} />
-        )}
-      </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+            </div>
+          ) : (
+            products.length > 0 ? (
+              <ProductGrid products={products} />
+            ) : (
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Aucun résultat trouvé</h2>
+                <p className="text-gray-500">Essayez de modifier vos filtres ou d&apos;utiliser des termes de recherche différents.</p>
+              </div>
+            )
+          )}
+        </div>
+      ) : (
+        // Interface de navigation principale
+        <>
+          <HeroSection onSearch={handleSearch} />
+          <FeaturedCategories />
+          <FeaturedServices />
+          <HowItWorks />
+          <Testimonials />
+          
+          {/* Call to Action */}
+          <section className="py-16 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold mb-6">Prêt à proposer vos services en Guyane ?</h2>
+              <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">Rejoignez notre communauté et commencez à partager vos talents avec la Guyane dès aujourd&apos;hui.</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button className="px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:shadow-lg transition-shadow">
+                  Proposer un service
+                </button>
+                <button className="px-8 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-colors">
+                  Découvrir comment ça marche
+                </button>
+              </div>
+            </div>
+          </section>
+          
+          {/* Footer est géré séparément dans le Header component */}
+        </>
+      )}
     </div>
   );
 }
