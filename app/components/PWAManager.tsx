@@ -20,8 +20,15 @@ export default function PWAManager() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return;
+    
     // Vérifier si l'app est déjà installée
     const checkIfInstalled = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -32,7 +39,7 @@ export default function PWAManager() {
     checkIfInstalled();
 
     // Enregistrer le service worker
-    if ('serviceWorker' in navigator) {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
       registerServiceWorker();
     }
 
@@ -58,7 +65,7 @@ export default function PWAManager() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, []);
+  }, [isClient]);
 
   /**
    * Enregistre le service worker
@@ -221,8 +228,17 @@ function PWAStatusIndicator() {
 export function useNetworkStatus() {
   const [isOnline, setIsOnline] = useState(true);
   const [wasOffline, setWasOffline] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return;
+    }
+
     const updateNetworkStatus = () => {
       const online = navigator.onLine;
       
@@ -253,7 +269,7 @@ export function useNetworkStatus() {
       window.removeEventListener('online', updateNetworkStatus);
       window.removeEventListener('offline', updateNetworkStatus);
     };
-  }, [isOnline, wasOffline]);
+  }, [isClient, isOnline, wasOffline]);
 
   return { isOnline, wasOffline };
 }
@@ -264,15 +280,24 @@ export function useNetworkStatus() {
 export function useAppCache() {
   const [cacheSize, setCacheSize] = useState<number>(0);
   const [isClearing, setIsClearing] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    calculateCacheSize();
+    setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      calculateCacheSize();
+    }
+  }, [isClient]);
 
   /**
    * Calcule la taille du cache
    */
   const calculateCacheSize = async () => {
+    if (!isClient || typeof navigator === 'undefined') return;
+    
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       try {
         const estimate = await navigator.storage.estimate();
@@ -287,6 +312,8 @@ export function useAppCache() {
    * Vide le cache de l'application
    */
   const clearCache = async () => {
+    if (!isClient || typeof window === 'undefined') return;
+    
     setIsClearing(true);
     
     try {
@@ -299,10 +326,14 @@ export function useAppCache() {
       }
       
       // Vider le localStorage
-      localStorage.clear();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
       
       // Vider le sessionStorage
-      sessionStorage.clear();
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
       
       // Recalculer la taille
       await calculateCacheSize();

@@ -9,13 +9,15 @@ import {
   CursorArrowRaysIcon,
   BanknotesIcon,
   CalendarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import { useAdvertisementStats } from '../../hooks/useAdvertisements';
 import { Advertisement, AdvertisementAnalytics as AnalyticsType } from '../../types/advertisements';
 import { formatCurrency, formatNumber, formatDate } from '../../lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+// ... existing code ...
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+// ... existing code ...
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -242,9 +244,9 @@ function MetricCard({
             {change !== undefined && (
               <div className="flex items-center mt-2">
                 {change >= 0 ? (
-                  <TrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
                 ) : (
-                  <TrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
+                  <ArrowTrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
                 )}
                 <span className={`text-sm font-medium ${
                   change >= 0 ? 'text-green-600' : 'text-red-600'
@@ -565,7 +567,7 @@ function OptimizationTab({
           ) : (
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUpIcon className="w-8 h-8 text-green-600" />
+                <ArrowTrendingUpIcon className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 Excellentes performances !

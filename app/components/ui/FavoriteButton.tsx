@@ -5,7 +5,7 @@ import { Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 interface FavoriteButtonProps {
   announcementId: string;

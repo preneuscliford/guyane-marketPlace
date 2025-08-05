@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { XMarkIcon, PhotoIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PhotoIcon, LinkIcon, BanknotesIcon } from '@heroicons/react/24/outline';
 import { useAdvertisements } from '../../hooks/useAdvertisements';
 import { Advertisement, CreateAdvertisementData, UpdateAdvertisementData } from '../../types/advertisements';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
+import { Button } from '../ui/Button'; // Correction: majuscule pour correspondre au fichier Button.tsx
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { Textarea } from '../ui/Textarea';
+import { Slider } from '../ui/Slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/badge';
-import { Slider } from '../ui/slider';
 import { Switch } from '../ui/switch';
 import { toast } from 'sonner';
 
