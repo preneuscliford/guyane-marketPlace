@@ -10,6 +10,9 @@ export interface AuthUser extends User {
     full_name?: string;
     bio?: string;
     location?: string;
+    skills?: string[];
+    phone?: string;
+    website?: string;
   };
 }
 

@@ -155,7 +155,7 @@ export interface AdvertisementEvent {
   type: 'impression' | 'click' | 'conversion';
   advertisement_id: string;
   user_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
   timestamp: string;
 }
 

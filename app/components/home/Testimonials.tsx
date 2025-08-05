@@ -108,8 +108,8 @@ const TestimonialCard: React.FC<TestimonialProps & { index: number }> = ({ name,
                       <Star 
                         className={`h-4 w-4 transition-colors duration-200 ${
                           i < rating 
-                            ? 'text-yellow-400 fill-yellow-400' 
-                            : 'text-gray-300'
+                            ? 'text-yellow-400 fill-yellow-400'
+                : 'text-gray-300'
                         }`}
                       />
                     </motion.div>
@@ -248,7 +248,7 @@ export function Testimonials() {
               Rejoignez notre communauté satisfaite
             </h3>
             <p className="text-gray-600 mb-6">
-              Découvrez pourquoi des milliers d'utilisateurs font confiance à Blada Market pour leurs achats et ventes en Guyane.
+              Découvrez pourquoi des milliers d&apos;utilisateurs font confiance à Blada Market pour leurs achats et ventes en Guyane.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}

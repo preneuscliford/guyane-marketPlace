@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Loader2, Camera, X } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, profile, updateProfile } = useAuth();
-  const router = useRouter();
+  const { user, updateProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -25,19 +24,19 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (profile) {
+    if (user?.profile) {
       setFormData({
-        username: profile.username || "",
-        full_name: profile.full_name || "",
-        bio: profile.bio || "",
-        location: profile.location || "",
-        skills: profile.skills ? profile.skills.join(", ") : "",
-        phone: profile.phone || "",
-        website: profile.website || "",
+        username: user.profile.username || "",
+        full_name: user.profile.full_name || "",
+        bio: user.profile.bio || "",
+        location: user.profile.location || "",
+        skills: user.profile.skills ? user.profile.skills.join(", ") : "",
+        phone: user.profile.phone || "",
+        website: user.profile.website || "",
       });
-      setAvatarUrl(profile.avatar_url || null);
+      setAvatarUrl(user.profile.avatar_url || null);
     }
-  }, [profile]);
+  }, [user?.profile]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -93,12 +92,13 @@ export default function ProfilePage() {
       setLoading(true);
       
       // Télécharger l'avatar si nécessaire
-      let newAvatarUrl = profile?.avatar_url;
+      let newAvatarUrl = user?.profile?.avatar_url;
       if (avatarFile) {
-        newAvatarUrl = await uploadAvatar();
-      } else if (avatarUrl === null && profile?.avatar_url) {
+      const uploadResult = await uploadAvatar();
+      newAvatarUrl = uploadResult ?? undefined;
+      } else if (avatarUrl === null && user?.profile?.avatar_url) {
         // L'utilisateur a supprimé son avatar
-        newAvatarUrl = null;
+        newAvatarUrl = undefined;
       }
       
       // Préparer les données du profil
@@ -137,9 +137,11 @@ export default function ProfilePage() {
               <div className="relative">
                 {avatarUrl ? (
                   <div className="relative">
-                    <img
+                    <Image
                       src={avatarUrl}
                       alt="Avatar"
+                      width={128}
+                      height={128}
                       className="h-32 w-32 rounded-full object-cover border-4 border-indigo-100"
                     />
                     <button
@@ -177,7 +179,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom d'utilisateur*
+                  Nom d&apos;utilisateur*
                 </label>
                 <input
                   id="username"

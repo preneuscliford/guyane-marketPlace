@@ -2,7 +2,7 @@
 
 import { createContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { User, Session } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 import { AuthUser, UseAuthReturn } from "@/hooks/useAuth";
 
 export const AuthContext = createContext<UseAuthReturn>({
@@ -41,7 +41,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
               .eq('id', user.id)
               .single();
 
-            setUser({ ...user, profile });
+            setUser({ ...user, profile } as AuthUser);
           }
         }
 
@@ -56,7 +56,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                 .eq('id', session.user.id)
                 .single();
 
-              setUser({ ...session.user, profile });
+              setUser({ ...session.user, profile } as AuthUser);
             } else {
               setUser(null);
             }
@@ -137,10 +137,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
       if (error) throw error;
 
-      setUser(prev => prev ? {
-        ...prev,
-        profile: { ...prev.profile, ...data }
-      } : null);
+      // Correction du typage pour setUser
+      setUser((prev: AuthUser | null): AuthUser | null => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          profile: { ...prev.profile, ...data }
+        } as AuthUser;
+      });
 
       return {};
     } catch (error) {

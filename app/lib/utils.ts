@@ -18,6 +18,13 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
+ * Formate un prix (alias pour formatCurrency)
+ */
+export function formatPrice(amount: number): string {
+  return formatCurrency(amount);
+}
+
+/**
  * Formate un nombre avec des séparateurs de milliers
  */
 export function formatNumber(num: number): string {

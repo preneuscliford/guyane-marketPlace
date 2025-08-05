@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/Header";
 import Link from "next/link";
+import Image from "next/image";
 
 type Conversation = {
   id: string;
@@ -30,16 +30,9 @@ export default function MessagesPage() {
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      fetchConversations();
-      subscribeToConversations();
-    }
-  }, [user]);
-
-  const fetchConversations = async () => {
+  // Fonction pour récupérer les conversations de l'utilisateur
+  const fetchConversations = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -64,12 +57,12 @@ export default function MessagesPage() {
         const otherUser = conv.user1_id === user.id ? conv.user2 : conv.user1;
         const messages = conv.messages || [];
         const lastMessage = messages.length > 0 
-          ? messages.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+          ? messages.sort((a: { created_at: string }, b: { created_at: string }) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
           : null;
         
         // Compter les messages non lus
         const unreadCount = messages.filter(
-          (msg) => !msg.read && msg.sender_id !== user.id
+          (msg: { read: boolean; sender_id: string }) => !msg.read && msg.sender_id !== user.id
         ).length;
 
         return {
@@ -98,9 +91,10 @@ export default function MessagesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const subscribeToConversations = () => {
+  // Fonction pour s'abonner aux changements en temps réel
+  const subscribeToConversations = useCallback(() => {
     if (!user) return;
 
     const channel = supabase
@@ -139,8 +133,17 @@ export default function MessagesPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [user, fetchConversations]);
 
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      const cleanup = subscribeToConversations();
+      return cleanup;
+    }
+  }, [user, fetchConversations, subscribeToConversations]);
+
+  // Fonction pour formater les dates d'affichage
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -186,9 +189,11 @@ export default function MessagesPage() {
                     <div className="px-6 py-5 flex items-center">
                       <div className="flex-shrink-0">
                         {conversation.other_user.avatar_url ? (
-                          <img
+                          <Image
                             src={conversation.other_user.avatar_url}
                             alt={conversation.other_user.username}
+                            width={48}
+                            height={48}
                             className="h-12 w-12 rounded-full object-cover"
                           />
                         ) : (
