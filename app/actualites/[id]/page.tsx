@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/types/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Header } from "@/components/layout/Header";
 
 // type Post = Database["public"]["Tables"]["posts"]["Row"]
 // type Comment = Database["public"]["Tables"]["comments"]["Row"]
@@ -199,6 +200,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
       if (loading || !post) {
         return (
           <ProtectedLayout>
+            <Header />
             <div className="flex min-h-screen items-center justify-center">
               <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
             </div>
@@ -208,7 +210,8 @@ export default function PostPage({ params }: { params: { id: string } }) {
 
       return (
         <ProtectedLayout>
-          <div className="container py-8">
+          <Header />
+          <div className="container py-8 pt-20">
             <div className="mx-auto max-w-2xl">
               <button
                 onClick={() => router.push("/actualites")}

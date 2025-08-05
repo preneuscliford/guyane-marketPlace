@@ -76,8 +76,13 @@ export function Footer() {
             </div>
             
             <div>
-              <h3 className="font-semibold text-white text-lg mb-4">Légal</h3>
+              <h3 className="font-semibold text-white text-lg mb-4">Paramètres</h3>
               <ul className="space-y-2">
+                <li>
+                  <Link href="/parametres/pwa" className="text-gray-400 hover:text-purple-300 transition-colors duration-200">
+                    Paramètres PWA
+                  </Link>
+                </li>
                 <li>
                   <Link href="/privacy" className="text-gray-400 hover:text-purple-300 transition-colors duration-200">
                     Confidentialité
@@ -104,15 +109,15 @@ export function Footer() {
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
               <div className="flex items-center">
                 <Mail className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">contact@bladamarket.gf</span>
+                <span className="text-gray-400">contact@guyane-marketplace.com</span>
               </div>
               <div className="flex items-center">
                 <Phone className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">+594 123 456 789</span>
+                <span className="text-gray-400">+594 594 123 456</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">Cayenne, Guyane</span>
+                <span className="text-gray-400">Cayenne, Guyane Française</span>
               </div>
             </div>
           </div>
@@ -120,7 +125,7 @@ export function Footer() {
         
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-4 pt-8 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Blada Market. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} Guyane Marketplace. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/supabase";
@@ -54,7 +55,9 @@ export default function AnnouncementsPage() {
 
   if (loading) {
     return (
-      <div className="container py-16 px-8">
+      <>
+        <Header />
+        <div className="container py-16 px-8 pt-24">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="rounded-lg border p-4">
@@ -65,12 +68,15 @@ export default function AnnouncementsPage() {
             </div>
           ))}
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="container py-8 px-8">
+    <>
+      <Header />
+      <div className="container py-8 px-8 pt-24">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-primary">Marché Guyanais</h1>
@@ -151,6 +157,7 @@ export default function AnnouncementsPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

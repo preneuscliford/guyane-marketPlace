@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Header } from "@/components/layout/Header";
 import { Textarea } from "@/components/ui/Textarea";
 import { Label } from "@/components/ui/Label";
 
@@ -90,7 +91,8 @@ export default function NewAnnouncementPage() {
 
   return (
     <ProtectedLayout>
-      <div className="container py-8">
+      <Header />
+      <div className="container py-8 pt-24">
         <div className="mx-auto max-w-2xl">
           <h1 className="mb-6 text-3xl font-bold">
             Publier une nouvelle annonce

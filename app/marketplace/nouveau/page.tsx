@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
+import { Header } from "@/components/layout/Header";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 
 const categories = [
@@ -65,7 +66,8 @@ export default function NewServicePage() {
 
   return (
     <ProtectedLayout>
-      <div className="container max-w-2xl py-8">
+      <Header />
+      <div className="container max-w-2xl py-8 pt-24">
         <h1 className="mb-8 text-3xl font-bold">Publier un nouveau service</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">

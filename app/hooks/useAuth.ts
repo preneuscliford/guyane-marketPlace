@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { AuthContext } from "@/providers/AuthProvider";
 import { User, Session } from "@supabase/supabase-js";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export interface AuthUser extends User {
   profile?: {
@@ -18,6 +18,7 @@ export interface UseAuthReturn {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: Error }>;
+  signInWithGoogle: () => Promise<{ error?: Error }>;
   signUp: (email: string, password: string) => Promise<{ error?: Error }>;
   signOut: () => Promise<void>;
   updateProfile: (data: Partial<AuthUser['profile']>) => Promise<{ error?: Error }>;
@@ -50,7 +51,8 @@ export function useRequireAuth() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth?redirect=' + encodeURIComponent(window.location.pathname));
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+      router.push('/auth?redirect=' + encodeURIComponent(currentPath));
     }
   }, [user, loading, router]);
 
@@ -62,10 +64,12 @@ export function usePersistAuth() {
   const { user, session } = useAuth();
 
   useEffect(() => {
-    if (session) {
-      localStorage.setItem('auth_session', JSON.stringify(session));
-    } else {
-      localStorage.removeItem('auth_session');
+    if (typeof window !== 'undefined') {
+      if (session) {
+        localStorage.setItem('auth_session', JSON.stringify(session));
+      } else {
+        localStorage.removeItem('auth_session');
+      }
     }
   }, [session]);
 

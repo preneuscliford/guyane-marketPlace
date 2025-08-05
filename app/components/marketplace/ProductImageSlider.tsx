@@ -25,7 +25,7 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
     return (
       <div className="relative aspect-square rounded-lg bg-gray-100">
         <Image
-          src="/placeholder.png"
+          src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center"
           alt={title}
           fill
           className="object-cover rounded-lg"

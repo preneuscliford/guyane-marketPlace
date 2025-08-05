@@ -21,7 +21,7 @@ const testimonials: Testimonial[] = [
     id: "t1",
     name: "Jean-Marc Dupont",
     role: "Entrepreneur, Cayenne",
-    avatar: "/images/testimonials/person1.jpg",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     content: "J'ai engagé un designer sur Blada Market pour créer le logo de ma nouvelle entreprise. Le résultat a dépassé mes attentes et a été livré en avance. Je recommande vivement cette plateforme à tous les entrepreneurs guyanais.",
     rating: 5.0,
     service: "Design Graphique"
@@ -30,7 +30,7 @@ const testimonials: Testimonial[] = [
     id: "t2",
     name: "Sophia Williams",
     role: "Blogueuse, Kourou",
-    avatar: "/images/testimonials/person2.jpg",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
     content: "Blada Market m'a permis de trouver un développeur local pour mon blog. Le processus a été simple, transparent et j'ai pu collaborer facilement. Un vrai plus pour notre économie locale!",
     rating: 4.5,
     service: "Développement Web"
@@ -39,7 +39,7 @@ const testimonials: Testimonial[] = [
     id: "t3",
     name: "Michel Lambert",
     role: "Artisan, Saint-Laurent",
-    avatar: "/images/testimonials/person3.jpg",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     content: "Grâce à un expert marketing trouvé sur Blada Market, j'ai pu augmenter significativement mes ventes en ligne. Sa connaissance du marché guyanais a fait toute la différence dans ma stratégie.",
     rating: 5.0,
     service: "Marketing Digital"
@@ -48,7 +48,7 @@ const testimonials: Testimonial[] = [
     id: "t4",
     name: "Amandine Rousseau",
     role: "Enseignante, Rémire-Montjoly",
-    avatar: "/images/testimonials/person4.jpg",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     content: "J'ai demandé une traduction de documents pédagogiques en créole. Le service était rapide et précis. Parfait pour mes besoins éducatifs spécifiques à notre région.",
     rating: 4.8,
     service: "Traduction & Langues"

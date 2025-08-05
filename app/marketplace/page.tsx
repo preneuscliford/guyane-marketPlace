@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { Header } from "@/components/layout/Header";
+
 import { HeroSection } from "@/components/marketplace/HeroSection";
 import { FeaturedCategories } from "@/components/marketplace/FeaturedCategories";
 import { FeaturedServices } from "@/components/marketplace/FeaturedServices";
@@ -106,12 +106,12 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      
       
       {/* Afficher l'interface de recherche ou l'interface de navigation principale */}
       {showAllProducts || searchQuery ? (
         // Interface de recherche
-        <div className="container mx-auto px-4 py-8 pt-24">
+        <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold">Résultats de recherche</h1>

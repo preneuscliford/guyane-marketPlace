@@ -10,6 +10,7 @@ export const AuthContext = createContext<UseAuthReturn>({
   session: null,
   loading: true,
   signIn: async () => ({ }),
+  signInWithGoogle: async () => ({ }),
   signUp: async () => ({ }),
   signOut: async () => { },
   updateProfile: async () => ({ }),
@@ -18,7 +19,7 @@ export const AuthContext = createContext<UseAuthReturn>({
   isAuthenticated: false,
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,7 +89,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, username: string) => {
+  /**
+   * Connexion avec Google OAuth
+   */
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      if (error) throw error;
+      return { data };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -96,18 +115,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) throw error;
-
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            username,
-            created_at: new Date().toISOString(),
-          });
-
-        if (profileError) throw profileError;
-      }
 
       return { data };
     } catch (error) {
@@ -170,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         loading,
         signIn,
+        signInWithGoogle,
         signUp,
         signOut,
         updateProfile,

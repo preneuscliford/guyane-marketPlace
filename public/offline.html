@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne - Guyane Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .button {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 10px;
+        }
+        
+        .button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon pulse">
+            📱
+        </div>
+        
+        <h1>Vous êtes hors ligne</h1>
+        
+        <p>
+            Pas de connexion internet ? Pas de problème ! 
+            Guyane Marketplace fonctionne même hors ligne grâce à sa technologie PWA.
+        </p>
+        
+        <div>
+            <a href="/" class="button" onclick="window.location.reload()">
+                🔄 Réessayer
+            </a>
+            <a href="/" class="button">
+                🏠 Accueil
+            </a>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">💾</span>
+                <span>Vos données sont sauvegardées localement</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                <span>Navigation rapide même sans internet</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔄</span>
+                <span>Synchronisation automatique au retour en ligne</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Vérifier périodiquement la connexion
+        function checkConnection() {
+            if (navigator.onLine) {
+                // Tenter de faire une requête pour vérifier la vraie connectivité
+                fetch('/', { method: 'HEAD', cache: 'no-cache' })
+                    .then(() => {
+                        window.location.reload();
+                    })
+                    .catch(() => {
+                        // Toujours hors ligne
+                    });
+            }
+        }
+        
+        // Vérifier la connexion toutes les 5 secondes
+        setInterval(checkConnection, 5000);
+        
+        // Écouter les événements de connexion
+        window.addEventListener('online', checkConnection);
+        
+        // Afficher le statut de connexion
+        function updateConnectionStatus() {
+            const status = navigator.onLine ? 'en ligne' : 'hors ligne';
+            console.log('Statut de connexion:', status);
+        }
+        
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Initialiser
+        updateConnectionStatus();
+    </script>
+</body>
+</html>

@@ -159,6 +159,18 @@ body {
   color: #171717;
 }
 
+/* Ensure Header is always visible */
+.header-fixed {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+}
+
+
+
 
 
 @layer base {

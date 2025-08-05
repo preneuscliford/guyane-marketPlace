@@ -25,7 +25,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/marketplace/${product.id}`} className="block aspect-square">
         <div className="relative h-full w-full">
           <Image
-            src={product.images[0] || "/placeholder.png"}
+            src={product.images[0] || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center"}
             alt={product.title}
             fill
             className="object-cover transition-transform group-hover:scale-105"

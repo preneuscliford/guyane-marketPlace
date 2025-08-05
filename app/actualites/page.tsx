@@ -9,6 +9,10 @@ import { PostImageUpload } from "@/components/ui/PostImageUpload";
 import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 
+
+
+
+
 type Profile = {
   id: string;
   username: string;
@@ -408,72 +412,76 @@ export default function ActualitesPage() {
       
 
   return (
-    <ProtectedLayout>
-      <div className="container py-8">
-        <div className="mx-auto max-w-2xl">
-          <h1 className="mb-8 text-3xl font-bold text-slate-800">
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            Fil d'actualité
-          </h1>
+    <>
+      <ProtectedLayout>
+        <div className="min-h-screen">
+          <div className="container py-8 pt-8">
+            <div className="mx-auto max-w-2xl">
+              <h1 className="mb-8 text-3xl font-bold text-slate-800">
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                Fil d'actualité
+              </h1>
 
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmitPost} className="mb-8">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Images
-                </label>
-                <PostImageUpload
-                  value={selectedImages}
-                  onChange={setSelectedImages}
-                  onRemove={(index) => {
-                    setSelectedImages((prev) =>
-                      prev.filter((_, i) => i !== index)
-                    );
-                  }}
-                />
-              </div>
-              {uploadProgress > 0 && (
-                <div className="mb-4 h-2 rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-teal-600 transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
+              {error && (
+                <div className="mb-4 rounded-md bg-red-50 p-4 text-red-600">
+                  {error}
                 </div>
               )}
-              <textarea
-                placeholder="Partagez quelque chose avec la communauté..."
-                className="min-h-[100px] w-full resize-none rounded-lg border-0 bg-transparent p-2 text-slate-600 placeholder-slate-400 focus:outline-none focus:ring-0"
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-              />
-              <div className="mt-4 flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={submitting || !newPost.trim()}
-                  className="bg-teal-600 hover:bg-teal-700 text-white transition-colors"
-                >
-                  {submitting ? "Publication..." : "Publier"}
-                </Button>
-              </div>
-            </div>
-          </form>
 
-          {renderContent()}
+              <form onSubmit={handleSubmitPost} className="mb-8">
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Images
+                    </label>
+                    <PostImageUpload
+                      value={selectedImages}
+                      onChange={setSelectedImages}
+                      onRemove={(index) => {
+                        setSelectedImages((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                      }}
+                    />
+                  </div>
+                  {uploadProgress > 0 && (
+                    <div className="mb-4 h-2 rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-teal-600 transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  )}
+                  <textarea
+                    placeholder="Partagez quelque chose avec la communauté..."
+                    className="min-h-[100px] w-full resize-none rounded-lg border-0 bg-transparent p-2 text-slate-600 placeholder-slate-400 focus:outline-none focus:ring-0"
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                  />
+                  <div className="mt-4 flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={submitting || !newPost.trim()}
+                      className="bg-teal-600 hover:bg-teal-700 text-white transition-colors"
+                    >
+                      {submitting ? "Publication..." : "Publier"}
+                    </Button>
+                  </div>
+                </div>
+              </form>
 
-          {hasMore && (
-            <div ref={loaderRef} className="flex justify-center py-4">
-              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-teal-600"></div>
+              {renderContent()}
+
+              {hasMore && (
+                <div ref={loaderRef} className="flex justify-center py-4">
+                  <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-teal-600"></div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    </ProtectedLayout>
+      </ProtectedLayout>
+    </>
   );
 
 }

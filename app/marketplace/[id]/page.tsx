@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
         <div className="space-y-4">
           <div className="relative aspect-square rounded-lg overflow-hidden">
             <Image
-              src={product.images[currentImage] || "/placeholder.png"}
+              src={product.images[currentImage] || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center"}
               alt={product.title}
               fill
               className="object-cover"
