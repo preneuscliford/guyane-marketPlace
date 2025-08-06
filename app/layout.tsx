@@ -13,6 +13,14 @@ import AuthProviderWrapper from "./components/providers/AuthProviderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Guyane Marketplace - La marketplace guyanaise",
   description: "La place de marché communautaire de la Guyane française. Achetez et vendez localement avec un système publicitaire innovant.",
@@ -43,13 +51,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Guyane Marketplace - La marketplace guyanaise",
     description: "La place de marché communautaire de la Guyane française",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: "cover",
   },
   other: {
     "theme-color": "#667eea",
