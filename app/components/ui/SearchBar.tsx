@@ -36,21 +36,21 @@ export function SearchBar({
       onSubmit={handleSubmit} 
       className={`relative flex items-center ${className}`}
     >
-      <Search className="absolute left-3 h-5 w-5 text-muted-foreground" />
+      <Search className="absolute left-2 sm:left-3 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        className="h-8 sm:h-10 w-full rounded-md border border-input bg-background pl-8 sm:pl-10 pr-8 sm:pr-10 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
       />
       {query && (
         <button
           type="button"
           onClick={clearSearch}
-          className="absolute right-3 text-muted-foreground hover:text-foreground"
+          className="absolute right-2 sm:right-3 text-muted-foreground hover:text-foreground p-1"
         >
-          <X className="h-5 w-5" />
+          <X className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
       )}
     </form>

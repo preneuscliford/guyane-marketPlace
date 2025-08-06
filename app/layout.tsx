@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { Footer } from "@/components/layout/Footer";
 import PWAManager from "@/components/PWAManager";
+import PWAStyles from "@/components/PWAStyles";
 import { Toaster } from "sonner";
 import { HeaderWrapper } from "./components/layout/HeaderWrapper";
 import AuthProviderWrapper from "./components/providers/AuthProviderWrapper";
@@ -46,8 +47,9 @@ export const metadata: Metadata = {
   viewport: {
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover",
   },
   other: {
     "theme-color": "#667eea",
@@ -74,8 +76,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#667eea" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col pt-16`}>
+      <body className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col pt-14 sm:pt-16`}>
         <AuthProviderWrapper>
+          <PWAStyles />
           <HeaderWrapper />
           <div className="flex-1 flex flex-col">
             {children}

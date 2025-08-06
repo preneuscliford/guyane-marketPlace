@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import * as React from "react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-md text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 touch-manipulation",
   {
     variants: {
       variant: {
@@ -20,10 +20,11 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-8 sm:h-10 px-3 sm:px-4 py-1.5 sm:py-2",
+        sm: "h-7 sm:h-9 rounded-md px-2 sm:px-3 py-1 sm:py-1.5",
+        lg: "h-10 sm:h-11 rounded-md px-6 sm:px-8 py-2 sm:py-2.5",
+        icon: "h-8 w-8 sm:h-10 sm:w-10",
+        xs: "h-6 sm:h-8 px-2 sm:px-3 py-1 sm:py-1.5 text-xs",
       },
     },
     defaultVariants: {
@@ -36,7 +37,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  size?: "default" | "sm" | "lg" | "icon";
+  size?: "default" | "sm" | "lg" | "icon" | "xs";
   isLoading?: boolean;
   asChild?: boolean;
 }

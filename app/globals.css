@@ -169,6 +169,159 @@ body {
   width: 100% !important;
 }
 
+/* PWA and Mobile Optimizations */
+@media screen and (max-width: 375px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Reduce font sizes on very small screens */
+  .text-xl {
+    font-size: 1.125rem;
+  }
+  
+  .text-lg {
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Further reduce spacing on 320px screens */
+  .space-x-4 > * + * {
+    margin-left: 0.5rem;
+  }
+  
+  .space-x-2 > * + * {
+    margin-left: 0.25rem;
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .header-fixed {
+    top: env(safe-area-inset-top) !important;
+  }
+}
+
+/* iOS PWA status bar handling */
+@supports (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    body {
+      padding-top: max(env(safe-area-inset-top), 20px);
+    }
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (hover: none) and (pointer: coarse) {
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Ensure clickable elements are large enough */
+  a, button, input, select, textarea {
+    touch-action: manipulation;
+  }
+}
+
+/* Dynamic PWA and screen size classes */
+.pwa-mode {
+  /* Styles spécifiques à la PWA */
+}
+
+.pwa-mode.ios-pwa {
+  /* Styles spécifiques à iOS PWA */
+}
+
+.screen-320 {
+  /* Styles pour écrans 320px et moins */
+}
+
+.screen-320 .container {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.screen-320 .text-xl {
+  font-size: 1rem !important;
+}
+
+.screen-320 .text-lg {
+  font-size: 0.875rem !important;
+}
+
+.screen-320 .space-x-4 > * + * {
+  margin-left: 0.25rem !important;
+}
+
+.screen-320 .space-x-2 > * + * {
+  margin-left: 0.125rem !important;
+}
+
+.screen-375 {
+  /* Styles pour écrans 375px et moins */
+}
+
+.screen-375 .container {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.screen-375 .text-xl {
+  font-size: 1.125rem !important;
+}
+
+.screen-375 .space-x-4 > * + * {
+  margin-left: 0.5rem !important;
+}
+
+/* Optimisations supplémentaires pour les très petits écrans */
+@media screen and (max-width: 320px) {
+  /* Force des ajustements même sans JavaScript */
+  .flex.space-x-4 {
+    gap: 0.25rem;
+  }
+  
+  .flex.space-x-2 {
+    gap: 0.125rem;
+  }
+  
+  /* Réduction des paddings sur les boutons */
+  .btn, button {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Améliorations pour l'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Optimisations pour les écrans haute densité */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Amélioration de la netteté des bordures */
+  .border {
+    border-width: 0.5px;
+  }
+}
+
 
 
 
