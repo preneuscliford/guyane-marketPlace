@@ -96,12 +96,12 @@ export function Header({ className }: { className?: string }) {
           {/* Mobile Search Toggle */}
           <div className="lg:hidden">
             {isSearchOpen ? (
-              <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 p-2 sm:p-4">
+              <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 p-2 sm:p-4 z-[10000] shadow-lg">
                 <div className="flex items-center space-x-2">
                   <SearchBar className="flex-1" />
                   <button
                     onClick={() => setIsSearchOpen(false)}
-                    className="p-2 text-gray-500 hover:text-gray-700"
+                    className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -166,7 +166,7 @@ export function Header({ className }: { className?: string }) {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg border border-gray-100 transform transition-all duration-300">
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg border border-gray-100 transform transition-all duration-300 z-[10001]">
                       <div className="py-1">
                         <Link
                           href="/profile"
@@ -248,7 +248,7 @@ export function Header({ className }: { className?: string }) {
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden py-3 sm:py-4 border-t bg-white">
+          <div className="lg:hidden py-3 sm:py-4 border-t bg-white z-[10000] relative">
             <div className="lg:hidden mb-3 sm:mb-4">
               <SearchBar className="" />
             </div>
