@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
+import { HeroAdvertisementCarousel } from '@/components/advertisements/AdvertisementCarousel';
 
 export function Hero() {
   const { isAuthenticated } = useAuth();
@@ -136,6 +137,18 @@ export function Hero() {
                 <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-2">10K+</p>
                 <p className="text-gray-600 font-medium">Transactions réussies</p>
               </div>
+            </div>
+          </motion.div>
+          
+          {/* Carrousel de publicités en grand format */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+            className="w-full max-w-6xl mt-16"
+          >
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/50">
+              <HeroAdvertisementCarousel />
             </div>
           </motion.div>
         </div>

@@ -1,0 +1,42 @@
+<svg width="384" height="384" viewBox="0 0 384 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond principal -->
+  <rect width="384" height="384" rx="64" fill="url(#gradient)"/>
+  
+  <!-- Icône de marketplace -->
+  <g transform="translate(64, 64)">
+    <!-- Panier de shopping principal -->
+    <path d="M40 80h180l15-45H30l-8-24H8v15h24l30 90h120v-15H60l-8-21h135z" fill="white" fill-opacity="0.95"/>
+    <circle cx="75" cy="210" r="15" fill="white"/>
+    <circle cx="180" cy="210" r="15" fill="white"/>
+    
+    <!-- Éléments de contenu du panier -->
+    <rect x="90" y="45" width="60" height="8" rx="4" fill="white" fill-opacity="0.8"/>
+    <rect x="90" y="60" width="45" height="8" rx="4" fill="white" fill-opacity="0.8"/>
+    <rect x="90" y="75" width="52" height="8" rx="4" fill="white" fill-opacity="0.8"/>
+    <rect x="90" y="90" width="38" height="8" rx="4" fill="white" fill-opacity="0.8"/>
+    
+    <!-- Badge de notification/publicité -->
+    <circle cx="210" cy="38" r="22" fill="#10B981"/>
+    <path d="M201 38l6 6 12-12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Éléments décoratifs supplémentaires -->
+    <circle cx="240" cy="90" r="12" fill="#F59E0B" fill-opacity="0.8"/>
+    <circle cx="225" cy="120" r="8" fill="#EF4444" fill-opacity="0.8"/>
+    <circle cx="255" cy="135" r="10" fill="#8B5CF6" fill-opacity="0.8"/>
+    
+    <!-- Éléments de design supplémentaires -->
+    <path d="M180 160c20 0 36-16 36-36s-16-36-36-36" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
+    <path d="M60 180c0-20 16-36 36-36s36 16 36 36" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
+  </g>
+  
+  <!-- Dégradé -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#06B6D4;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

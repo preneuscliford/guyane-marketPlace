@@ -8,7 +8,7 @@ import { FeaturedCategories } from "@/components/marketplace/FeaturedCategories"
 import { FeaturedServices } from "@/components/marketplace/FeaturedServices";
 import { HowItWorks } from "@/components/marketplace/HowItWorks";
 import { Testimonials } from "@/components/marketplace/Testimonials";
-import { ProductGrid } from "@/components/marketplace/ProductGrid";
+import ProductGrid from "../../components/marketplace/ProductGrid";
 import { FilterBar } from "@/components/marketplace/FilterBar";
 
 interface Product {
@@ -136,14 +136,11 @@ export default function MarketplacePage() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
             </div>
           ) : (
-            products.length > 0 ? (
-              <ProductGrid products={products} />
-            ) : (
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Aucun résultat trouvé</h2>
-                <p className="text-gray-500">Essayez de modifier vos filtres ou d&apos;utiliser des termes de recherche différents.</p>
-              </div>
-            )
+            <ProductGrid 
+              searchQuery={searchQuery}
+              selectedCategory={filters.category}
+              selectedLocation={filters.location}
+            />
           )}
         </div>
       ) : (

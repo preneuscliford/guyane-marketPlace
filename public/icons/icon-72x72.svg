@@ -1,0 +1,24 @@
+<svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond principal -->
+  <rect width="72" height="72" rx="12" fill="url(#gradient)"/>
+  
+  <!-- Icône de marketplace simplifiée -->
+  <g transform="translate(12, 12)">
+    <!-- Panier de shopping -->
+    <path d="M8 16h32l3-9H6l-2-5H0v3h5l6 18h24v-3H12l-2-4h27z" fill="white" fill-opacity="0.9"/>
+    <circle cx="15" cy="42" r="3" fill="white"/>
+    <circle cx="36" cy="42" r="3" fill="white"/>
+    
+    <!-- Badge -->
+    <circle cx="42" cy="8" r="6" fill="#10B981"/>
+    <path d="M39 8l2 2 3-3" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Dégradé -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
