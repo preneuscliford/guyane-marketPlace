@@ -3,7 +3,7 @@ import forms from '@tailwindcss/forms';
 import animate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   darkMode: ["class"],
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -103,3 +103,5 @@ export default {
     animate,
   ],
 };
+
+export default config;

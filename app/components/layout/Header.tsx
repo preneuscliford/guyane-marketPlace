@@ -65,31 +65,33 @@ export function Header({ className }: { className?: string }) {
   return (
     <header className={`fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-[9999] border-b border-gray-200 shadow-sm ${className || ''}`}>
       <div className="container mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex h-14 sm:h-16 items-center justify-between">
-          <div className="flex items-center min-w-0">
+        <div className="flex h-14 sm:h-16 items-center justify-between gap-4">
+          {/* Logo et Navigation */}
+          <div className="flex items-center min-w-0 flex-shrink-0">
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
-              <span className="ml-2 sm:ml-4 mr-2 sm:mr-8 text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap hidden xs:block">Blada Market</span>
+              <span className="ml-2 sm:ml-4 text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap hidden xs:block">Blada Market</span>
               <span className="ml-2 text-sm font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap xs:hidden">BM</span>
             </Link>
-            
-            {!isCreateAnnouncePage && (
-              <nav className="hidden lg:ml-8 lg:flex lg:space-x-8 xl:space-x-12">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`text-gray-700 hover:text-purple-600 font-medium whitespace-nowrap text-sm xl:text-base ${pathname === item.href ? 'text-purple-600' : ''}`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
-            )}
           </div>
 
+          {/* Navigation Desktop */}
+          {!isCreateAnnouncePage && (
+            <nav className="hidden lg:flex lg:space-x-6 xl:space-x-8 flex-shrink-0">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`text-gray-700 hover:text-purple-600 font-medium whitespace-nowrap text-sm xl:text-base ${pathname === item.href ? 'text-purple-600' : ''}`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          )}
+
           {/* Desktop Search */}
-          <div className="hidden lg:block w-full max-w-md mx-4">
+          <div className="hidden lg:block flex-1 max-w-xs">
             <SearchBar />
           </div>
 
