@@ -207,9 +207,11 @@ export default function MessageModal({
             >
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <DialogTitle className="flex items-center gap-2">
-                    <MessageCircle className="h-5 w-5 text-blue-600" />
-                    Contacter {receiverName}
+                  <DialogTitle>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-blue-600" />
+                      Contacter {receiverName}
+                    </div>
                   </DialogTitle>
                   <Button
                     variant="ghost"
