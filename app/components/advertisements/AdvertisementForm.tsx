@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { XMarkIcon, PhotoIcon, LinkIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PhotoIcon, LinkIcon, BanknotesIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { useAdvertisements } from '../../hooks/useAdvertisements';
 import { Advertisement, CreateAdvertisementData, UpdateAdvertisementData } from '../../types/advertisements';
 import { Button } from '../ui/Button'; // Correction: majuscule pour correspondre au fichier Button.tsx
@@ -15,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { toast } from 'sonner';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 interface AdvertisementFormProps {
   advertisement?: Advertisement | null;
@@ -76,6 +78,7 @@ export default function AdvertisementForm({
   onSuccess
 }: AdvertisementFormProps) {
   const { createAdvertisement, updateAdvertisement, loading } = useAdvertisements();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState<CreateAdvertisementData>({
     title: '',
@@ -93,6 +96,10 @@ export default function AdvertisementForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewMode, setPreviewMode] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEditing = !!advertisement;
 
@@ -107,12 +114,90 @@ export default function AdvertisementForm({
         category: advertisement.category || '',
         location: advertisement.location || '',
         budget: advertisement.budget,
-        daily_budget: advertisement.daily_budget,
-        start_date: advertisement.start_date ? advertisement.start_date.split('T')[0] : '',
-        end_date: advertisement.end_date ? advertisement.end_date.split('T')[0] : ''
+        start_date: advertisement.start_date ? new Date(advertisement.start_date).toISOString().split('T')[0] : '',
+        end_date: advertisement.end_date ? new Date(advertisement.end_date).toISOString().split('T')[0] : '',
+        is_active: advertisement.is_active
       });
+      setImagePreview(advertisement.image_url || '');
     }
   }, [advertisement]);
+
+  // Fonction pour gérer la sélection d'image
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        toast.error('Veuillez sélectionner un fichier image valide');
+        return;
+      }
+      
+      // Vérifier la taille du fichier (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('La taille de l\'image ne doit pas dépasser 5MB');
+        return;
+      }
+      
+      setImageFile(file);
+      
+      // Créer un aperçu de l'image
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Fonction pour uploader l'image vers Supabase Storage
+  const uploadImage = async (file: File): Promise<string | null> => {
+    if (!user) {
+      toast.error('Vous devez être connecté pour uploader une image');
+      return null;
+    }
+
+    try {
+      setUploadingImage(true);
+      
+      // Générer un nom de fichier unique
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/ad-${Date.now()}.${fileExt}`;
+      
+      // Uploader le fichier
+      const { data, error } = await supabase.storage
+        .from('advertisements')
+        .upload(fileName, file);
+      
+      if (error) {
+        console.error('Erreur upload:', error);
+        toast.error('Erreur lors de l\'upload de l\'image');
+        return null;
+      }
+      
+      // Obtenir l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('advertisements')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Erreur upload:', error);
+      toast.error('Erreur lors de l\'upload de l\'image');
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  // Fonction pour supprimer l'image sélectionnée
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    updateField('image_url', '');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   /**
    * Valide le formulaire
@@ -148,10 +233,6 @@ export default function AdvertisementForm({
       newErrors.daily_budget = 'Le budget quotidien ne peut pas dépasser le budget total';
     }
 
-    if (formData.image_url && !isValidUrl(formData.image_url)) {
-      newErrors.image_url = 'L\'URL de l\'image n\'est pas valide';
-    }
-
     if (formData.target_url && !isValidUrl(formData.target_url)) {
       newErrors.target_url = 'L\'URL de destination n\'est pas valide';
     }
@@ -181,26 +262,56 @@ export default function AdvertisementForm({
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 Début de la soumission du formulaire');
+    console.log('📝 Données du formulaire:', formData);
     
     if (!validateForm()) {
+      console.log('❌ Validation échouée');
       toast.error('Veuillez corriger les erreurs dans le formulaire');
       return;
     }
-
+    console.log('✅ Validation réussie');
     try {
+      let finalImageUrl = formData.image_url;
+      
+      // Si un fichier image a été sélectionné, l'uploader d'abord
+      if (imageFile) {
+        console.log('📸 Upload d\'image en cours...');
+        const uploadedUrl = await uploadImage(imageFile);
+        if (uploadedUrl) {
+          finalImageUrl = uploadedUrl;
+          console.log('✅ Image uploadée:', uploadedUrl);
+        } else {
+          console.log('❌ Échec de l\'upload d\'image');
+          // Si l'upload échoue, arrêter la soumission
+          return;
+        }
+      }
+
+      const submissionData = {
+        ...formData,
+        image_url: finalImageUrl
+      };
+      console.log('📤 Données à soumettre:', submissionData);
+
       if (isEditing && advertisement) {
-        const updateData: UpdateAdvertisementData = { ...formData };
-        await updateAdvertisement(advertisement.id, updateData);
+        console.log('🔄 Mise à jour de la publicité...');
+        await updateAdvertisement(advertisement.id, submissionData as UpdateAdvertisementData);
         toast.success('Publicité mise à jour avec succès');
       } else {
-        await createAdvertisement(formData);
+        console.log('➕ Création de la publicité...');
+        const result = await createAdvertisement(submissionData);
+        console.log('✅ Publicité créée:', result);
         toast.success('Publicité créée avec succès');
       }
       
       onSuccess();
     } catch (err) {
+      console.error('❌ Erreur lors de la soumission:', err);
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       toast.error(errorMessage);
+    } finally {
+      // Le loading est géré par le hook useAdvertisements
     }
   };
 
@@ -239,7 +350,7 @@ export default function AdvertisementForm({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col"
       >
         {/* En-tête */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -270,7 +381,9 @@ export default function AdvertisementForm({
 
         <div className="flex-1 overflow-y-auto">
           {previewMode ? (
-            <AdvertisementPreview formData={formData} />
+            <div className="p-6">
+              <AdvertisementPreview formData={formData} />
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-6 space-y-8">
               {/* Informations de base */}
@@ -359,22 +472,88 @@ export default function AdvertisementForm({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Section upload d'image */}
                   <div>
-                    <Label htmlFor="image_url">URL de l'image</Label>
-                    <Input
-                      id="image_url"
-                      value={formData.image_url}
-                      onChange={(e) => updateField('image_url', e.target.value)}
-                      placeholder="https://exemple.com/image.jpg"
-                      className={errors.image_url ? 'border-red-500' : ''}
-                    />
-                    {errors.image_url && (
-                      <p className="text-red-500 text-sm mt-1">{errors.image_url}</p>
-                    )}
-                    <p className="text-gray-500 text-sm mt-1">
-                      Recommandé: 1200x630px, format JPG ou PNG
-                    </p>
+                    <Label>Image de la publicité</Label>
+                    <div className="mt-2">
+                      {/* Zone d'aperçu de l'image */}
+                      {imagePreview ? (
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Aperçu"
+                            className="w-full h-48 object-cover rounded-lg border-2 border-dashed border-gray-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={removeImage}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                        >
+                          <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mb-2" />
+                          <p className="text-gray-600 text-center">
+                            <span className="font-medium">Cliquez pour uploader</span>
+                            <br />
+                            ou glissez-déposez votre image ici
+                          </p>
+                          <p className="text-gray-400 text-sm mt-1">
+                            PNG, JPG jusqu'à 5MB
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Input file caché */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                      
+                      {/* Boutons d'action */}
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingImage}
+                        >
+                          <PhotoIcon className="w-4 h-4 mr-2" />
+                          {imagePreview ? 'Changer l\'image' : 'Sélectionner une image'}
+                        </Button>
+                        
+                        {imagePreview && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={removeImage}
+                          >
+                            <XMarkIcon className="w-4 h-4 mr-2" />
+                            Supprimer
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {uploadingImage && (
+                        <div className="flex items-center gap-2 mt-2 text-blue-600">
+                          <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+                          <span className="text-sm">Upload en cours...</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+
 
                   <div>
                     <Label htmlFor="target_url">URL de destination</Label>

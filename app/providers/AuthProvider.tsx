@@ -12,7 +12,7 @@ export const AuthContext = createContext<UseAuthReturn>({
   signIn: async () => ({ }),
   signInWithGoogle: async () => ({ }),
   signUp: async () => ({ }),
-  signOut: async () => { },
+  signOut: async () => {},
   updateProfile: async () => ({ }),
   resetPassword: async () => ({ }),
   updatePassword: async () => ({ }),
@@ -107,11 +107,29 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, username: string) => {
     try {
+      // Vérifier d'abord si le nom d'utilisateur est disponible
+      const { data: existingUser, error: checkError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .single();
+
+      if (existingUser) {
+        throw new Error('Ce nom d\'utilisateur est déjà pris. Veuillez en choisir un autre.');
+      }
+
+      // Créer le compte utilisateur avec les métadonnées
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username: username,
+            full_name: ''
+          }
+        }
       });
       
       if (error) throw error;

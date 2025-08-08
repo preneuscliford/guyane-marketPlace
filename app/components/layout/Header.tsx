@@ -57,6 +57,7 @@ export function Header({ className }: { className?: string }) {
   const navigation = [
     { name: "Accueil", href: "/" },
     { name: "Marketplace", href: "/marketplace" },
+    { name: "Services", href: "/services" },
     { name: "Annonces", href: "/annonces" },
     { name: "Actualités", href: "/actualites" },
     ...(user ? [{ name: "Mes Publicités", href: "/publicites" }] : []),
@@ -155,7 +156,7 @@ export function Header({ className }: { className?: string }) {
                   >
                     <div className="relative h-6 w-6 sm:h-8 sm:w-8 rounded-full overflow-hidden ring-1 sm:ring-2 ring-purple-100">
                       <Image
-                        src={user.profile?.avatar_url || "/default-avatar.png"}
+                        src={user.profile?.avatar_url || "/default-avatar.svg"}
                         alt="Avatar"
                         fill
                         sizes="32px"

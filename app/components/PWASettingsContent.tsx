@@ -227,7 +227,7 @@ export function PWASettingsContent() {
               Cache de l'application
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Taille actuelle du cache : <span className="font-medium">{formatBytes(cacheSize)}</span>
+              Taille actuelle du cache : <span className="font-medium">{formatBytes(Number(cacheSize))}</span>
             </p>
             <div className="flex space-x-3">
               <Button

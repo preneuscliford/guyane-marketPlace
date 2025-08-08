@@ -1,0 +1,328 @@
+=================================================================
+                DOCUMENTATION SÉCURITÉ RLS SUPABASE
+                    Guyane Marketplace Application
+=================================================================
+
+Date de configuration : Décembre 2024
+Projet Supabase : guyane-marketplace (ID: oidmaqovylsvbewsrlcb)
+
+=================================================================
+                        RÉSUMÉ GÉNÉRAL
+=================================================================
+
+✅ TOUTES LES TABLES SONT MAINTENANT SÉCURISÉES AVEC RLS
+✅ TOUS LES BUCKETS DE STOCKAGE SONT SÉCURISÉS
+✅ TOUTES LES FONCTIONS ONT DES SEARCH_PATH SÉCURISÉS
+✅ POLITIQUES GRANULAIRES POUR CHAQUE OPÉRATION (SELECT, INSERT, UPDATE, DELETE)
+
+Principe de sécurité appliqué :
+- Lecture publique : Contenu visible par tous (posts, produits, annonces)
+- Gestion personnelle : Chaque utilisateur ne peut modifier que ses propres données
+- Accès contrôlé : Conversations et messages limités aux participants
+- Stockage sécurisé : Upload authentifié avec gestion personnelle des fichiers
+
+=================================================================
+                    TABLES SÉCURISÉES AVEC RLS
+=================================================================
+
+📊 TABLES DE PROFILS ET UTILISATEURS
+-----------------------------------
+
+1. TABLE : profiles
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Public profiles are viewable by everyone" (SELECT) : Profils publics visibles par tous
+     * "Users can view own profile" (SELECT) : Utilisateurs peuvent voir leur propre profil
+     * "Users can update own profile" (UPDATE) : Utilisateurs peuvent modifier leur profil
+     * "Users can insert own profile" (INSERT) : Utilisateurs peuvent créer leur profil
+
+🛒 TABLES DE MARKETPLACE
+------------------------
+
+2. TABLE : announcements
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Announcements are viewable by everyone" (SELECT) : Annonces visibles par tous
+     * "Users can insert own announcements" (INSERT) : Utilisateurs peuvent créer leurs annonces
+     * "Users can update own announcements" (UPDATE) : Utilisateurs peuvent modifier leurs annonces
+     * "Users can delete own announcements" (DELETE) : Utilisateurs peuvent supprimer leurs annonces
+
+3. TABLE : products
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Products are viewable by everyone" (SELECT) : Produits visibles par tous
+     * "Users can insert own products" (INSERT) : Utilisateurs peuvent créer leurs produits
+     * "Users can update own products" (UPDATE) : Utilisateurs peuvent modifier leurs produits
+     * "Users can delete own products" (DELETE) : Utilisateurs peuvent supprimer leurs produits
+
+4. TABLE : categories
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Categories are viewable by everyone" (SELECT) : Catégories visibles par tous (lecture seule)
+     * Note : Seuls les administrateurs peuvent modifier les catégories
+
+👥 TABLES DE COMMUNAUTÉ
+-----------------------
+
+5. TABLE : posts
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Posts are viewable by everyone" (SELECT) : Posts visibles par tous
+     * "Users can insert own posts" (INSERT) : Utilisateurs peuvent créer leurs posts
+     * "Users can update own posts" (UPDATE) : Utilisateurs peuvent modifier leurs posts
+     * "Users can delete own posts" (DELETE) : Utilisateurs peuvent supprimer leurs posts
+
+6. TABLE : comments
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Comments are viewable by everyone" (SELECT) : Commentaires visibles par tous
+     * "Users can insert own comments" (INSERT) : Utilisateurs peuvent créer leurs commentaires
+     * "Users can update own comments" (UPDATE) : Utilisateurs peuvent modifier leurs commentaires
+     * "Users can delete own comments" (DELETE) : Utilisateurs peuvent supprimer leurs commentaires
+
+7. TABLE : likes
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Likes are viewable by everyone" (SELECT) : Likes visibles par tous
+     * "Users can insert own likes" (INSERT) : Utilisateurs peuvent ajouter leurs likes
+     * "Users can delete own likes" (DELETE) : Utilisateurs peuvent supprimer leurs likes
+
+8. TABLE : favorites
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Users can view own favorites" (SELECT) : Utilisateurs peuvent voir leurs favoris
+     * "Users can insert own favorites" (INSERT) : Utilisateurs peuvent ajouter des favoris
+     * "Users can delete own favorites" (DELETE) : Utilisateurs peuvent supprimer leurs favoris
+
+9. TABLE : reviews
+   - RLS : ACTIVÉ
+   - Politiques :
+     * "Reviews are viewable by everyone" (SELECT) : Avis visibles par tous
+     * "Users can insert own reviews" (INSERT) : Utilisateurs peuvent créer leurs avis
+     * "Users can update own reviews" (UPDATE) : Utilisateurs peuvent modifier leurs avis
+     * "Users can delete own reviews" (DELETE) : Utilisateurs peuvent supprimer leurs avis
+
+💬 TABLES DE MESSAGERIE
+-----------------------
+
+10. TABLE : conversations
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Users can view own conversations" (SELECT) : Utilisateurs voient leurs conversations
+      * "Users can insert own conversations" (INSERT) : Utilisateurs peuvent créer des conversations
+      * "Users can update own conversations" (UPDATE) : Utilisateurs peuvent modifier leurs conversations
+      * "Users can delete own conversations" (DELETE) : Utilisateurs peuvent supprimer leurs conversations
+
+11. TABLE : conversation_participants
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Users can view conversation participants" (SELECT) : Participants visibles aux membres
+      * "Users can insert conversation participants" (INSERT) : Ajout de participants autorisé
+      * "Users can delete conversation participants" (DELETE) : Suppression de participants autorisée
+
+12. TABLE : messages
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Users can view conversation messages" (SELECT) : Messages visibles aux participants
+      * "Users can insert own messages" (INSERT) : Utilisateurs peuvent envoyer des messages
+      * "Users can update own messages" (UPDATE) : Utilisateurs peuvent modifier leurs messages
+      * "Users can delete own messages" (DELETE) : Utilisateurs peuvent supprimer leurs messages
+
+🔔 TABLES SYSTÈME
+-----------------
+
+13. TABLE : notifications
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Users can view own notifications" (SELECT) : Utilisateurs voient leurs notifications
+      * "Users can update own notifications" (UPDATE) : Utilisateurs peuvent marquer comme lues
+      * "System can insert notifications" (INSERT) : Le système peut créer des notifications
+      * "Users can delete own notifications" (DELETE) : Utilisateurs peuvent supprimer leurs notifications
+
+14. TABLE : subscriptions
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Users can view own subscriptions" (SELECT) : Utilisateurs voient leurs abonnements
+      * "Users can insert own subscriptions" (INSERT) : Utilisateurs peuvent s'abonner
+      * "Users can update own subscriptions" (UPDATE) : Utilisateurs peuvent modifier leurs abonnements
+      * "Users can delete own subscriptions" (DELETE) : Utilisateurs peuvent se désabonner
+
+📢 TABLES DE PUBLICITÉS
+-----------------------
+
+15. TABLE : advertisements
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Active advertisements are viewable by everyone" (SELECT) : Publicités actives visibles par tous
+      * "Users can insert own advertisements" (INSERT) : Utilisateurs peuvent créer leurs publicités
+      * "Users can update own advertisements" (UPDATE) : Utilisateurs peuvent modifier leurs publicités
+      * "Users can delete own advertisements" (DELETE) : Utilisateurs peuvent supprimer leurs publicités
+
+16. TABLE : advertisement_impressions
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Anyone can insert impressions" (INSERT) : Tracking des impressions autorisé
+      * "Ad owners can view their impressions" (SELECT) : Propriétaires voient leurs stats
+
+17. TABLE : advertisement_clicks
+    - RLS : ACTIVÉ
+    - Politiques :
+      * "Anyone can insert clicks" (INSERT) : Tracking des clics autorisé
+      * "Ad owners can view their clicks" (SELECT) : Propriétaires voient leurs stats
+
+=================================================================
+                    BUCKETS DE STOCKAGE SÉCURISÉS
+=================================================================
+
+🗂️ POLITIQUES POUR TOUS LES BUCKETS
+
+1. BUCKET : marketplace_images
+   - Type : Public
+   - Politiques :
+     * "Public images are viewable by everyone" (SELECT) : Images visibles par tous
+     * "Authenticated users can upload marketplace images" (INSERT) : Upload pour utilisateurs authentifiés
+     * "Users can update own marketplace images" (UPDATE) : Modification des propres images
+     * "Users can delete own marketplace images" (DELETE) : Suppression des propres images
+
+2. BUCKET : post-images
+   - Type : Public
+   - Politiques :
+     * "Post images are viewable by everyone" (SELECT) : Images de posts visibles par tous
+     * "Authenticated users can upload post images" (INSERT) : Upload pour utilisateurs authentifiés
+     * "Users can update own post images" (UPDATE) : Modification des propres images
+     * "Users can delete own post images" (DELETE) : Suppression des propres images
+
+3. BUCKET : announcements-images
+   - Type : Public
+   - Politiques :
+     * "Announcement images are viewable by everyone" (SELECT) : Images d'annonces visibles par tous
+     * "Authenticated users can upload announcement images" (INSERT) : Upload pour utilisateurs authentifiés
+     * "Users can update own announcement images" (UPDATE) : Modification des propres images
+     * "Users can delete own announcement images" (DELETE) : Suppression des propres images
+
+4. BUCKET : services-images
+   - Type : Public
+   - Politiques :
+     * "Service images are viewable by everyone" (SELECT) : Images de services visibles par tous
+     * "Authenticated users can upload service images" (INSERT) : Upload pour utilisateurs authentifiés
+     * "Users can update own service images" (UPDATE) : Modification des propres images
+     * "Users can delete own service images" (DELETE) : Suppression des propres images
+
+=================================================================
+                    FONCTIONS SÉCURISÉES
+=================================================================
+
+🔧 CORRECTION DES SEARCH_PATH MUTABLES
+
+Toutes les fonctions suivantes ont été sécurisées avec search_path = '' :
+
+1. increment_product_views(uuid)
+   - Fonction pour incrémenter les vues des produits
+   - Search_path sécurisé : ✅
+
+2. increment_advertisement_views(uuid)
+   - Fonction pour incrémenter les vues des publicités
+   - Search_path sécurisé : ✅
+
+3. increment_advertisement_clicks(uuid)
+   - Fonction pour incrémenter les clics des publicités
+   - Search_path sécurisé : ✅
+
+4. handle_new_user()
+   - Fonction pour gérer les nouveaux utilisateurs
+   - Search_path sécurisé : ✅
+
+5. update_updated_at_column()
+   - Fonction pour mettre à jour les timestamps
+   - Search_path sécurisé : ✅
+
+6. update_advertisement_stats()
+   - Fonction pour mettre à jour les statistiques des publicités
+   - Search_path sécurisé : ✅
+
+=================================================================
+                    MIGRATIONS APPLIQUÉES
+=================================================================
+
+📝 LISTE DES MIGRATIONS EXÉCUTÉES :
+
+1. enable_rls_profiles_policies
+   - Activation RLS et politiques pour la table profiles
+
+2. enable_rls_announcements_policies
+   - Activation RLS et politiques pour la table announcements
+
+3. enable_rls_favorites_policies
+   - Activation RLS et politiques pour la table favorites
+
+4. enable_rls_reviews_policies
+   - Activation RLS et politiques pour la table reviews
+
+5. enable_rls_messaging_policies
+   - Activation RLS et politiques pour les tables de messagerie
+   - (conversations, conversation_participants, messages)
+
+6. enable_rls_community_policies_safe
+   - Activation RLS et politiques pour les tables de communauté
+   - (posts, comments, likes)
+
+7. enable_rls_categories_policies
+   - Activation RLS et politiques pour la table categories
+
+8. enable_rls_advertisements_policies
+   - Activation RLS et politiques pour les tables de publicités
+   - (advertisements, advertisement_impressions, advertisement_clicks)
+
+9. enable_storage_rls_policies
+   - Activation des politiques RLS pour tous les buckets de stockage
+
+10. fix_remaining_rls_issues
+    - Correction des derniers problèmes RLS
+    - (products, notifications, subscriptions)
+
+11. fix_function_search_paths
+    - Correction des search_path mutables pour toutes les fonctions
+
+=================================================================
+                    VÉRIFICATIONS DE SÉCURITÉ
+=================================================================
+
+✅ PROBLÈMES RÉSOLUS :
+- Toutes les tables publiques ont maintenant RLS activé
+- Toutes les politiques manquantes ont été créées
+- Tous les search_path mutables ont été corrigés
+- Tous les buckets de stockage sont sécurisés
+
+⚠️  AVERTISSEMENTS RESTANTS (non critiques) :
+- Protection contre les mots de passe compromis désactivée
+- Options MFA insuffisantes
+
+Ces avertissements concernent la configuration d'authentification
+et peuvent être activés dans les paramètres Supabase Auth si souhaité.
+
+=================================================================
+                    RECOMMANDATIONS FUTURES
+=================================================================
+
+🔐 SÉCURITÉ SUPPLÉMENTAIRE :
+1. Activer la protection contre les mots de passe compromis
+2. Configurer des options MFA supplémentaires
+3. Mettre en place des politiques d'administration pour les catégories
+4. Surveiller régulièrement les logs de sécurité
+
+📊 MONITORING :
+1. Vérifier périodiquement les conseillers de sécurité Supabase
+2. Auditer les politiques RLS lors d'ajouts de nouvelles tables
+3. Tester les permissions avec différents types d'utilisateurs
+
+=================================================================
+                        FIN DU DOCUMENT
+=================================================================
+
+Ce document constitue la documentation complète de la sécurité
+RLS mise en place pour l'application Guyane Marketplace.
+
+Tous les éléments critiques de sécurité sont maintenant en place
+et l'application est prête pour la production.
+
+Date de dernière mise à jour : Décembre 2024

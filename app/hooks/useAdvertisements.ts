@@ -124,28 +124,62 @@ export function useAdvertisements() {
    * Crée une nouvelle publicité
    */
   const createAdvertisement = useCallback(async (data: CreateAdvertisementData): Promise<Advertisement> => {
-    if (!user) throw new Error('Utilisateur non connecté');
+    console.log('🔍 createAdvertisement appelé avec:', data);
+    
+    if (!user) {
+      console.log('❌ Utilisateur non connecté');
+      throw new Error('Utilisateur non connecté');
+    }
+    console.log('✅ Utilisateur connecté:', user.id);
 
     setLoading(true);
     setError(null);
 
     try {
+      const insertData = {
+        ...data,
+        user_id: user.id
+      };
+      console.log('📤 Données à insérer:', insertData);
+      
       const { data: advertisement, error } = await supabase
         .from('advertisements')
-        .insert({
-          ...data,
-          user_id: user.id
-        })
+        .insert(insertData)
         .select()
         .single();
 
-      if (error) throw error;
+      console.log('📥 Réponse Supabase:', { advertisement, error });
+      
+      if (error) {
+        console.error('❌ Erreur Supabase détaillée:');
+        console.error('Error object:', error);
+        console.error('Error message:', error?.message);
+        console.error('Error details:', error?.details);
+        console.error('Error hint:', error?.hint);
+        console.error('Error code:', error?.code);
+        console.error('Error keys:', Object.keys(error || {}));
+        console.error('Error values:', Object.values(error || {}));
+        
+        // Essayer de créer un objet d'erreur plus lisible
+        const errorInfo = {
+          message: error?.message || 'Message non disponible',
+          details: error?.details || 'Détails non disponibles',
+          hint: error?.hint || 'Hint non disponible',
+          code: error?.code || 'Code non disponible',
+          allProperties: Object.getOwnPropertyNames(error || {})
+        };
+        console.error('Error info structured:', errorInfo);
+        
+        throw new Error(`Erreur Supabase: ${error?.message || 'Erreur inconnue'}`);
+      }
 
       // Mettre à jour la liste locale
       setAdvertisements(prev => [advertisement, ...prev]);
+      console.log('✅ Publicité créée avec succès:', advertisement);
 
       return advertisement;
     } catch (err) {
+      console.error('❌ Erreur dans createAdvertisement:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création de la publicité';
       setError(errorMessage);
       throw err;

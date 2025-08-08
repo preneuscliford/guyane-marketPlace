@@ -22,7 +22,7 @@ export interface UseAuthReturn {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: Error }>;
   signInWithGoogle: () => Promise<{ error?: Error }>;
-  signUp: (email: string, password: string) => Promise<{ error?: Error }>;
+  signUp: (email: string, password: string, username: string) => Promise<{ error?: Error }>;
   signOut: () => Promise<void>;
   updateProfile: (data: Partial<AuthUser['profile']>) => Promise<{ error?: Error }>;
   resetPassword: (email: string) => Promise<{ error?: Error }>;

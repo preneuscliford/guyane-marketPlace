@@ -130,7 +130,7 @@ export function ReviewsList({
                   <div className="flex items-start">
                     <div className="h-10 w-10 mr-4 relative rounded-full overflow-hidden">
                       <Image 
-                        src={review.user?.avatar_url || "/default-avatar.png"} 
+                        src={review.user?.avatar_url || "/default-avatar.svg"} 
                         alt={review.user?.username || "Utilisateur"}
                         fill
                         className="object-cover"

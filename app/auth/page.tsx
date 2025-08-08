@@ -11,11 +11,40 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { signIn, signUp, signInWithGoogle } = useAuth();
+
+  // Fonction de validation du mot de passe
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return "Le mot de passe doit contenir au moins 8 caractères";
+    }
+    if (!/[a-zA-Z]/.test(password)) {
+      return "Le mot de passe doit contenir au moins une lettre";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "Le mot de passe doit contenir au moins un chiffre";
+    }
+    return null;
+  };
+
+  // Fonction de validation du nom d'utilisateur
+  const validateUsername = (username: string): string | null => {
+    if (username.length < 3) {
+      return "Le nom d'utilisateur doit contenir au moins 3 caractères";
+    }
+    if (username.length > 20) {
+      return "Le nom d'utilisateur ne peut pas dépasser 20 caractères";
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores";
+    }
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +53,43 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        await signUp(email, password);
-        setError("Vérifiez votre email pour confirmer votre inscription.");
+        // Validation du nom d'utilisateur pour l'inscription
+        const usernameError = validateUsername(username);
+        if (usernameError) {
+          setError(usernameError);
+          setIsLoading(false);
+          return;
+        }
+
+        // Validation du mot de passe pour l'inscription
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+          setError(passwordError);
+          setIsLoading(false);
+          return;
+        }
+
+        const result = await signUp(email, password, username);
+        if (result.error) {
+          // Gestion spécifique des erreurs d'unicité du nom d'utilisateur
+          if (result.error.message.includes('profiles_username_key')) {
+            setError("Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.");
+          } else {
+            setError(result.error.message);
+          }
+        } else {
+          // Redirection directe vers la page d'accueil après inscription
+          router.push("/");
+          router.refresh();
+        }
       } else {
-        await signIn(email, password);
-        router.push("/");
-        router.refresh();
+        const result = await signIn(email, password);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          router.push("/");
+          router.refresh();
+        }
       }
     } catch (error) {
       setError(
@@ -89,6 +149,32 @@ export default function Auth() {
             </div>
           </div>
 
+          {isSignUp && (
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                Nom d'utilisateur
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all"
+                  placeholder="nom_utilisateur"
+                  required
+                  minLength={3}
+                  maxLength={20}
+                  pattern="[a-zA-Z0-9_-]+"
+                  title="Le nom d'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                3-20 caractères, lettres, chiffres, tirets et underscores uniquement
+              </p>
+            </div>
+          )}
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Mot de passe
@@ -102,8 +188,14 @@ export default function Auth() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all"
                 placeholder="••••••••"
                 required
+                minLength={8}
               />
             </div>
+            {isSignUp && (
+              <p className="text-xs text-gray-500 mt-1">
+                Au moins 8 caractères avec des lettres et des chiffres
+              </p>
+            )}
           </div>
 
           {error && (

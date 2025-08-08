@@ -58,8 +58,8 @@ export default function CategoryPage() {
   const [sortBy, setSortBy] = useState('recent');
 
   const categorySlug = Array.isArray(category) ? category[0] : category;
-  const categoryName = categoryMapping[categorySlug] || categorySlug;
-  const displayName = displayNames[categorySlug] || categorySlug;
+  const categoryName = categorySlug ? (categoryMapping[categorySlug] || categorySlug) : '';
+  const displayName = categorySlug ? displayNames[categorySlug] || categorySlug : '';
 
   /**
    * Récupère les produits de la catégorie depuis Supabase
