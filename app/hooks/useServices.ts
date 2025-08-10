@@ -102,6 +102,7 @@ export function useServices() {
 
   /**
    * Récupère un service par son ID
+   * Note: L'incrémentation des vues est maintenant gérée par le hook useServiceViews
    */
   const getServiceById = useCallback(async (id: string): Promise<ServiceWithProfile | null> => {
     try {
@@ -128,11 +129,8 @@ export function useServices() {
         throw error;
       }
 
-      // Incrémenter le compteur de vues
-      await supabase
-        .from('services')
-        .update({ views: (data.views || 0) + 1 })
-        .eq('id', id);
+      // Note: L'incrémentation des vues est maintenant gérée par useServiceViews
+      // pour éviter les doublons et améliorer la précision du comptage
 
       return data;
     } catch (err) {

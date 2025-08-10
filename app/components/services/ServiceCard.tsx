@@ -16,6 +16,7 @@ import {
   DollarSign,
   User
 } from 'lucide-react';
+import { ServiceViewsSimple } from './ServiceViewsDisplay';
 import { ServiceWithProfile } from '@/types/services';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -198,10 +199,10 @@ export function ServiceCard({
 
         {/* Statistiques */}
         <div className="flex items-center gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-1">
-            <Eye className="h-3 w-3" />
-            <span>{service.views || 0} vues</span>
-          </div>
+          <ServiceViewsSimple 
+            views={service.views || 0}
+            className="text-xs"
+          />
           {service.rating && service.rating > 0 && (
             <div className="flex items-center gap-1">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />

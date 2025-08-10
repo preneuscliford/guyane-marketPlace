@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/hooks/useAuth';
+import { useAutoServiceViews } from '@/hooks/useServiceViews';
+import { ServiceViewsSimple } from '@/components/services/ServiceViewsDisplay';
 import { ServiceWithProfile } from '@/types/services';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -46,6 +48,12 @@ export default function ServiceDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Utiliser le nouveau système de vues intelligent
+  const { viewResult, loading: viewsLoading } = useAutoServiceViews(
+    params.id as string,
+    !!service // Activer seulement quand le service est chargé
+  );
 
   /**
    * Gère la suppression du service
@@ -359,10 +367,9 @@ export default function ServiceDetailPage() {
                         })}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{service.views || 0} vues</span>
-                    </div>
+                    <ServiceViewsSimple 
+                      views={service.views || 0}
+                    />
                   </div>
                 </div>
                 
