@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
@@ -13,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus, Upload, MapPin, DollarSign, Tag } from 'lucide-react';
+import { X, Plus, Upload, MapPin, DollarSign, Tag, Loader2 } from 'lucide-react';
 import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -26,6 +27,7 @@ import {
   PRICE_TYPES
 } from '@/types/services';
 import { toast } from 'sonner';
+import { ServiceImageUpload } from '@/components/ui/ServiceImageUpload';
 
 interface ServiceFormProps {
   service?: Service;
@@ -51,8 +53,10 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
     location: '',
     images: [],
     tags: [],
-    contact_phone: '',
-    contact_email: '',
+    contact_info: {
+      phone: '',
+      email: ''
+    },
     availability: 'available'
   });
   
@@ -72,8 +76,10 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
         location: service.location,
         images: service.images || [],
         tags: service.tags || [],
-        contact_phone: service.contact_phone || '',
-        contact_email: service.contact_email || '',
+        contact_info: {
+          phone: service.contact_info?.phone || '',
+          email: service.contact_info?.email || ''
+        },
         availability: service.availability
       });
       setImageUrls(service.images || []);
@@ -101,7 +107,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
     if (!formData.location.trim()) {
       newErrors.location = 'La localisation est requise';
     }
-    if (formData.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_email)) {
+    if (formData.contact_info?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_info.email)) {
       newErrors.contact_email = 'Email invalide';
     }
 
@@ -175,44 +181,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
     }));
   };
 
-  /**
-   * Ajoute une nouvelle image depuis la galerie ou par URL
-   */
-  const addImageUrl = () => {
-    // Créer un input file pour sélectionner depuis la galerie
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (files) {
-        Array.from(files).forEach(file => {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const result = event.target?.result as string;
-            if (result) {
-              setImageUrls(prev => [...prev, result]);
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-    };
-    
-    input.click();
-  };
-  
-  /**
-    * Ajoute une image par URL
-    */
-   const addImageByUrl = () => {
-     const url = prompt('Entrez l\'URL de l\'image:');
-     if (url && url.trim()) {
-       setImageUrls(prev => [...prev, url.trim()]);
-     }
-   };
+
 
   /**
    * Supprime une URL d'image
@@ -307,7 +276,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, price_type: value as any }))}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Sélectionnez le type de prix" />
                 </SelectTrigger>
                 <SelectContent>
                   {PRICE_TYPES.map((type) => (
@@ -341,8 +310,8 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
               <Label htmlFor="contact_phone">Téléphone</Label>
               <Input
                 id="contact_phone"
-                value={formData.contact_phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, contact_phone: e.target.value }))}
+                value={formData.contact_info?.phone || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, contact_info: { ...prev.contact_info, phone: e.target.value } }))}
                 placeholder="Ex: 0594 XX XX XX"
               />
             </div>
@@ -352,8 +321,8 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
               <Input
                 id="contact_email"
                 type="email"
-                value={formData.contact_email}
-                onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
+                value={formData.contact_info?.email || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, contact_info: { ...prev.contact_info, email: e.target.value } }))}
                 placeholder="contact@exemple.com"
                 className={errors.contact_email ? 'border-red-500' : ''}
               />
@@ -369,12 +338,12 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
               onValueChange={(value) => setFormData(prev => ({ ...prev, availability: value as any }))}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Sélectionnez la disponibilité" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="available">Disponible</SelectItem>
-                <SelectItem value="busy">Occupé</SelectItem>
-                <SelectItem value="unavailable">Indisponible</SelectItem>
+                <SelectItem key="available" value="available">Disponible</SelectItem>
+                <SelectItem key="busy" value="busy">Occupé</SelectItem>
+                <SelectItem key="unavailable" value="unavailable">Indisponible</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -394,8 +363,8 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag, index) => (
-                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+              {formData.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                   {tag}
                   <X
                     className="h-3 w-3 cursor-pointer"
@@ -407,43 +376,13 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
           </div>
 
           {/* Images */}
-          <div className="space-y-2">
-            <Label>Images</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <Button type="button" onClick={addImageUrl} variant="outline" className="w-full">
-                <Upload className="h-4 w-4 mr-2" />
-                Choisir depuis la galerie
-              </Button>
-              <Button type="button" onClick={addImageByUrl} variant="outline" className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter par URL
-              </Button>
-            </div>
-            {imageUrls.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {imageUrls.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Image ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder-image.jpg';
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => removeImageUrl(index)}
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="space-y-4">
+            <Label>Images du service</Label>
+            <ServiceImageUpload
+              value={imageUrls}
+              onChange={(urls) => setImageUrls(urls)}
+              onRemove={(url) => setImageUrls(prev => prev.filter(imageUrl => imageUrl !== url))}
+            />
           </div>
 
           {/* Boutons d'action */}

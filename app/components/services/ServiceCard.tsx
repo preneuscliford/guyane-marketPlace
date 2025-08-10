@@ -96,7 +96,7 @@ export function ServiceCard({
   };
 
   return (
-    <Card className="h-full flex flex-col hover:shadow-lg transition-shadow duration-200">
+    <Card className="h-full flex flex-col hover:shadow-xl transition-all duration-300 border-0 bg-white shadow-md hover:scale-[1.02] rounded-xl overflow-hidden">
       <CardHeader className="pb-3">
         {/* Image principale */}
         {service.images && service.images.length > 0 && (
@@ -110,8 +110,8 @@ export function ServiceCard({
               }}
             />
             {/* Badge de disponibilité */}
-            <div className="absolute top-2 right-2">
-              <Badge className={getAvailabilityColor(service.availability)}>
+            <div className="absolute top-3 right-3">
+              <Badge className={`${getAvailabilityColor(service.availability)} shadow-md border border-white/20`}>
                 <Clock className="h-3 w-3 mr-1" />
                 {getAvailabilityText(service.availability)}
               </Badge>
@@ -132,7 +132,7 @@ export function ServiceCard({
             </h3>
           </div>
           
-          <Badge variant="secondary" className="w-fit">
+          <Badge variant="secondary" className="w-fit bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200 hover:from-purple-200 hover:to-pink-200 transition-all duration-200">
             {service.category}
           </Badge>
         </div>
@@ -145,9 +145,9 @@ export function ServiceCard({
         </p>
 
         {/* Prix */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
           <DollarSign className="h-4 w-4 text-green-600" />
-          <span className="font-semibold text-green-600">
+          <span className="font-semibold text-green-700">
             {formatPrice(service.price, service.price_type)}
           </span>
         </div>
@@ -160,7 +160,7 @@ export function ServiceCard({
 
         {/* Profil du prestataire */}
         {service.profiles && (
-          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
             <Avatar className="h-8 w-8">
               <AvatarImage src={service.profiles.avatar_url || ''} />
               <AvatarFallback>
@@ -184,12 +184,12 @@ export function ServiceCard({
         {service.tags && service.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {service.tags.slice(0, 3).map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
+              <Badge key={index} variant="outline" className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200">
                 {tag}
               </Badge>
             ))}
             {service.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200">
                 +{service.tags.length - 3}
               </Badge>
             )}
@@ -248,18 +248,18 @@ export function ServiceCard({
               variant="outline"
               size="sm"
               asChild
-              className="flex-1"
+              className="flex-1 border-blue-200 text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-200"
             >
               <Link href={`/services/${service.id}`}>
                 Voir détails
               </Link>
             </Button>
             
-            {(service.contact_phone || service.contact_email) && (
+            {(service.contact_info?.phone || service.contact_info?.email) && (
               <Button
                 size="sm"
                 onClick={() => onContact?.(service)}
-                className="flex-1"
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-sm hover:shadow-md transition-all duration-200"
               >
                 <Phone className="h-4 w-4 mr-1" />
                 Contacter
@@ -277,12 +277,12 @@ export function ServiceCard({
  */
 export function ServiceCardCompact({ service }: { service: ServiceWithProfile }) {
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
+    <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white shadow-sm hover:scale-[1.01] rounded-xl overflow-hidden">
       <CardContent className="p-4">
         <div className="flex gap-3">
           {/* Image miniature */}
           {service.images && service.images.length > 0 && (
-            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
               <img
                 src={service.images[0]}
                 alt={service.title}
@@ -305,7 +305,7 @@ export function ServiceCardCompact({ service }: { service: ServiceWithProfile })
                   {service.title}
                 </Link>
               </h4>
-              <Badge variant="secondary" className="text-xs ml-2">
+              <Badge variant="secondary" className="text-xs ml-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200">
                 {service.category}
               </Badge>
             </div>
@@ -320,7 +320,7 @@ export function ServiceCardCompact({ service }: { service: ServiceWithProfile })
                 <span className="truncate">{service.location}</span>
               </div>
               
-              <div className="flex items-center gap-1 text-xs font-medium text-green-600">
+              <div className="flex items-center gap-1 text-xs font-medium text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 px-2 py-1 rounded-lg border border-green-100">
                 <DollarSign className="h-3 w-3" />
                 <span>
                   {service.price === 0 ? 'Gratuit' : `${service.price}€`}

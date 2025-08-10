@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ServiceForm } from '@/components/services/ServiceForm';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';

@@ -29,8 +29,11 @@ export interface CreateServiceData {
   price?: number | null;
   price_type?: 'fixed' | 'hourly' | 'daily' | 'negotiable';
   images?: string[];
-  availability?: Record<string, any>;
-  contact_info?: Record<string, any>;
+  availability?: string;
+  contact_info?: {
+    phone?: string;
+    email?: string;
+  };
   tags?: string[];
 }
 

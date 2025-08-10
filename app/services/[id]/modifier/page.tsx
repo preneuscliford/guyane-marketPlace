@@ -19,7 +19,7 @@ export default function ModifierServicePage() {
   const { id } = useParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { getService, loading } = useServices();
+  const { getServiceById, loading } = useServices();
   const [service, setService] = useState<Service | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export default function ModifierServicePage() {
       }
 
       try {
-        const serviceData = await getService(id);
+        const serviceData = await getServiceById(id);
         if (!serviceData) {
           setError("Service non trouvé");
           return;
@@ -54,7 +54,7 @@ export default function ModifierServicePage() {
     if (!authLoading && user) {
       loadService();
     }
-  }, [id, user, authLoading, getService]);
+  }, [id, user, authLoading, getServiceById]);
 
   // Rediriger si non connecté
   useEffect(() => {
@@ -128,9 +128,8 @@ export default function ModifierServicePage() {
             <div className="lg:col-span-2">
               {service && (
                 <ServiceForm
-                  initialData={service}
+                  service={service}
                   onSuccess={handleSuccess}
-                  mode="edit"
                 />
               )}
             </div>

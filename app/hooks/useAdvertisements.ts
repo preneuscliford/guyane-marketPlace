@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import {
   Advertisement,
   AdvertisementStats,
@@ -21,7 +21,7 @@ export function useAdvertisements() {
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+
   const { user } = useAuth();
 
   /**
@@ -290,7 +290,6 @@ export function useAdvertisementStats() {
   const [analytics, setAnalytics] = useState<AdvertisementAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
 
   /**
    * Récupère les statistiques d'une publicité
@@ -434,7 +433,6 @@ export function useWeightedCarousel() {
   const [weightedAds, setWeightedAds] = useState<WeightedAdvertisement[]>([]);
   const [currentAd, setCurrentAd] = useState<WeightedAdvertisement | null>(null);
   const [loading, setLoading] = useState(false);
-  const supabase = createClientComponentClient();
 
   /**
    * Calcule le poids d'une publicité basé sur son budget

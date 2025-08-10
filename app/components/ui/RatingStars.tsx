@@ -84,11 +84,12 @@ export function RatingStars({
   return (
     <div className={cn("flex space-x-1", className)}>
       {[...Array(totalStars)].map((_, index) => {
-        const starIndex = index + 1;
+    const starIndex = index + 1;
+    const starKey = `star-${index}`;
         
         return (
           <span
-            key={index}
+            key={starKey}
             className={cn(
               "relative cursor-default transition-all duration-100",
               interactive && "cursor-pointer hover:scale-110"

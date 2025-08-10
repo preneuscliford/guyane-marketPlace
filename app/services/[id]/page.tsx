@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -133,10 +133,10 @@ export default function ServiceDetailPage() {
   const handleContact = (type: 'phone' | 'email') => {
     if (!service) return;
 
-    if (type === 'phone' && service.contact_phone) {
-      window.open(`tel:${service.contact_phone}`);
-    } else if (type === 'email' && service.contact_email) {
-      window.open(`mailto:${service.contact_email}`);
+    if (type === 'phone' && service.contact_info?.phone) {
+      window.open(`tel:${service.contact_info.phone}`);
+    } else if (type === 'email' && service.contact_info?.email) {
+      window.open(`mailto:${service.contact_info.email}`);
     } else {
       toast.error('Information de contact non disponible');
     }
@@ -412,7 +412,7 @@ export default function ServiceDetailPage() {
                 
                 {/* Actions de contact */}
                 <div className="space-y-2">
-                  {service.contact_phone && (
+                  {service.contact_info?.phone && (
                     <Button
                       onClick={() => handleContact('phone')}
                       className="w-full"
@@ -423,7 +423,7 @@ export default function ServiceDetailPage() {
                     </Button>
                   )}
                   
-                  {service.contact_email && (
+                  {service.contact_info?.email && (
                     <Button
                       onClick={() => handleContact('email')}
                       className="w-full"
@@ -451,17 +451,17 @@ export default function ServiceDetailPage() {
               <CardTitle className="text-lg">Contact</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {service.contact_phone && (
+              {service.contact_info?.phone && (
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-gray-400" />
-                  <span>{service.contact_phone}</span>
+                  <span>{service.contact_info.phone}</span>
                 </div>
               )}
               
-              {service.contact_email && (
+              {service.contact_info?.email && (
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="break-all">{service.contact_email}</span>
+                  <span className="break-all">{service.contact_info.email}</span>
                 </div>
               )}
               

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import {
   Service,
   CreateServiceData,
@@ -20,7 +20,7 @@ export function useServices() {
   const [services, setServices] = useState<ServiceWithProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+
   const { user } = useAuth();
 
   /**
@@ -148,7 +148,7 @@ export function useServices() {
   /**
    * Crée un nouveau service
    */
-  const createService = useCallback(async (data: CreateServiceData): Promise<Service> => {
+  const createService = useCallback(async (serviceData: CreateServiceData): Promise<Service> => {
     if (!user) {
       throw new Error('Utilisateur non connecté');
     }
@@ -157,22 +157,32 @@ export function useServices() {
       setLoading(true);
       setError(null);
 
+      // Vérification de l'authentification
       console.log('👤 Utilisateur connecté:', user.id);
       
+      // Préparer les données avec tous les champs requis
       const insertData = {
-        ...data,
-        user_id: user.id
+        title: serviceData.title,
+        description: serviceData.description,
+        price: serviceData.price || null,
+        category: serviceData.category,
+        location: serviceData.location,
+        user_id: user.id,
+        images: serviceData.images || [],
+        status: 'active',
+        price_type: serviceData.price_type || 'fixed',
+        availability: serviceData.availability || {},
+        contact_info: serviceData.contact_info || {},
+        tags: serviceData.tags || []
       };
+      
       console.log('📤 Données à insérer:', insertData);
       
-      const { data: service, error } = await supabase
-        .from('services')
-        .insert(insertData)
-        .select()
-        .single();
-
-      console.log('📥 Réponse Supabase:', { service, error });
+      // Insertion directe comme dans les annonces
+      const { data, error } = await supabase.from('services').insert(insertData).select().single();
       
+      console.log('📥 Réponse Supabase:', { data, error });
+
       if (error) {
         console.error('❌ Erreur Supabase détaillée:');
         console.error('Error object:', error);
@@ -180,17 +190,17 @@ export function useServices() {
         console.error('Error details:', error?.details);
         console.error('Error hint:', error?.hint);
         console.error('Error code:', error?.code);
-        
         throw new Error(`Erreur Supabase: ${error?.message || 'Erreur inconnue'}`);
       }
 
-      // Mettre à jour la liste locale
-      await fetchServices();
-      console.log('✅ Service créé avec succès:', service);
+      console.log('✅ Service créé avec succès:', data);
 
-      return service;
+      // Rafraîchir la liste des services
+      await fetchServices();
+
+      return data;
     } catch (err) {
-      console.error('❌ Erreur dans createService:', err);
+      console.error('Erreur lors de la création du service:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création du service';
       setError(errorMessage);
       throw err;
@@ -327,7 +337,6 @@ export function useServiceStats() {
   const [stats, setStats] = useState<ServiceStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
 
   /**
    * Récupère les statistiques générales des services

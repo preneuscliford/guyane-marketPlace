@@ -209,9 +209,9 @@ export default function HeroAdvertisementCarousel() {
 
           {/* Dots Indicator */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {advertisements.map((_, index) => (
+            {advertisements.map((ad, index) => (
               <button
-                key={index}
+                key={`ad-dot-${ad.id}`}
                 onClick={() => setCurrentAd(advertisements[index])}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentIndex
@@ -317,9 +317,9 @@ export function CompactAdvertisementCarousel() {
       {/* Dots */}
       {advertisements.length > 1 && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {advertisements.map((_, index) => (
+          {advertisements.map((ad, index) => (
             <div
-              key={index}
+              key={`ad-indicator-${ad.id}`}
               className={`w-1.5 h-1.5 rounded-full transition-all ${
                 index === currentIndex ? 'bg-white' : 'bg-white/50'
               }`}

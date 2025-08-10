@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import {
   Search,
@@ -141,10 +141,10 @@ export default function ServicesPage() {
    * Gère le contact avec un prestataire
    */
   const handleContact = (service: ServiceWithProfile) => {
-    if (service.contact_phone) {
-      window.open(`tel:${service.contact_phone}`);
-    } else if (service.contact_email) {
-      window.open(`mailto:${service.contact_email}`);
+    if (service.contact_info?.phone) {
+      window.open(`tel:${service.contact_info.phone}`);
+    } else if (service.contact_info?.email) {
+      window.open(`mailto:${service.contact_info.email}`);
     } else {
       toast.info('Aucune information de contact disponible');
     }
@@ -271,7 +271,7 @@ export default function ServicesPage() {
                       <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les catégories</SelectItem>
+                      <SelectItem key="all-categories" value="all">Toutes les catégories</SelectItem>
                       {SERVICE_CATEGORIES.map((category) => (
                         <SelectItem key={category.value} value={category.value}>
                           {category.label}
@@ -338,7 +338,7 @@ export default function ServicesPage() {
                       <SelectValue placeholder="Tous les types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Tous les types</SelectItem>
+                      <SelectItem key="all-types" value="all">Tous les types</SelectItem>
                       {PRICE_TYPES.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
@@ -359,11 +359,11 @@ export default function ServicesPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="created_at">Date de création</SelectItem>
-                      <SelectItem value="title">Titre</SelectItem>
-                      <SelectItem value="price">Prix</SelectItem>
-                      <SelectItem value="views">Popularité</SelectItem>
-                      <SelectItem value="rating">Note</SelectItem>
+                      <SelectItem key="created_at" value="created_at">Date de création</SelectItem>
+                      <SelectItem key="title" value="title">Titre</SelectItem>
+                      <SelectItem key="price" value="price">Prix</SelectItem>
+                      <SelectItem key="views" value="views">Popularité</SelectItem>
+                      <SelectItem key="rating" value="rating">Note</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -379,8 +379,8 @@ export default function ServicesPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="desc">Décroissant</SelectItem>
-                      <SelectItem value="asc">Croissant</SelectItem>
+                      <SelectItem key="desc" value="desc">Décroissant</SelectItem>
+                      <SelectItem key="asc" value="asc">Croissant</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
