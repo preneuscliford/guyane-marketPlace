@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -33,15 +34,16 @@ import {
   PRICE_TYPES
 } from '@/types/services';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 
 /**
  * Page principale des services
  */
 export default function ServicesPage() {
   const { user } = useAuth();
-  const { services, loading, error, fetchServices } = useServices();
+  const { services, loading, error, fetchServices, deleteService } = useServices();
   const { stats, fetchStats } = useServiceStats();
+  const router = useRouter();
   
   // État des filtres
   const [searchParams, setSearchParams] = useState<ServiceSearchParams>({
@@ -147,6 +149,32 @@ export default function ServicesPage() {
       window.open(`mailto:${service.contact_info.email}`);
     } else {
       toast.info('Aucune information de contact disponible');
+    }
+  };
+
+  /**
+   * Gère la modification d'un service
+   */
+  const handleEdit = (service: ServiceWithProfile) => {
+    router.push(`/services/${service.id}/modifier`);
+  };
+
+  /**
+   * Gère la suppression d'un service
+   */
+  const handleDelete = async (service: ServiceWithProfile) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+      return;
+    }
+
+    try {
+      await deleteService(service.id);
+      toast.success('Service supprimé avec succès');
+      // Rafraîchir la liste
+      await fetchServices(searchParams);
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      toast.error('Erreur lors de la suppression du service');
     }
   };
 
@@ -434,12 +462,17 @@ export default function ServicesPage() {
               <ServiceCard
                 key={service.id}
                 service={service}
-                onContact={handleContact}
+                onContact={() => handleContact(service)}
+                onEdit={user?.id === service.user_id ? () => handleEdit(service) : undefined}
+                onDelete={user?.id === service.user_id ? () => handleDelete(service) : undefined}
               />
             ) : (
               <ServiceCardCompact
                 key={service.id}
                 service={service}
+                onContact={() => handleContact(service)}
+                onEdit={user?.id === service.user_id ? () => handleEdit(service) : undefined}
+                onDelete={user?.id === service.user_id ? () => handleDelete(service) : undefined}
               />
             )
           ))}

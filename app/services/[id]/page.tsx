@@ -40,11 +40,33 @@ export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { getServiceById, loading } = useServices();
+  const { getServiceById, deleteService, loading } = useServices();
   
   const [service, setService] = useState<ServiceWithProfile | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  /**
+   * Gère la suppression du service
+   */
+  const handleDelete = async () => {
+    if (!service || !window.confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteService(service.id);
+      toast.success('Service supprimé avec succès');
+      router.push('/services');
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      toast.error('Erreur lors de la suppression du service');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Charger le service
   useEffect(() => {
@@ -484,8 +506,13 @@ export default function ServiceDetailPage() {
                     Modifier le service
                   </Link>
                 </Button>
-                <Button variant="destructive" className="w-full">
-                  Supprimer le service
+                <Button 
+                  variant="destructive" 
+                  className="w-full"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Suppression...' : 'Supprimer le service'}
                 </Button>
               </CardContent>
             </Card>
