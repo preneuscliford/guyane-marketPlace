@@ -176,14 +176,43 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
   };
 
   /**
-   * Ajoute une URL d'image
+   * Ajoute une nouvelle image depuis la galerie ou par URL
    */
   const addImageUrl = () => {
-    const url = prompt('Entrez l\'URL de l\'image:');
-    if (url && url.trim()) {
-      setImageUrls(prev => [...prev, url.trim()]);
-    }
+    // Créer un input file pour sélectionner depuis la galerie
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files) {
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const result = event.target?.result as string;
+            if (result) {
+              setImageUrls(prev => [...prev, result]);
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    };
+    
+    input.click();
   };
+  
+  /**
+    * Ajoute une image par URL
+    */
+   const addImageByUrl = () => {
+     const url = prompt('Entrez l\'URL de l\'image:');
+     if (url && url.trim()) {
+       setImageUrls(prev => [...prev, url.trim()]);
+     }
+   };
 
   /**
    * Supprime une URL d'image
@@ -380,10 +409,16 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
           {/* Images */}
           <div className="space-y-2">
             <Label>Images</Label>
-            <Button type="button" onClick={addImageUrl} variant="outline" className="w-full">
-              <Upload className="h-4 w-4 mr-2" />
-              Ajouter une image
-            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <Button type="button" onClick={addImageUrl} variant="outline" className="w-full">
+                <Upload className="h-4 w-4 mr-2" />
+                Choisir depuis la galerie
+              </Button>
+              <Button type="button" onClick={addImageByUrl} variant="outline" className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                Ajouter par URL
+              </Button>
+            </div>
             {imageUrls.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                 {imageUrls.map((url, index) => (
