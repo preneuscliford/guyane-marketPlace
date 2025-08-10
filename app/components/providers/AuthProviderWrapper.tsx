@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from 'react';
-import AuthProvider from '@/providers/AuthProvider';
+import AuthProvider from '@/app/providers/AuthProvider';
 
 /**
  * Wrapper client pour AuthProvider

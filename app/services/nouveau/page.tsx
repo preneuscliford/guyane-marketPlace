@@ -4,25 +4,17 @@ import React from 'react';
 import { ServiceForm } from '@/components/services/ServiceForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { useRequireAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 /**
  * Page de création d'un nouveau service
  */
 export default function NewServicePage() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useRequireAuth();
   const router = useRouter();
-
-  // Rediriger si l'utilisateur n'est pas connecté
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth/login?redirect=/services/nouveau');
-    }
-  }, [user, loading, router]);
 
   // Afficher un loader pendant la vérification de l'authentification
   if (loading) {
