@@ -749,6 +749,8 @@ export type Database = {
           status: string | null
           tags: string[] | null
           title: string
+          total_views: number | null
+          unique_views: number | null
           updated_at: string
           user_id: string
           views: number | null
@@ -769,6 +771,8 @@ export type Database = {
           status?: string | null
           tags?: string[] | null
           title: string
+          total_views?: number | null
+          unique_views?: number | null
           updated_at?: string
           user_id: string
           views?: number | null
@@ -789,6 +793,8 @@ export type Database = {
           status?: string | null
           tags?: string[] | null
           title?: string
+          total_views?: number | null
+          unique_views?: number | null
           updated_at?: string
           user_id?: string
           views?: number | null
@@ -800,7 +806,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_service_views: {
+        Args: {
+          p_service_id: string
+          p_user_id?: string | null
+          p_ip_address?: string | null
+          p_session_id?: string | null
+          p_user_agent?: string | null
+        }
+        Returns: {
+          success: boolean
+          unique_views: number
+          total_views: number
+        }
+      }
+      get_service_view_stats: {
+        Args: {
+          p_service_id: string
+        }
+        Returns: {
+          unique_views: number
+          total_views: number
+          views_today: number
+          views_this_week: number
+          views_this_month: number
+        }
+      }
     }
     Enums: {
       [_ in never]: never

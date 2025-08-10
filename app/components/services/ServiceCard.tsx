@@ -200,13 +200,17 @@ export function ServiceCard({
         {/* Statistiques */}
         <div className="flex items-center gap-4 text-xs text-gray-500">
           <ServiceViewsSimple 
-            views={service.views || 0}
+            totalViews={service.total_views}
+            views={service.views}
             className="text-xs"
           />
           {service.rating && service.rating > 0 && (
             <div className="flex items-center gap-1">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
               <span>{service.rating.toFixed(1)}</span>
+              {service.reviews_count && service.reviews_count > 0 && (
+                <span className="text-gray-400">({service.reviews_count})</span>
+              )}
             </div>
           )}
           <div className="flex items-center gap-1">

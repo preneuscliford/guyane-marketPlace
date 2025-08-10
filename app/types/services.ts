@@ -15,6 +15,8 @@ export interface Service {
   contact_info: Record<string, any>;
   tags: string[];
   views: number;
+  unique_views?: number;
+  total_views?: number;
   rating: number;
   reviews_count: number;
   created_at: string;

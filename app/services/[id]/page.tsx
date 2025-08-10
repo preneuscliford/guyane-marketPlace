@@ -29,6 +29,7 @@ import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/hooks/useAuth';
 import { useAutoServiceViews } from '@/hooks/useServiceViews';
 import { ServiceViewsSimple } from '@/components/services/ServiceViewsDisplay';
+import { ServiceReviews } from '@/components/services/ServiceReviews';
 import { ServiceWithProfile } from '@/types/services';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -52,7 +53,7 @@ export default function ServiceDetailPage() {
   // Utiliser le nouveau système de vues intelligent
   const { viewResult, loading: viewsLoading } = useAutoServiceViews(
     params.id as string,
-    !!service // Activer seulement quand le service est chargé
+    true // Activer dès que l'ID est disponible
   );
 
   /**
@@ -368,7 +369,8 @@ export default function ServiceDetailPage() {
                       </span>
                     </div>
                     <ServiceViewsSimple 
-                      views={service.views || 0}
+                      totalViews={service.total_views}
+                      views={service.views}
                     />
                   </div>
                 </div>
@@ -408,6 +410,12 @@ export default function ServiceDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Section des avis */}
+          <ServiceReviews 
+            serviceId={service.id}
+            serviceOwnerId={service.user_id}
+          />
         </div>
 
         {/* Sidebar */}

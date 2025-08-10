@@ -18,6 +18,15 @@ interface ViewStats {
 }
 
 /**
+ * Génère un ID de session unique
+ */
+const generateSessionId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15) +
+         Date.now().toString(36);
+};
+
+/**
  * Hook pour gérer les vues des services de manière intelligente
  * Évite les comptages multiples et fournit des statistiques détaillées
  */
@@ -33,15 +42,6 @@ export function useServiceViews() {
     }
     return id;
   });
-
-  /**
-   * Génère un ID de session unique
-   */
-  const generateSessionId = useCallback((): string => {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15) +
-           Date.now().toString(36);
-  }, []);
 
   /**
    * Obtient l'adresse IP du client (optionnel)
@@ -106,7 +106,7 @@ export function useServiceViews() {
    */
   const getViewStats = useCallback(async (serviceId: string): Promise<ViewStats | null> => {
     try {
-      const { data, error } = await supabase.rpc('get_service_view_stats', {
+      const { data, error } = await supabase.rpc('get_service_view_stats' as string, {
         p_service_id: serviceId
       });
 

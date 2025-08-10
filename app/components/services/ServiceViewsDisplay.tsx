@@ -104,7 +104,7 @@ export function ServiceViewsDisplay({
           <TooltipTrigger asChild>
             <div className="flex items-center gap-1 text-sm text-gray-600">
               <Eye className="h-4 w-4" />
-              <span>{uniqueViews || totalViews} vues</span>
+              <span>{totalViews || uniqueViews} vues</span>
               {showTrending && isTrending && (
                 <TrendingUp className="h-3 w-3 text-orange-500 ml-1" />
               )}
@@ -125,18 +125,24 @@ export function ServiceViewsDisplay({
 
 /**
  * Composant simplifié pour l'affichage dans les cartes
+ * Utilise prioritairement total_views, puis views en fallback
  */
 export function ServiceViewsSimple({ 
-  views, 
+  views,
+  totalViews,
   className = "" 
 }: { 
-  views: number; 
+  views?: number;
+  totalViews?: number; 
   className?: string; 
 }) {
+  // Prioriser total_views, puis views en fallback
+  const displayViews = totalViews ?? views ?? 0;
+  
   return (
     <div className={`flex items-center gap-1 text-sm text-gray-600 ${className}`}>
       <Eye className="h-3 w-3" />
-      <span>{views} vues</span>
+      <span>{displayViews} vues</span>
     </div>
   );
 }

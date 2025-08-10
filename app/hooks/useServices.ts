@@ -88,7 +88,7 @@ export function useServices() {
         throw error;
       }
 
-      setServices(data || []);
+      setServices(data ? (data as unknown as ServiceWithProfile[]) : []);
       return data || [];
     } catch (err) {
       console.error('Erreur dans fetchServices:', err);
@@ -132,7 +132,7 @@ export function useServices() {
       // Note: L'incrémentation des vues est maintenant gérée par useServiceViews
       // pour éviter les doublons et améliorer la précision du comptage
 
-      return data;
+      return data as unknown as ServiceWithProfile;
     } catch (err) {
       console.error('Erreur dans getServiceById:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la récupération du service';
@@ -196,7 +196,7 @@ export function useServices() {
       // Rafraîchir la liste des services
       await fetchServices();
 
-      return data;
+      return data as Service;
     } catch (err) {
       console.error('Erreur lors de la création du service:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création du service';
@@ -233,9 +233,9 @@ export function useServices() {
       }
 
       // Mettre à jour la liste locale
-      setServices(prev => prev.map(s => s.id === id ? { ...s, ...service } : s));
+      setServices(prev => prev.map(s => s.id === id ? { ...s, ...(service as ServiceWithProfile) } : s));
       
-      return service;
+      return service as Service;
     } catch (err) {
       console.error('Erreur dans updateService:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour du service';
@@ -304,7 +304,7 @@ export function useServices() {
         throw error;
       }
 
-      return data || [];
+      return (data as Service[]) || [];
     } catch (err) {
       console.error('Erreur dans getUserServices:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la récupération de vos services';
@@ -355,7 +355,7 @@ export function useServiceStats() {
 
       const totalServices = services.length;
       const activeServices = services.filter(s => s.status === 'active').length;
-      const totalViews = services.reduce((sum, s) => sum + (s.views || 0), 0);
+      const totalViews = services.reduce((sum, s) => sum + (s.total_views || s.views || 0), 0);
       const averageRating = services.length > 0 
         ? services.reduce((sum, s) => sum + (s.rating || 0), 0) / services.length 
         : 0;
