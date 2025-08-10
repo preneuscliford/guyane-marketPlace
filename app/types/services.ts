@@ -82,26 +82,26 @@ export interface ServiceStats {
 
 // Catégories de services prédéfinies
 export const SERVICE_CATEGORIES = [
-  'Services à domicile',
-  'Cours et formations',
-  'Artisanat',
-  'Transport',
-  'Informatique',
-  'Événementiel',
-  'Santé et bien-être',
-  'Jardinage',
-  'Réparation',
-  'Nettoyage',
-  'Garde d\'enfants',
-  'Aide aux personnes âgées',
-  'Photographie',
-  'Musique',
-  'Traduction',
-  'Conseil',
-  'Autres'
+  { value: 'services-domicile', label: 'Services à domicile' },
+  { value: 'cours-formations', label: 'Cours et formations' },
+  { value: 'artisanat', label: 'Artisanat' },
+  { value: 'transport', label: 'Transport' },
+  { value: 'informatique', label: 'Informatique' },
+  { value: 'evenementiel', label: 'Événementiel' },
+  { value: 'sante-bien-etre', label: 'Santé et bien-être' },
+  { value: 'jardinage', label: 'Jardinage' },
+  { value: 'reparation', label: 'Réparation' },
+  { value: 'nettoyage', label: 'Nettoyage' },
+  { value: 'garde-enfants', label: 'Garde d\'enfants' },
+  { value: 'aide-personnes-agees', label: 'Aide aux personnes âgées' },
+  { value: 'photographie', label: 'Photographie' },
+  { value: 'musique', label: 'Musique' },
+  { value: 'traduction', label: 'Traduction' },
+  { value: 'conseil', label: 'Conseil' },
+  { value: 'autres', label: 'Autres' }
 ] as const;
 
-export type ServiceCategory = typeof SERVICE_CATEGORIES[number];
+export type ServiceCategory = typeof SERVICE_CATEGORIES[number]['value'];
 
 // Types de tarification
 export const PRICE_TYPES = [
