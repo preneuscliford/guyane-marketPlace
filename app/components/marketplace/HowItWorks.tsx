@@ -28,16 +28,16 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-12 sm:py-16 lg:py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Comment fonctionne Blada Market</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Comment fonctionne Blada Market</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
             Notre marketplace met en relation les talents guyanais avec ceux qui ont besoin de leurs services, en toute simplicité
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {steps.map((step, index) => (
             <motion.div
               key={index}
@@ -45,31 +45,31 @@ export function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-shadow"
+              className="bg-gradient-to-br from-gray-50 to-white p-6 sm:p-8 rounded-2xl shadow-md hover:shadow-lg transition-shadow"
             >
-              <div className="h-14 w-14 rounded-full bg-gradient-to-r from-purple-600 to-fuchsia-600 flex items-center justify-center text-white mb-6">
-                <step.icon className="h-7 w-7" />
+              <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-gradient-to-r from-purple-600 to-fuchsia-600 flex items-center justify-center text-white mb-4 sm:mb-6">
+                <step.icon className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
               
-              <h3 className="text-xl font-bold text-gray-800 mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
                 {index + 1}. {step.title}
               </h3>
               
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base">
                 {step.description}
               </p>
             </motion.div>
           ))}
         </div>
         
-        <div className="mt-16 text-center">
+        <div className="mt-12 sm:mt-16 text-center">
           <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
             <a 
               href="#" 
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-medium rounded-full hover:shadow-lg transition-shadow inline-block"
+              className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-medium rounded-full hover:shadow-lg transition-shadow inline-block text-sm sm:text-base"
             >
               Commencer à explorer
             </a>

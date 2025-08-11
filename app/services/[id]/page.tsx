@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft,
@@ -317,10 +317,10 @@ export default function ServiceDetailPage() {
                   
                   {/* Badge de disponibilité */}
                   <div className="absolute top-4 right-4">
-                    <Badge className={getAvailabilityColor(service.availability)}>
+                    <Badge className={getAvailabilityColor(service.availability as unknown as string)}>
                       <Clock className="h-3 w-3 mr-1" />
-                      {getAvailabilityText(service.availability)}
-                    </Badge>
+                      {getAvailabilityText(service.availability as unknown as string)}
+                    </Badge>    
                   </div>
                 </div>
                 
@@ -377,7 +377,7 @@ export default function ServiceDetailPage() {
                 
                 <div className="text-right">
                   <div className="text-2xl font-bold text-green-600">
-                    {formatPrice(service.price, service.price_type)}
+                    {formatPrice(service.price ?? 0, service.price_type)}
                   </div>
                   <Badge variant="secondary">{service.category}</Badge>
                 </div>

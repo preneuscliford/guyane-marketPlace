@@ -41,10 +41,10 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-20 md:py-32">
+      <div className="relative z-10 container mx-auto px-4 py-16 sm:py-20 md:py-32">
         <div className="max-w-3xl mx-auto text-center">
           <motion.h1 
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -53,7 +53,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
           </motion.h1>
           
           <motion.p 
-            className="text-xl text-white/90 mb-10"
+            className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-10 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -71,15 +71,15 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
                 <input 
                   type="text" 
                   placeholder="Que recherchez-vous aujourd'hui ?" 
-                  className="w-full px-6 py-4 rounded-full text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-full text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <button 
                   type="submit" 
-                  className="absolute right-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-3 rounded-full hover:from-purple-700 hover:to-fuchsia-700 transition-all"
+                  className="absolute right-1 sm:right-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-2 sm:p-3 rounded-full hover:from-purple-700 hover:to-fuchsia-700 transition-all"
                 >
-                  <SearchIcon className="h-6 w-6" />
+                  <SearchIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
               </div>
             </form>
@@ -88,7 +88,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
               {popularSearches.map((term, index) => (
                 <button
                   key={index}
-                  className="text-white bg-white/20 backdrop-blur-sm hover:bg-white/30 px-3 py-1 rounded-full text-sm transition-colors"
+                  className="text-white bg-white/20 backdrop-blur-sm hover:bg-white/30 px-3 py-1 rounded-full text-xs sm:text-sm transition-colors"
                   onClick={() => {
                     setSearchQuery(term);
                     onSearch(term);
@@ -105,9 +105,9 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="w-full max-w-6xl mx-auto mt-16"
+            className="w-full max-w-6xl mx-auto mt-8 sm:mt-12 md:mt-16"
           >
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl border border-white/20">
               <HeroAdvertisementCarousel />
             </div>
           </motion.div>

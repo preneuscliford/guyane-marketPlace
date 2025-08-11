@@ -84,14 +84,14 @@ export function Testimonials() {
 
   return (
     <section 
-      className="py-20 bg-gradient-to-br from-purple-700 to-fuchsia-700"
+      className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-purple-700 to-fuchsia-700"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-white mb-4">Ce que disent nos utilisateurs</h2>
-          <p className="text-white/80 max-w-2xl mx-auto">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ce que disent nos utilisateurs</h2>
+          <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base">
             Découvrez les expériences de ceux qui ont trouvé le service idéal sur Blada Market
           </p>
         </div>
@@ -99,9 +99,9 @@ export function Testimonials() {
         <div className="max-w-4xl mx-auto relative">
           {/* Testimonial Carousel */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
-            <div className="p-8 md:p-12 relative">
-              <div className="absolute top-8 right-8 text-purple-500 opacity-20">
-                <Quote className="h-20 w-20" />
+            <div className="p-6 sm:p-8 md:p-12 relative">
+              <div className="absolute top-4 sm:top-6 md:top-8 right-4 sm:right-6 md:right-8 text-purple-500 opacity-20">
+                <Quote className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20" />
               </div>
               
               <motion.div
@@ -112,8 +112,8 @@ export function Testimonials() {
                 transition={{ duration: 0.5 }}
                 className="relative z-10"
               >
-                <div className="flex items-center mb-6">
-                  <div className="relative h-16 w-16 rounded-full overflow-hidden mr-4 border-2 border-purple-200">
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <div className="relative h-12 w-12 sm:h-16 sm:w-16 rounded-full overflow-hidden mr-3 sm:mr-4 border-2 border-purple-200">
                     <Image
                       src={testimonials[currentIndex].avatar}
                       alt={testimonials[currentIndex].name}
@@ -122,22 +122,22 @@ export function Testimonials() {
                     />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">{testimonials[currentIndex].name}</h3>
-                    <p className="text-gray-600">{testimonials[currentIndex].role}</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-800">{testimonials[currentIndex].name}</h3>
+                    <p className="text-gray-600 text-sm sm:text-base">{testimonials[currentIndex].role}</p>
                   </div>
                 </div>
                 
-                <p className="text-lg text-gray-700 mb-6 italic">
+                <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6 italic">
                   &ldquo;{testimonials[currentIndex].content}&rdquo;
                 </p>
                 
-                <div className="flex flex-wrap items-center justify-between">
-                  <div className="flex items-center mb-2 md:mb-0">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-0">
+                  <div className="flex items-center mb-2 sm:mb-0">
                     <RatingStars rating={testimonials[currentIndex].rating} size="md" />
-                    <span className="ml-2 text-gray-700">{testimonials[currentIndex].rating.toFixed(1)}</span>
+                    <span className="ml-2 text-gray-700 text-sm sm:text-base">{testimonials[currentIndex].rating.toFixed(1)}</span>
                   </div>
                   
-                  <div className="text-sm text-purple-600 font-medium">
+                  <div className="text-xs sm:text-sm text-purple-600 font-medium">
                     Service utilisé: {testimonials[currentIndex].service}
                   </div>
                 </div>
@@ -146,13 +146,13 @@ export function Testimonials() {
           </div>
           
           {/* Navigation */}
-          <div className="flex justify-center mt-8 space-x-4">
+          <div className="flex justify-center mt-6 sm:mt-8 space-x-3 sm:space-x-4">
             <button
               onClick={prev}
-              className="p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+              className="p-2 sm:p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
               aria-label="Témoignage précédent"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
             
             {/* Indicators */}
@@ -173,10 +173,10 @@ export function Testimonials() {
             
             <button
               onClick={next}
-              className="p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+              className="p-2 sm:p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
               aria-label="Témoignage suivant"
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </div>
         </div>

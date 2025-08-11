@@ -105,7 +105,7 @@ const categories: Category[] = [
 
 export function FeaturedCategories() {
   return (
-    <section className="py-20 bg-gradient-to-br from-slate-50 via-purple-50/30 to-emerald-50/20">
+    <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-slate-50 via-purple-50/30 to-emerald-50/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* En-tête de section amélioré */}
         <motion.div 
@@ -113,31 +113,31 @@ export function FeaturedCategories() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12 sm:mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200/50 rounded-full shadow-sm mb-6">
-            <Star className="w-4 h-4 text-purple-500" />
-            <span className="text-sm font-medium text-gray-700">Catégories populaires</span>
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200/50 rounded-full shadow-sm mb-4 sm:mb-6">
+            <Star className="w-3 sm:w-4 h-3 sm:h-4 text-purple-500" />
+            <span className="text-xs sm:text-sm font-medium text-gray-700">Catégories populaires</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
             <span className="bg-gradient-to-r from-purple-600 via-fuchsia-500 to-emerald-500 bg-clip-text text-transparent">
               Explorez par catégorie
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto mb-6 sm:mb-8">
             Découvrez une large gamme de services professionnels adaptés à vos besoins
           </p>
           <Link 
             href="/marketplace/categories" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 backdrop-blur-sm border-2 border-purple-200 rounded-full text-purple-700 hover:bg-purple-50 hover:border-purple-300 transition-all duration-300 font-medium shadow-sm hover:shadow-md"
+            className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-sm border-2 border-purple-200 rounded-full text-purple-700 hover:bg-purple-50 hover:border-purple-300 transition-all duration-300 font-medium shadow-sm hover:shadow-md text-sm sm:text-base"
           >
             Voir toutes les catégories 
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 sm:h-4 w-3 sm:w-4" />
           </Link>
         </motion.div>
         
         {/* Grille de catégories améliorée */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}

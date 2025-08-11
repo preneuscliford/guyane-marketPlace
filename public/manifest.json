@@ -81,7 +81,7 @@
       "url": "/publicites",
       "icons": [
         {
-          "src": "/icons/icon-96x96.png",
+          "src": "/icons/icon-96x96.svg",
           "sizes": "96x96"
         }
       ]
@@ -93,7 +93,7 @@
       "url": "/annonces/nouvelle",
       "icons": [
         {
-          "src": "/icons/icon-96x96.png",
+          "src": "/icons/icon-96x96.svg",
           "sizes": "96x96"
         }
       ]

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useWeightedCarousel, useAdvertisementStats } from '../../hooks/useAdvertisements';
@@ -168,44 +168,44 @@ export default function AdvertisementCarousel({
           className="relative"
         >
           <div 
-            className="flex items-center p-6 cursor-pointer group"
+            className="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-6 cursor-pointer group"
             onClick={() => handleAdClick(currentAd)}
           >
             {/* Image de la publicité */}
             {currentAd.image_url && (
-              <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 mr-6">
+              <div className="relative w-full h-48 sm:w-20 sm:h-20 md:w-32 md:h-32 flex-shrink-0 sm:mr-4 md:mr-6 mb-4 sm:mb-0">
                 <Image
                   src={currentAd.image_url}
                   alt={currentAd.title}
                   fill
                   className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 768px) 96px, 128px"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 80px, 128px"
                 />
               </div>
             )}
 
             {/* Contenu textuel */}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200">
+            <div className="flex-1 min-w-0 w-full">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200 leading-tight">
                 {currentAd.title}
               </h3>
-              <p className="text-gray-600 text-sm md:text-base line-clamp-2 mb-3">
+              <p className="text-gray-600 text-sm sm:text-sm md:text-base line-clamp-2 mb-3 leading-relaxed">
                 {currentAd.description}
               </p>
               
               {/* Métadonnées */}
-              <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-xs md:text-sm text-gray-500">
                 {currentAd.category && (
-                  <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full">
+                  <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs">
                     {currentAd.category}
                   </span>
                 )}
                 {currentAd.location && (
-                  <span className="flex items-center">
+                  <span className="flex items-center text-xs">
                     📍 {currentAd.location}
                   </span>
                 )}
-                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium text-xs">
                   Sponsorisé
                 </span>
               </div>
@@ -213,7 +213,7 @@ export default function AdvertisementCarousel({
 
             {/* Indicateur de lien externe */}
             {currentAd.target_url && (
-              <div className="flex-shrink-0 ml-4">
+              <div className="flex-shrink-0 mt-4 sm:mt-0 sm:ml-4 self-center">
                 <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center group-hover:bg-primary-600 transition-colors duration-200">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

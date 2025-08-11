@@ -82,13 +82,16 @@ export function useReviews(params: UseReviewsParams = {}) {
           profiles: profilesData?.find(profile => profile.id === review.user_id) || null
         }));
 
-        setReviews(reviewsWithProfiles as Review[]);
-        calculateStats(reviewsWithProfiles as Review[]);
+        setReviews(reviewsWithProfiles.map(review => ({
+          ...review,
+          service_id: (review as any).service_id || null // Type assertion to handle missing property
+        })) as unknown as Review[]);
+
         
         // If user is logged in, find their review
         if (user) {
           const userReview = reviewsWithProfiles.find(review => review.user_id === user.id);
-          setUserReview(userReview as Review || null);
+          setUserReview(userReview ? (userReview as unknown as Review) : null);
         }
       }
     } catch (error) {

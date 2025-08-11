@@ -16,6 +16,10 @@ export interface Advertisement {
   end_date?: string;
   created_at: string;
   updated_at: string;
+  // Colonnes de statistiques ajoutées pour correspondre au schéma Supabase
+  clicks?: number;
+  impressions?: number;
+  view_count?: number;
 }
 
 export interface AdvertisementStats {

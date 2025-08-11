@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import {
   MapPin,
   Star,
@@ -20,6 +20,7 @@ import { ServiceViewsSimple } from './ServiceViewsDisplay';
 import { ServiceWithProfile } from '@/types/services';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import Image from 'next/image';
 
 interface ServiceCardProps {
   service: ServiceWithProfile;
@@ -102,19 +103,23 @@ export function ServiceCard({
         {/* Image principale */}
         {service.images && service.images.length > 0 && (
           <div className="relative w-full h-48 mb-3 rounded-lg overflow-hidden">
-            <img
+            <Image
               src={service.images[0]}
               alt={service.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              loading="eager"
+              quality={75}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={(e) => {
                 e.currentTarget.src = '/placeholder-service.jpg';
               }}
             />
             {/* Badge de disponibilité */}
             <div className="absolute top-3 right-3">
-              <Badge className={`${getAvailabilityColor(service.availability)} shadow-md border border-white/20`}>
+              <Badge variant="default" className={`${getAvailabilityColor(service.availability?.toString() || '')} shadow-md border border-white/20`}>
                 <Clock className="h-3 w-3 mr-1" />
-                {getAvailabilityText(service.availability)}
+                {getAvailabilityText(service.availability?.toString() ?? '')}
               </Badge>
             </div>
           </div>
@@ -149,7 +154,7 @@ export function ServiceCard({
         <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
           <DollarSign className="h-4 w-4 text-green-600" />
           <span className="font-semibold text-green-700">
-            {formatPrice(service.price, service.price_type)}
+            {formatPrice(service.price ?? 0, service.price_type)}
           </span>
         </div>
 
@@ -197,6 +202,32 @@ export function ServiceCard({
           </div>
         )}
 
+        {/* Avis et note */}
+        {service.rating && service.rating > 0 && (
+          <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-100">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`h-4 w-4 ${
+                    star <= Math.round(service.rating)
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="font-semibold text-yellow-700">
+              {service.rating.toFixed(1)}
+            </span>
+            {service.reviews_count && service.reviews_count > 0 && (
+              <span className="text-sm text-yellow-600">
+                ({service.reviews_count} avis)
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Statistiques */}
         <div className="flex items-center gap-4 text-xs text-gray-500">
           <ServiceViewsSimple 
@@ -204,15 +235,6 @@ export function ServiceCard({
             views={service.views}
             className="text-xs"
           />
-          {service.rating && service.rating > 0 && (
-            <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span>{service.rating.toFixed(1)}</span>
-              {service.reviews_count && service.reviews_count > 0 && (
-                <span className="text-gray-400">({service.reviews_count})</span>
-              )}
-            </div>
-          )}
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             <span>

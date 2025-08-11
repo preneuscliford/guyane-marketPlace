@@ -77,7 +77,10 @@ export default function MarketplacePage() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProducts(data || []);
+      setProducts((data || []).map(product => ({
+        ...product,
+        images: product.images || []
+      })));
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -111,16 +114,16 @@ export default function MarketplacePage() {
       {/* Afficher l'interface de recherche ou l'interface de navigation principale */}
       {showAllProducts || searchQuery ? (
         // Interface de recherche
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">Résultats de recherche</h1>
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h1 className="text-2xl sm:text-3xl font-bold">Résultats de recherche</h1>
               <button 
                 onClick={() => {
                   setShowAllProducts(false);
                   setSearchQuery("");
                 }}
-                className="px-4 py-2 text-purple-600 border border-purple-600 rounded-lg hover:bg-purple-50 transition-colors"
+                className="px-4 py-2 text-purple-600 border border-purple-600 rounded-lg hover:bg-purple-50 transition-colors text-sm sm:text-base"
               >
                 Retour à l&apos;accueil
               </button>
@@ -153,15 +156,15 @@ export default function MarketplacePage() {
           <Testimonials />
           
           {/* Call to Action */}
-          <section className="py-16 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white">
+          <section className="py-12 sm:py-16 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-6">Prêt à proposer vos services en Guyane ?</h2>
-              <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">Rejoignez notre communauté et commencez à partager vos talents avec la Guyane dès aujourd&apos;hui.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Prêt à proposer vos services en Guyane ?</h2>
+              <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">Rejoignez notre communauté et commencez à partager vos talents avec la Guyane dès aujourd&apos;hui.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:shadow-lg transition-shadow">
+                <button className="px-6 sm:px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:shadow-lg transition-shadow text-sm sm:text-base">
                   Proposer un service
                 </button>
-                <button className="px-8 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-colors">
+                <button className="px-6 sm:px-8 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-colors text-sm sm:text-base">
                   Découvrir comment ça marche
                 </button>
               </div>

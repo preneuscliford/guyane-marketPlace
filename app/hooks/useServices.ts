@@ -41,6 +41,9 @@ export function useServices() {
             full_name,
             avatar_url,
             location
+          ),
+          reviews (
+            rating
           )
         `)
         .eq('status', 'active');
@@ -88,8 +91,47 @@ export function useServices() {
         throw error;
       }
 
-      setServices(data ? (data as unknown as ServiceWithProfile[]) : []);
-      return data || [];
+      // Calculer les statistiques d'avis pour chaque service
+      const servicesWithStats = data ? data.map(service => {
+        const reviews = service.reviews || [];
+        const rating = reviews.length > 0 
+          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
+          : 0;
+        const reviews_count = reviews.length;
+        
+        return {
+          ...service,
+          rating: Math.round(rating * 10) / 10, // Arrondir à 1 décimale
+          reviews_count
+        };
+      }) : [];
+
+      // Tri intelligent : services récents et bien notés en premier
+      const sortedServices = servicesWithStats.sort((a, b) => {
+        // Calculer un score composite basé sur la note et la récence
+        const now = new Date().getTime();
+        const aDate = new Date(a.created_at).getTime();
+        const bDate = new Date(b.created_at).getTime();
+        
+        // Score de récence (plus récent = score plus élevé)
+        const daysDiffA = (now - aDate) / (1000 * 60 * 60 * 24);
+        const daysDiffB = (now - bDate) / (1000 * 60 * 60 * 24);
+        const recencyScoreA = Math.max(0, 30 - daysDiffA) / 30; // Score de 0 à 1
+        const recencyScoreB = Math.max(0, 30 - daysDiffB) / 30;
+        
+        // Score de qualité (note moyenne)
+        const qualityScoreA = a.rating / 5; // Score de 0 à 1
+        const qualityScoreB = b.rating / 5;
+        
+        // Score composite (60% qualité, 40% récence)
+        const scoreA = (qualityScoreA * 0.6) + (recencyScoreA * 0.4);
+        const scoreB = (qualityScoreB * 0.6) + (recencyScoreB * 0.4);
+        
+        return scoreB - scoreA; // Tri décroissant
+      });
+
+      setServices(sortedServices as unknown as ServiceWithProfile[]);
+      return servicesWithStats || [];
     } catch (err) {
       console.error('Erreur dans fetchServices:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la récupération des services';
@@ -119,6 +161,9 @@ export function useServices() {
             full_name,
             avatar_url,
             location
+          ),
+          reviews (
+            rating
           )
         `)
         .eq('id', id)
@@ -129,8 +174,22 @@ export function useServices() {
         throw error;
       }
 
-      // Note: L'incrémentation des vues est maintenant gérée par useServiceViews
-      // pour éviter les doublons et améliorer la précision du comptage
+      // Calculer les statistiques d'avis
+      if (data) {
+        const reviews = data.reviews || [];
+        const rating = reviews.length > 0 
+          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
+          : 0;
+        const reviews_count = reviews.length;
+        
+        const serviceWithStats = {
+          ...data,
+          rating: Math.round(rating * 10) / 10, // Arrondir à 1 décimale
+          reviews_count
+        };
+        
+        return serviceWithStats as unknown as ServiceWithProfile;
+      }
 
       return data as unknown as ServiceWithProfile;
     } catch (err) {
