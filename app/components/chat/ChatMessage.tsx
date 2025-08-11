@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDate } from "@/lib/utils";
-import { Avatar } from "@/components/ui/Avatar";
+import { Avatar } from "@/components/ui/AvatarComponent";
 
 interface ChatMessageProps {
   message: {
@@ -21,10 +21,10 @@ export function ChatMessage({ message, isOwn }: ChatMessageProps) {
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4`}>
       <div className={`flex ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[80%]`}>
         <Avatar
-          src={message.sender.avatar_url}
-          fallback={message.sender.username[0]}
           className="h-8 w-8"
-        />
+        >
+          {message.sender.username[0]}
+        </Avatar>
         <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
           <div className={`rounded-lg px-4 py-2 ${
             isOwn ? 'bg-primary text-white' : 'bg-muted'
