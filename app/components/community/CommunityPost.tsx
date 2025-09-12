@@ -79,11 +79,13 @@ export default function CommunityPost({
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(post.user_liked || false);
   const [likeCount, setLikeCount] = useState(post.like_count);
+  const [commentCount, setCommentCount] = useState(post.comment_count);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [replies, setReplies] = useState<Post[]>([]);
-  const [repliesVisible, setRepliesVisible] = useState(level < 2);
+  // Les réponses sont masquées par défaut, l'utilisateur doit cliquer pour les voir
+  const [repliesVisible, setRepliesVisible] = useState(false);
   const [loadingReplies, setLoadingReplies] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -96,18 +98,57 @@ export default function CommunityPost({
   /**
    * Charge les commentaires du post
    */
+  // Fonction pour obtenir le nombre réel de commentaires depuis la base de données
+  const fetchCommentCount = useCallback(async () => {
+    try {
+      console.log(
+        "Vérification du nombre réel de commentaires pour le post:",
+        post.id
+      );
+      const { count, error } = await supabase
+        .from("comments" as any)
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", post.id)
+        .eq("is_hidden", false);
+
+      if (error) {
+        console.error("Erreur lors du comptage des commentaires:", error);
+        return;
+      }
+
+      if (count !== undefined && count !== null && count !== commentCount) {
+        console.log(
+          `Correction du nombre de commentaires: ${count} (affichait ${commentCount})`
+        );
+        setCommentCount(count);
+        // Forcer la mise à jour si nécessaire
+        if (onUpdate) {
+          onUpdate();
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors du comptage des commentaires:", error);
+    }
+  }, [post.id, commentCount, onUpdate]);
+
   const fetchReplies = useCallback(async () => {
-    if (!repliesVisible || level >= maxLevel) return;
+    // On ne bloque plus le chargement des commentaires même quand ils ne sont pas visibles
+    // Cela permet de précharger les commentaires sans attendre que l'utilisateur clique
+    if (level >= maxLevel) return;
 
     setLoadingReplies(true);
     try {
-      // Récupération des commentaires sans la jointure
+      // Récupération des commentaires - utiliser uniquement les champs qui existent dans la table
+      console.log("Récupération des commentaires pour le post:", post.id);
       const { data: commentsData, error: commentsError } = await supabase
         .from("comments" as any)
-        .select("*")
+        .select("id, content, user_id, post_id, created_at, is_hidden")
         .eq("post_id", post.id)
         .eq("is_hidden", false)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true })
+        .limit(20); // Augmenté à 20 pour voir plus de commentaires
+
+      console.log("Commentaires récupérés:", commentsData);
 
       if (commentsError) {
         console.error(
@@ -119,6 +160,7 @@ export default function CommunityPost({
 
       if (!commentsData || commentsData.length === 0) {
         setReplies([]);
+        setCommentCount(0);
         return;
       }
 
@@ -156,7 +198,7 @@ export default function CommunityPost({
         created_at: c.created_at,
         updated_at: c.created_at, // Les commentaires n'ont pas updated_at, on utilise created_at
         is_hidden: c.is_hidden || false,
-        like_count: c.like_count || 0,
+        like_count: 0, // Les commentaires n'ont pas de like_count, on initialise à 0
         comment_count: 0, // Les commentaires n'ont pas de sous-commentaires
         profiles: profilesMap[c.user_id] || {
           id: c.user_id,
@@ -165,33 +207,16 @@ export default function CommunityPost({
         user_liked: false, // Par défaut, on suppose que l'utilisateur n'a pas aimé le commentaire
       }));
 
-      // Si l'utilisateur est connecté, vérifier quels commentaires il a aimés
-      if (user) {
-        const { data: userLikes } = await supabase
-          .from("likes")
-          .select("post_id")
-          .eq("user_id", user.id)
-          .in(
-            "post_id",
-            commentsAsReplies.map((comment: Post) => comment.id)
-          );
-
-        if (userLikes && userLikes.length > 0) {
-          const likedCommentIds = userLikes.map((like) => like.post_id);
-
-          // Mettre à jour le statut "aimé" pour chaque commentaire
-          commentsAsReplies.forEach((comment: Post) => {
-            if (likedCommentIds.includes(comment.id)) {
-              comment.user_liked = true;
-            }
-          });
-        }
-      }
-
-      setReplies(commentsAsReplies);
+      // Afficher le nombre de commentaires récupérés pour debug
+      console.log(
+        `${commentsAsReplies.length} commentaires prêts à être affichés`
+      );
 
       // Mettre à jour l'état avec les commentaires récupérés
       setReplies(commentsAsReplies);
+
+      // Mettre à jour le compteur de commentaires avec le nombre réel
+      setCommentCount(commentsAsReplies.length);
     } catch (error) {
       console.error("Erreur lors du chargement des commentaires:", error);
       toast.error("Impossible de charger les commentaires");
@@ -199,7 +224,7 @@ export default function CommunityPost({
     } finally {
       setLoadingReplies(false);
     }
-  }, [level, maxLevel, post.id, repliesVisible, user]);
+  }, [post.id, level, maxLevel]);
 
   /**
    * Gère le like/unlike d'un post avec une meilleure gestion des erreurs
@@ -385,20 +410,27 @@ export default function CommunityPost({
       setReplyContent("");
       setShowReplyForm(false);
 
-      // S'assurer que les réponses sont visibles
+      // S'assurer que les réponses sont visibles après avoir ajouté un commentaire
       setRepliesVisible(true);
 
-      // Mettre à jour le compteur de commentaires dans le post parent
-      post.comment_count = (post.comment_count || 0) + 1;
+      // Mettre à jour le compteur de commentaires dans le post parent (une seule fois)
+      setCommentCount((prev) => (prev || 0) + 1);
 
       // Rafraîchir la liste complète des commentaires pour s'assurer que tout est synchronisé
+      console.log("Commentaire ajouté, actualisation dans 1 seconde...");
+
+      // Attendre un peu plus longtemps pour s'assurer que le commentaire est enregistré côté serveur
       setTimeout(() => {
+        console.log(
+          "Rechargement des commentaires et mise à jour du compteur..."
+        );
+        fetchCommentCount(); // Récupérer le nombre exact de commentaires depuis la base de données
         fetchReplies(); // Recharger les commentaires pour avoir les données les plus récentes
 
         if (onUpdate) {
           onUpdate(); // Mettre à jour le post parent si nécessaire
         }
-      }, 500); // Petit délai pour s'assurer que le commentaire est bien enregistré
+      }, 1000); // Délai plus long pour s'assurer que le commentaire est bien enregistré
 
       toast.success("Réponse publiée!");
     } catch (err) {
@@ -486,11 +518,12 @@ export default function CommunityPost({
     }
   };
 
+  // Chargement initial des commentaires au montage du composant
   useEffect(() => {
-    if (repliesVisible && post.comment_count > 0) {
-      fetchReplies();
-    }
-  }, [repliesVisible, post.comment_count, fetchReplies]);
+    console.log("Chargement initial des commentaires pour le post:", post.id);
+    fetchReplies(); // Charger les commentaires une seule fois
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post.id]); // Se déclenche une seule fois par post
 
   const marginLeft = level * 24;
 
@@ -644,6 +677,20 @@ export default function CommunityPost({
                   </Button>
                 )}
 
+                {/* Indicateur du nombre de commentaires */}
+                <div className="flex items-center gap-1 px-2">
+                  <Reply className="h-4 w-4 text-gray-500" />
+                  <span
+                    className={`inline-flex items-center justify-center text-sm ${
+                      commentCount > 0
+                        ? "bg-teal-100 text-teal-700 font-medium px-2 py-0.5 rounded-full"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {commentCount}
+                  </span>
+                </div>
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -654,22 +701,35 @@ export default function CommunityPost({
                   Partager
                 </Button>
 
-                {post.comment_count > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setRepliesVisible(!repliesVisible)}
-                    className="flex items-center gap-2 text-teal-600 ml-auto font-medium"
-                  >
-                    {repliesVisible ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                    {post.comment_count} réponse
-                    {post.comment_count > 1 ? "s" : ""}
-                  </Button>
-                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (!repliesVisible) {
+                      // Si on ouvre les réponses, forcer le chargement des commentaires
+                      console.log(
+                        "Chargement forcé des commentaires pour le post:",
+                        post.id
+                      );
+                      fetchReplies();
+                    }
+                    setRepliesVisible(!repliesVisible);
+                  }}
+                  className={`flex items-center gap-2 ml-auto ${
+                    commentCount > 0
+                      ? "text-teal-600 font-medium"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {repliesVisible ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                  {commentCount > 0
+                    ? `${commentCount} réponse${commentCount > 1 ? "s" : ""}`
+                    : "Voir les réponses"}
+                </Button>
               </div>
 
               {/* Formulaire de réponse */}
@@ -707,36 +767,135 @@ export default function CommunityPost({
             </div>
           )}
         </CardContent>
-      </Card>
 
-      {/* Réponses */}
-      {repliesVisible && (
-        <div className="space-y-3">
-          {loadingReplies ? (
-            <div className="flex justify-center py-4">
-              <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-teal-600"></div>
-            </div>
-          ) : replies.length > 0 ? (
-            replies.map((reply) => (
-              <CommunityPost
-                key={reply.id}
-                post={reply}
-                level={level + 1}
-                maxLevel={maxLevel}
-                onUpdate={fetchReplies}
-              />
-            ))
-          ) : post.comment_count > 0 ? (
-            <div className="text-center py-2 text-gray-500 text-sm">
-              Chargement des commentaires...
-            </div>
-          ) : (
-            <div className="text-center py-2 text-gray-500 text-sm">
-              Soyez le premier à commenter
-            </div>
-          )}
-        </div>
-      )}
+        {/* Réponses intégrées dans la Card */}
+        {repliesVisible && (
+          <div className="mt-6 px-4 pb-4">
+            {loadingReplies ? (
+              <div className="flex justify-center py-8">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-600 border-t-transparent"></div>
+                  <span className="text-sm text-gray-500">
+                    Chargement des commentaires...
+                  </span>
+                </div>
+              </div>
+            ) : replies.length > 0 ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <h4 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <Reply className="h-4 w-4 text-teal-600" />
+                    Commentaires
+                  </h4>
+                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+                    {replies.length} commentaire{replies.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {replies.map((reply, index) => (
+                    <div
+                      key={reply.id}
+                      className="group relative bg-gray-50/50 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      {/* Ligne décorative */}
+                      <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-teal-400 to-teal-600 rounded-l-lg opacity-60"></div>
+
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+                          {reply.profiles && reply.profiles.avatar_url ? (
+                            <Image
+                              src={reply.profiles.avatar_url}
+                              alt={reply.profiles.username || "Utilisateur"}
+                              className="h-full w-full object-cover"
+                              fill
+                              sizes="32px"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-semibold text-xs">
+                              {reply.profiles
+                                ? (
+                                    reply.profiles.full_name ||
+                                    reply.profiles.username ||
+                                    "U"
+                                  )
+                                    .charAt(0)
+                                    .toUpperCase()
+                                : "U"}
+                            </div>
+                          )}
+                        </Avatar>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h5 className="font-semibold text-sm text-gray-900 truncate">
+                              {(reply.profiles &&
+                                (reply.profiles.full_name ||
+                                  reply.profiles.username)) ||
+                                "Utilisateur"}
+                            </h5>
+                            <time className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full shadow-sm">
+                              {formatDistanceToNow(new Date(reply.created_at), {
+                                addSuffix: true,
+                                locale: fr,
+                              })}
+                            </time>
+                          </div>
+
+                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            {reply.content}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Numéro du commentaire */}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="text-xs text-gray-400 bg-white px-1.5 py-0.5 rounded-full shadow-sm">
+                          #{index + 1}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : commentCount > 0 ? (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
+                  <Reply className="h-5 w-5 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-500 mb-3">
+                  Chargement des commentaires...
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 rounded-full mb-4">
+                  <Reply className="h-6 w-6 text-teal-500" />
+                </div>
+                <h5 className="font-medium text-gray-900 mb-2">
+                  Aucun commentaire pour le moment
+                </h5>
+                <p className="text-sm text-gray-500 mb-4">
+                  {commentCount > 0
+                    ? `Les ${commentCount} commentaires ne se sont pas chargés correctement`
+                    : "Soyez le premier à partager votre avis"}
+                </p>
+                {commentCount > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fetchReplies()}
+                    className="text-xs hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-colors"
+                  >
+                    <Reply className="h-3 w-3 mr-1" />
+                    Recharger les commentaires
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }
