@@ -22,6 +22,19 @@ interface DialogTitleProps {
   children: React.ReactNode;
 }
 
+interface DialogDescriptionProps {
+  children: React.ReactNode;
+}
+
+interface DialogFooterProps {
+  children: React.ReactNode;
+}
+
+interface DialogTriggerProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
 /**
  * Composant Dialog pour les modales
  */
@@ -71,5 +84,38 @@ export function DialogTitle({ children }: DialogTitleProps) {
     <h2 className="text-lg font-semibold text-gray-900">
       {children}
     </h2>
+  );
+}
+
+/**
+ * Description du dialog
+ */
+export function DialogDescription({ children }: DialogDescriptionProps) {
+  return (
+    <p className="text-sm text-gray-600 mt-2">
+      {children}
+    </p>
+  );
+}
+
+/**
+ * Pied de page du dialog
+ */
+export function DialogFooter({ children }: DialogFooterProps) {
+  return (
+    <div className="p-6 pt-4 border-t bg-gray-50 flex justify-end gap-2">
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Déclencheur du dialog
+ */
+export function DialogTrigger({ children, onClick }: DialogTriggerProps) {
+  return (
+    <div onClick={onClick}>
+      {children}
+    </div>
   );
 }

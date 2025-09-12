@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      likes: {
+        Row: {
+          id: string
+          post_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       advertisement_clicks: {
         Row: {
           advertisement_id: string | null
@@ -56,513 +92,51 @@ export type Database = {
           },
         ]
       }
-      advertisement_impressions: {
-        Row: {
-          advertisement_id: string | null
-          created_at: string | null
-          id: string
-          ip_address: unknown | null
-          user_agent: string | null
-          user_id: string | null
-        }
-        Insert: {
-          advertisement_id?: string | null
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          advertisement_id?: string | null
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "advertisement_impressions_advertisement_id_fkey"
-            columns: ["advertisement_id"]
-            isOneToOne: false
-            referencedRelation: "advertisements"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "advertisement_impressions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      advertisement_stats: {
-        Row: {
-          advertisement_id: string | null
-          clicks: number | null
-          cost_per_click: number | null
-          created_at: string | null
-          date: string | null
-          id: string
-          impressions: number | null
-        }
-        Insert: {
-          advertisement_id?: string | null
-          clicks?: number | null
-          cost_per_click?: number | null
-          created_at?: string | null
-          date?: string | null
-          id?: string
-          impressions?: number | null
-        }
-        Update: {
-          advertisement_id?: string | null
-          clicks?: number | null
-          cost_per_click?: number | null
-          created_at?: string | null
-          date?: string | null
-          id?: string
-          impressions?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "advertisement_stats_advertisement_id_fkey"
-            columns: ["advertisement_id"]
-            isOneToOne: false
-            referencedRelation: "advertisements"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      advertisements: {
-        Row: {
-          budget: number | null
-          category: string | null
-          clicks: number | null
-          created_at: string | null
-          daily_budget: number | null
-          description: string
-          end_date: string | null
-          id: string
-          image_url: string | null
-          impressions: number | null
-          location: string | null
-          start_date: string | null
-          status: string | null
-          target_url: string | null
-          title: string
-          total_spent: number | null
-          updated_at: string | null
-          user_id: string | null
-          view_count: number | null
-        }
-        Insert: {
-          budget?: number | null
-          category?: string | null
-          clicks?: number | null
-          created_at?: string | null
-          daily_budget?: number | null
-          description: string
-          end_date?: string | null
-          id?: string
-          image_url?: string | null
-          impressions?: number | null
-          location?: string | null
-          start_date?: string | null
-          status?: string | null
-          target_url?: string | null
-          title: string
-          total_spent?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-          view_count?: number | null
-        }
-        Update: {
-          budget?: number | null
-          category?: string | null
-          clicks?: number | null
-          created_at?: string | null
-          daily_budget?: number | null
-          description?: string
-          end_date?: string | null
-          id?: string
-          image_url?: string | null
-          impressions?: number | null
-          location?: string | null
-          start_date?: string | null
-          status?: string | null
-          target_url?: string | null
-          title?: string
-          total_spent?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-          view_count?: number | null
-        }
-        Relationships: []
-      }
-      announcements: {
-        Row: {
-          category: string
-          created_at: string
-          description: string
-          id: string
-          images: string[] | null
-          location: string
-          price: number | null
-          read: boolean | null
-          title: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          description: string
-          id?: string
-          images?: string[] | null
-          location: string
-          price?: number | null
-          read?: boolean | null
-          title: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          description?: string
-          id?: string
-          images?: string[] | null
-          location?: string
-          price?: number | null
-          read?: boolean | null
-          title?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "announcements_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      categories: {
-        Row: {
-          id: string
-          name: string
-        }
-        Insert: {
-          id?: string
-          name: string
-        }
-        Update: {
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      comments: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          post_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          post_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          post_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      contact_messages: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          product_id: string | null
-          product_title: string | null
-          receiver_id: string | null
-          sender_email: string
-          sender_name: string
-          updated_at: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          product_id?: string | null
-          product_title?: string | null
-          receiver_id?: string | null
-          sender_email: string
-          sender_name: string
-          updated_at?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          product_id?: string | null
-          product_title?: string | null
-          receiver_id?: string | null
-          sender_email?: string
-          sender_name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "contact_messages_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contact_messages_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conversation_participants: {
-        Row: {
-          conversation_id: string
-          user_id: string
-        }
-        Insert: {
-          conversation_id: string
-          user_id: string
-        }
-        Update: {
-          conversation_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversation_participants_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversation_participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conversations: {
-        Row: {
-          created_at: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-        }
-        Relationships: []
-      }
-      favorites: {
-        Row: {
-          announcement_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          announcement_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          announcement_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_announcement_id_fkey"
-            columns: ["announcement_id"]
-            isOneToOne: false
-            referencedRelation: "announcements"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      likes: {
-        Row: {
-          created_at: string
-          post_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          post_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          post_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "likes_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          content: string
-          conversation_id: string | null
-          created_at: string
-          id: string
-          user_id: string | null
-        }
-        Insert: {
-          content: string
-          conversation_id?: string | null
-          created_at?: string
-          id?: string
-          user_id?: string | null
-        }
-        Update: {
-          content?: string
-          conversation_id?: string | null
-          created_at?: string
-          id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notifications: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          read: boolean | null
-          reference_id: string | null
-          reference_type: string | null
-          type: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          read?: boolean | null
-          reference_id?: string | null
-          reference_type?: string | null
-          type: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          read?: boolean | null
-          reference_id?: string | null
-          reference_type?: string | null
-          type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       posts: {
         Row: {
-          content: string
-          created_at: string
           id: string
-          image_url: string | null
+          content: string
+          user_id: string
+          parent_id: string | null
+          created_at: string
           updated_at: string
-          user_id: string | null
+          is_hidden: boolean
+          like_count: number
+          comment_count: number
+          image_url?: string
+          hidden_by?: string
+          hidden_at?: string
+          hidden_reason?: string
         }
         Insert: {
-          content: string
-          created_at?: string
           id?: string
-          image_url?: string | null
+          content: string
+          user_id: string
+          parent_id?: string | null
+          created_at?: string
           updated_at?: string
-          user_id?: string | null
+          is_hidden?: boolean
+          like_count?: number
+          comment_count?: number
+          image_url?: string
+          hidden_by?: string
+          hidden_at?: string
+          hidden_reason?: string
         }
         Update: {
-          content?: string
-          created_at?: string
           id?: string
-          image_url?: string | null
+          content?: string
+          user_id?: string
+          parent_id?: string | null
+          created_at?: string
           updated_at?: string
-          user_id?: string | null
+          is_hidden?: boolean
+          like_count?: number
+          comment_count?: number
+          image_url?: string
+          hidden_by?: string
+          hidden_at?: string
+          hidden_reason?: string
         }
         Relationships: [
           {
@@ -572,265 +146,191 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "posts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          }
         ]
       }
-      product_likes: {
+      profiles: {
         Row: {
-          created_at: string | null
           id: string
-          product_id: string | null
-          user_id: string | null
+          updated_at: string | null
+          username: string
+          full_name: string | null
+          avatar_url: string | null
+          website: string | null
+          business_name: string | null
+          business_description: string | null
+          location: string | null
+          phone: string | null
+          email: string | null
+          role: string | null
+          is_business: boolean
+          is_verified: boolean
         }
         Insert: {
-          created_at?: string | null
-          id?: string
-          product_id?: string | null
-          user_id?: string | null
+          id: string
+          updated_at?: string | null
+          username: string
+          full_name?: string | null
+          avatar_url?: string | null
+          website?: string | null
+          business_name?: string | null
+          business_description?: string | null
+          location?: string | null
+          phone?: string | null
+          email?: string | null
+          role?: string | null
+          is_business?: boolean
+          is_verified?: boolean
         }
         Update: {
-          created_at?: string | null
           id?: string
-          product_id?: string | null
-          user_id?: string | null
+          updated_at?: string | null
+          username?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          website?: string | null
+          business_name?: string | null
+          business_description?: string | null
+          location?: string | null
+          phone?: string | null
+          email?: string | null
+          role?: string | null
+          is_business?: boolean
+          is_verified?: boolean
         }
         Relationships: [
           {
-            foreignKeyName: "product_likes_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          moderator_id: string | null
+          moderator_notes: string | null
+          reason: string
+          reported_content_id: string
+          reported_content_type: string
+          reported_user_id: string | null
+          reporter_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          reason: string
+          reported_content_id: string
+          reported_content_type: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          reason?: string
+          reported_content_id?: string
+          reported_content_type?: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_moderator_id_fkey"
+            columns: ["moderator_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      products: {
-        Row: {
-          category: string
-          created_at: string
-          description: string
-          featured: boolean | null
-          id: string
-          images: string[] | null
-          location: string
-          price: number
-          status: string | null
-          title: string
-          updated_at: string
-          user_id: string
-          view_count: number | null
-          views: number | null
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          description: string
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          location: string
-          price: number
-          status?: string | null
-          title: string
-          updated_at?: string
-          user_id: string
-          view_count?: number | null
-          views?: number | null
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          description?: string
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          location?: string
-          price?: number
-          status?: string | null
-          title?: string
-          updated_at?: string
-          user_id?: string
-          view_count?: number | null
-          views?: number | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string
-          email: string
-          full_name: string | null
-          id: string
-          location: string | null
-          phone_number: string | null
-          preferences: Json | null
-          social_links: Json | null
-          updated_at: string | null
-          username: string
-          website: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email: string
-          full_name?: string | null
-          id: string
-          location?: string | null
-          phone_number?: string | null
-          preferences?: Json | null
-          social_links?: Json | null
-          updated_at?: string | null
-          username: string
-          website?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email?: string
-          full_name?: string | null
-          id?: string
-          location?: string | null
-          phone_number?: string | null
-          preferences?: Json | null
-          social_links?: Json | null
-          updated_at?: string | null
-          username?: string
-          website?: string | null
-        }
-        Relationships: []
-      }
-      reviews: {
-        Row: {
-          announcement_id: string | null
-          comment: string | null
-          created_at: string
-          id: string
-          rating: number
-          target_user_id: string
-          user_id: string
-        }
-        Insert: {
-          announcement_id?: string | null
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating: number
-          target_user_id: string
-          user_id: string
-        }
-        Update: {
-          announcement_id?: string | null
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating?: number
-          target_user_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      services: {
-        Row: {
-          availability: Json | null
-          category: string
-          contact_info: Json | null
-          created_at: string
-          description: string
-          id: string
-          images: string[] | null
-          location: string
-          price: number | null
-          price_type: string | null
-          rating: number | null
-          reviews_count: number | null
-          status: string | null
-          tags: string[] | null
-          title: string
-          total_views: number | null
-          unique_views: number | null
-          updated_at: string
-          user_id: string
-          views: number | null
-        }
-        Insert: {
-          availability?: Json | null
-          category: string
-          contact_info?: Json | null
-          created_at?: string
-          description: string
-          id?: string
-          images?: string[] | null
-          location: string
-          price?: number | null
-          price_type?: string | null
-          rating?: number | null
-          reviews_count?: number | null
-          status?: string | null
-          tags?: string[] | null
-          title: string
-          total_views?: number | null
-          unique_views?: number | null
-          updated_at?: string
-          user_id: string
-          views?: number | null
-        }
-        Update: {
-          availability?: Json | null
-          category?: string
-          contact_info?: Json | null
-          created_at?: string
-          description?: string
-          id?: string
-          images?: string[] | null
-          location?: string
-          price?: number | null
-          price_type?: string | null
-          rating?: number | null
-          reviews_count?: number | null
-          status?: string | null
-          tags?: string[] | null
-          title?: string
-          total_views?: number | null
-          unique_views?: number | null
-          updated_at?: string
-          user_id?: string
-          views?: number | null
-        }
-        Relationships: []
-      }
     }
     Views: {
-      [_ in never]: never
+      reports_with_users: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          moderator_full_name: string | null
+          moderator_id: string | null
+          moderator_notes: string | null
+          moderator_username: string | null
+          reason: string | null
+          reported_content_id: string | null
+          reported_content_type: string | null
+          reported_user_id: string | null
+          reporter_full_name: string | null
+          reporter_id: string | null
+          reporter_username: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      increment_service_views: {
-        Args: {
-          p_service_id: string
-          p_user_id?: string | null
-          p_ip_address?: string | null
-          p_session_id?: string | null
-          p_user_agent?: string | null
-        }
-        Returns: {
-          success: boolean
-          unique_views: number
-          total_views: number
-        }
-      }
-      get_service_view_stats: {
-        Args: {
-          p_service_id: string
-        }
-        Returns: {
-          unique_views: number
-          total_views: number
-          views_today: number
-          views_this_week: number
-          views_this_month: number
-        }
+      get_moderation_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
     }
     Enums: {
@@ -842,30 +342,25 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database['public']
-
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']] extends { Tables: any; Views: any }
-        ? Database[PublicTableNameOrOptions['schema']]['Tables'] & Database[PublicTableNameOrOptions['schema']]['Views']
-        : never)
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']] extends { Tables: any; Views: any }
-    ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
-        PublicSchema['Views'])
-    ? (PublicSchema['Tables'] &
-        PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
+        Database["public"]["Views"])
+    ? (Database["public"]["Tables"] &
+        Database["public"]["Views"])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -874,23 +369,19 @@ export type Tables<
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof PublicSchema['Tables']
+    | keyof Database["public"]["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']] extends { Tables: any }
-        ? Database[PublicTableNameOrOptions['schema']]['Tables']
-        : never)
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']] extends { Tables: any }
-    ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -899,23 +390,19 @@ export type TablesInsert<
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof PublicSchema['Tables']
+    | keyof Database["public"]["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']] extends { Tables: any }
-        ? Database[PublicTableNameOrOptions['schema']]['Tables']
-        : never)
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']] extends { Tables: any }
-    ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -924,17 +411,28 @@ export type TablesUpdate<
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof PublicSchema['Enums']
+    | keyof Database["public"]["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicEnumNameOrOptions['schema']] extends { Enums: any }
-        ? Database[PublicEnumNameOrOptions['schema']]['Enums']
-        : never)
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']] extends { Enums: any }
-    ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
+    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
     : never
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof Database["public"]["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof Database["public"]["CompositeTypes"]
+    ? Database["public"]["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

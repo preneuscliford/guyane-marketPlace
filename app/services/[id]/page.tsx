@@ -35,6 +35,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import ReportButton from '@/components/ui/ReportButton';
 
 /**
  * Page de détail d'un service
@@ -260,6 +261,15 @@ export default function ServiceDetailPage() {
             <Share2 className="h-4 w-4 mr-2" />
             Partager
           </Button>
+          <ReportButton
+            contentType="service"
+            contentId={service.id}
+            reportedUserId={service.user_id}
+            variant="outline"
+            size="sm"
+            className="hover:border-red-200 hover:text-red-500"
+            showText={false}
+          />
         </div>
       </div>
 

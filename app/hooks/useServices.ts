@@ -28,25 +28,27 @@ export function useServices() {
    */
   const fetchServices = useCallback(async (params: ServiceSearchParams = {}) => {
     try {
+      console.log('useServices: Début de fetchServices avec params:', params);
       setLoading(true);
       setError(null);
-
+      
       let query = supabase
         .from('services')
         .select(`
           *,
-          profiles (
+          profiles!services_user_id_fkey (
             id,
             username,
             full_name,
-            avatar_url,
-            location
+            avatar_url
           ),
           reviews (
             rating
           )
         `)
         .eq('status', 'active');
+        
+      console.log('useServices: Query Supabase créée');
 
       // Appliquer les filtres
       if (params.category) {
@@ -84,27 +86,69 @@ export function useServices() {
         query = query.range(params.offset, params.offset + (params.limit || 10) - 1);
       }
 
-      const { data, error } = await query;
-
+      // Exécuter la requête avec timeout
+      console.log('useServices: Exécution de la requête Supabase...');
+      
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout de la requête Supabase')), 10000);
+      });
+      
+      const { data, error } = await Promise.race([
+        query,
+        timeoutPromise
+      ]) as any;
+      
+      console.log('useServices: Résultat de la requête:', { data, error });
+      
       if (error) {
-        console.error('Erreur lors de la récupération des services:', error);
+        console.error('useServices: Erreur lors de la récupération des services:', error);
         throw error;
+      }
+      
+      if (!data) {
+        console.warn('useServices: Aucune donnée retournée par Supabase');
+        setServices([]);
+        return [];
       }
 
       // Calculer les statistiques d'avis pour chaque service
       const servicesWithStats = data ? data.map(service => {
-        const reviews = service.reviews || [];
-        const rating = reviews.length > 0 
-          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
-          : 0;
-        const reviews_count = reviews.length;
-        
-        return {
-          ...service,
-          rating: Math.round(rating * 10) / 10, // Arrondir à 1 décimale
-          reviews_count
-        };
+        try {
+          const reviews = service.reviews || [];
+          let rating = 0;
+          
+          if (reviews && reviews.length > 0) {
+            const total = reviews.reduce((sum: number, review: any) => {
+              const reviewRating = typeof review.rating === 'string' 
+                ? parseFloat(review.rating) || 0 
+                : review.rating || 0;
+              return sum + reviewRating;
+            }, 0);
+            rating = total / reviews.length;
+          }
+          
+          const reviews_count = reviews ? reviews.length : 0;
+          
+          // Garder le prix tel quel, la conversion se fera au moment de l'affichage
+          // pour éviter des problèmes de sérialisation sur Vercel
+          
+          return {
+            ...service,
+            rating: Math.round(rating * 10) / 10, // Arrondir à 1 décimale
+            reviews_count
+          };
+        } catch (err) {
+          console.error('Erreur lors du traitement du service:', err);
+          // Retourner le service original en cas d'erreur
+          return {
+            ...service,
+            rating: 0,
+            reviews_count: 0
+          };
+        }
       }) : [];
+      
+      console.log('Services récupérés:', servicesWithStats.length, servicesWithStats);
 
       // Tri intelligent : services récents et bien notés en premier
       const sortedServices = servicesWithStats.sort((a, b) => {
@@ -133,7 +177,7 @@ export function useServices() {
       setServices(sortedServices as unknown as ServiceWithProfile[]);
       return servicesWithStats || [];
     } catch (err) {
-      console.error('Erreur dans fetchServices:', err);
+      console.error('Erreur dans fetchServices:', err instanceof Error ? err.message : String(err));
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la récupération des services';
       setError(errorMessage);
       throw err;
@@ -155,7 +199,7 @@ export function useServices() {
         .from('services')
         .select(`
           *,
-          profiles (
+          profiles!services_user_id_fkey (
             id,
             username,
             full_name,

@@ -9,6 +9,7 @@ import PWAStyles from "@/components/PWAStyles";
 import { Toaster } from "sonner";
 import { HeaderWrapper } from "./components/layout/HeaderWrapper";
 import AuthProviderWrapper from "./components/providers/AuthProviderWrapper";
+import FeedbackButton from "./components/feedback/FeedbackButton";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -85,6 +86,7 @@ export default function RootLayout({
             {children}
           </div>
           <Footer />
+          <FeedbackButton />
           <PWAManager />
           <Toaster 
             position="top-right"

@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { Button } from "@components/ui/Button";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import { ReportButton } from "@/components/ui/ReportButton";
 
 interface AnnouncementCardProps {
   announcement: {
@@ -52,8 +53,17 @@ export default function AnnouncementCard({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md relative">
-      {/* Bouton de favoris */}
-      <div className="absolute top-4 right-4">
+      {/* Boutons de favoris et signalement */}
+      <div className="absolute top-4 right-4 flex gap-2">
+        <ReportButton 
+          contentType="announcement"
+          contentId={announcement.id}
+          reportedUserId={announcement.user_id}
+          variant="ghost"
+          size="sm"
+          className="text-gray-500 hover:text-red-500"
+          showText={false}
+        />
         <FavoriteButton announcementId={announcement.id} size="sm" />
       </div>
       

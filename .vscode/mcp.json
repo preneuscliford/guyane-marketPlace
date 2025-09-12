@@ -1,8 +1,26 @@
 {
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "sbp_ea01540eac52c1b7894beb7d177239f0d78d0901",
+      "description": "Supabase personal access token",
+      "password": true
+    }
+  ],
   "servers": {
-    "datapilot": {
-      "url": "http://localhost:7700/sse",
-      "type": "sse"
+    "supabase": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=oidmaqovylsvbewsrlcb"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_ea01540eac52c1b7894beb7d177239f0d78d0901"
+      }
     }
   }
 }

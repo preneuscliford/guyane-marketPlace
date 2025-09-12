@@ -7,6 +7,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Button } from '../../app/components/ui/Button';
 import { Badge } from '../../app/components/ui/badge';
 import { Card, CardContent } from '../../app/components/ui/Card';
+import ReportButton from '../../app/components/moderation/ReportButton';
 import { 
   Heart, 
   MapPin, 
@@ -249,6 +250,17 @@ export default function ProductGrid({
                     }`} 
                   />
                 </Button>
+                
+                {/* Bouton de signalement */}
+                <ReportButton
+                  contentType="product"
+                  contentId={product.id}
+                  reportedUserId={product.user_id}
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-12 right-3 h-8 w-8 p-0 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-red-500"
+                  showText={false}
+                />
               </div>
 
               <CardContent className="p-4">

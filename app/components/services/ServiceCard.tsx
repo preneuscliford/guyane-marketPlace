@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/AvatarComponent';
+import React from "react";
+import Link from "next/link";
 import {
-  MapPin,
-  Star,
-  Eye,
-  Phone,
-  Mail,
-  Clock,
-  DollarSign,
-  User
-} from 'lucide-react';
-import { ServiceViewsSimple } from './ServiceViewsDisplay';
-import { ServiceWithProfile } from '@/types/services';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import Image from 'next/image';
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/Button";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/AvatarComponent";
+import { MapPin, Star, Phone, Clock, DollarSign, User } from "lucide-react";
+import { ServiceViewsSimple } from "./ServiceViewsDisplay";
+import { ServiceWithProfile } from "@/types/services";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import Image from "next/image";
 
 interface ServiceCardProps {
   service: ServiceWithProfile;
@@ -38,27 +38,27 @@ export function ServiceCard({
   showActions = false,
   onEdit,
   onDelete,
-  onContact
+  onContact,
 }: ServiceCardProps) {
   /**
    * Formate le prix selon le type
    */
   const formatPrice = (price: number, priceType: string) => {
-    if (price === 0) return 'Gratuit';
-    
-    const formattedPrice = new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
+    if (price === 0) return "Gratuit";
+
+    const formattedPrice = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(price);
 
     switch (priceType) {
-      case 'hourly':
+      case "hourly":
         return `${formattedPrice}/h`;
-      case 'daily':
+      case "daily":
         return `${formattedPrice}/jour`;
-      case 'monthly':
+      case "monthly":
         return `${formattedPrice}/mois`;
-      case 'negotiable':
+      case "negotiable":
         return `${formattedPrice} (négociable)`;
       default:
         return formattedPrice;
@@ -70,14 +70,14 @@ export function ServiceCard({
    */
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
-      case 'available':
-        return 'bg-green-100 text-green-800';
-      case 'busy':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'unavailable':
-        return 'bg-red-100 text-red-800';
+      case "available":
+        return "bg-green-100 text-green-800";
+      case "busy":
+        return "bg-yellow-100 text-yellow-800";
+      case "unavailable":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -86,14 +86,14 @@ export function ServiceCard({
    */
   const getAvailabilityText = (availability: string) => {
     switch (availability) {
-      case 'available':
-        return 'Disponible';
-      case 'busy':
-        return 'Occupé';
-      case 'unavailable':
-        return 'Indisponible';
+      case "available":
+        return "Disponible";
+      case "busy":
+        return "Occupé";
+      case "unavailable":
+        return "Indisponible";
       default:
-        return 'Non spécifié';
+        return "Non spécifié";
     }
   };
 
@@ -101,27 +101,46 @@ export function ServiceCard({
     <Card className="h-full flex flex-col hover:shadow-xl transition-all duration-300 border-0 bg-white shadow-md hover:scale-[1.02] rounded-xl overflow-hidden">
       <CardHeader className="pb-3">
         {/* Image principale */}
-        {service.images && service.images.length > 0 && (
+        {service.images &&
+        Array.isArray(service.images) &&
+        service.images.length > 0 &&
+        service.images[0] ? (
           <div className="relative w-full h-48 mb-3 rounded-lg overflow-hidden">
             <Image
               src={service.images[0]}
-              alt={service.title}
+              alt={service.title || "Service"}
               fill
               className="object-cover"
               loading="eager"
               quality={75}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={(e) => {
-                e.currentTarget.src = '/placeholder-service.jpg';
+                // Fallback to placeholder image
+                e.currentTarget.src = "/default-avatar.svg";
               }}
             />
             {/* Badge de disponibilité */}
             <div className="absolute top-3 right-3">
-              <Badge variant="default" className={`${getAvailabilityColor(service.availability?.toString() || '')} shadow-md border border-white/20`}>
+              <Badge
+                variant="default"
+                className={`${getAvailabilityColor(
+                  typeof service.availability === "string"
+                    ? service.availability
+                    : "available"
+                )} shadow-md border border-white/20`}
+              >
                 <Clock className="h-3 w-3 mr-1" />
-                {getAvailabilityText(service.availability?.toString() ?? '')}
+                {getAvailabilityText(
+                  typeof service.availability === "string"
+                    ? service.availability
+                    : "available"
+                )}
               </Badge>
             </div>
+          </div>
+        ) : (
+          <div className="w-full h-48 mb-3 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+            <div className="text-gray-400">Aucune image</div>
           </div>
         )}
 
@@ -129,7 +148,7 @@ export function ServiceCard({
         <div className="space-y-2">
           <div className="flex items-start justify-between">
             <h3 className="font-semibold text-lg line-clamp-2 flex-1">
-              <Link 
+              <Link
                 href={`/services/${service.id}`}
                 className="hover:text-blue-600 transition-colors"
               >
@@ -137,8 +156,11 @@ export function ServiceCard({
               </Link>
             </h3>
           </div>
-          
-          <Badge variant="secondary" className="w-fit bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200 hover:from-purple-200 hover:to-pink-200 transition-all duration-200">
+
+          <Badge
+            variant="secondary"
+            className="w-fit bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200 hover:from-purple-200 hover:to-pink-200 transition-all duration-200"
+          >
             {service.category}
           </Badge>
         </div>
@@ -154,7 +176,12 @@ export function ServiceCard({
         <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
           <DollarSign className="h-4 w-4 text-green-600" />
           <span className="font-semibold text-green-700">
-            {formatPrice(service.price ?? 0, service.price_type)}
+            {formatPrice(
+              typeof service.price === "string"
+                ? parseFloat(service.price) || 0
+                : service.price ?? 0,
+              service.price_type
+            )}
           </span>
         </div>
 
@@ -168,14 +195,16 @@ export function ServiceCard({
         {service.profiles && (
           <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={service.profiles.avatar_url || ''} />
+              <AvatarImage src={service.profiles.avatar_url || ""} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {service.profiles.full_name || service.profiles.username || 'Utilisateur'}
+                {service.profiles.full_name ||
+                  service.profiles.username ||
+                  "Utilisateur"}
               </p>
               {service.profiles.location && (
                 <p className="text-xs text-gray-500 truncate">
@@ -190,12 +219,19 @@ export function ServiceCard({
         {service.tags && service.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {service.tags.slice(0, 3).map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200">
+              <Badge
+                key={index}
+                variant="outline"
+                className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200"
+              >
                 {tag}
               </Badge>
             ))}
             {service.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200">
+              <Badge
+                variant="outline"
+                className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-slate-100 transition-all duration-200"
+              >
                 +{service.tags.length - 3}
               </Badge>
             )}
@@ -203,34 +239,43 @@ export function ServiceCard({
         )}
 
         {/* Avis et note */}
-        {service.rating && service.rating > 0 && (
+        {service.rating && parseFloat(String(service.rating)) > 0 && (
           <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-100">
             <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-4 w-4 ${
-                    star <= Math.round(service.rating)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                />
-              ))}
+              {[1, 2, 3, 4, 5].map((star) => {
+                const ratingValue =
+                  typeof service.rating === "string"
+                    ? parseFloat(service.rating)
+                    : service.rating;
+                return (
+                  <Star
+                    key={star}
+                    className={`h-4 w-4 ${
+                      star <= Math.round(ratingValue)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                );
+              })}
             </div>
             <span className="font-semibold text-yellow-700">
-              {service.rating.toFixed(1)}
+              {typeof service.rating === "string"
+                ? parseFloat(service.rating).toFixed(1)
+                : service.rating.toFixed(1)}
             </span>
-            {service.reviews_count && service.reviews_count > 0 && (
-              <span className="text-sm text-yellow-600">
-                ({service.reviews_count} avis)
-              </span>
-            )}
+            {service.reviews_count &&
+              parseInt(String(service.reviews_count)) > 0 && (
+                <span className="text-sm text-yellow-600">
+                  ({service.reviews_count} avis)
+                </span>
+              )}
           </div>
         )}
 
         {/* Statistiques */}
         <div className="flex items-center gap-4 text-xs text-gray-500">
-          <ServiceViewsSimple 
+          <ServiceViewsSimple
             totalViews={service.total_views}
             views={service.views}
             className="text-xs"
@@ -240,7 +285,7 @@ export function ServiceCard({
             <span>
               {formatDistanceToNow(new Date(service.created_at), {
                 addSuffix: true,
-                locale: fr
+                locale: fr,
               })}
             </span>
           </div>
@@ -277,11 +322,9 @@ export function ServiceCard({
               asChild
               className="flex-1 border-blue-200 text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-200"
             >
-              <Link href={`/services/${service.id}`}>
-                Voir détails
-              </Link>
+              <Link href={`/services/${service.id}`}>Voir détails</Link>
             </Button>
-            
+
             {(service.contact_info?.phone || service.contact_info?.email) && (
               <Button
                 size="sm"
@@ -302,61 +345,136 @@ export function ServiceCard({
 /**
  * Composant de carte de service en mode compact
  */
-export function ServiceCardCompact({ service }: { service: ServiceWithProfile }) {
-  return (
-    <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white shadow-sm hover:scale-[1.01] rounded-xl overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex gap-3">
-          {/* Image miniature */}
-          {service.images && service.images.length > 0 && (
-            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
-              <img
-                src={service.images[0]}
-                alt={service.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder-service.jpg';
-                }}
-              />
-            </div>
-          )}
-
-          {/* Contenu */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between mb-1">
-              <h4 className="font-medium text-sm line-clamp-1 flex-1">
-                <Link 
-                  href={`/services/${service.id}`}
-                  className="hover:text-blue-600 transition-colors"
-                >
-                  {service.title}
-                </Link>
-              </h4>
-              <Badge variant="secondary" className="text-xs ml-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200">
-                {service.category}
-              </Badge>
-            </div>
-            
-            <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-              {service.description}
-            </p>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <MapPin className="h-3 w-3" />
-                <span className="truncate">{service.location}</span>
+export function ServiceCardCompact({
+  service,
+  onContact,
+  onEdit,
+  onDelete,
+}: ServiceCardProps) {
+  try {
+    return (
+      <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white shadow-sm hover:scale-[1.01] rounded-xl overflow-hidden">
+        <CardContent className="p-4">
+          <div className="flex gap-3">
+            {/* Image miniature */}
+            {service.images &&
+            Array.isArray(service.images) &&
+            service.images.length > 0 &&
+            service.images[0] ? (
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+                <Image
+                  src={service.images[0]}
+                  alt={service.title || "Service"}
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    e.currentTarget.src = "/default-avatar.svg";
+                  }}
+                />
               </div>
-              
-              <div className="flex items-center gap-1 text-xs font-medium text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 px-2 py-1 rounded-lg border border-green-100">
-                <DollarSign className="h-3 w-3" />
-                <span>
-                  {service.price === 0 ? 'Gratuit' : `${service.price}€`}
-                </span>
+            ) : (
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-sm bg-gray-100 flex items-center justify-center">
+                <span className="text-xs text-gray-400">No image</span>
+              </div>
+            )}
+
+            {/* Contenu */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-1">
+                <h4 className="font-medium text-sm line-clamp-1 flex-1">
+                  <Link
+                    href={`/services/${service.id}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    {service.title}
+                  </Link>
+                </h4>
+                <Badge
+                  variant="secondary"
+                  className="text-xs ml-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200"
+                >
+                  {service.category}
+                </Badge>
+              </div>
+
+              <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                {service.description}
+              </p>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <MapPin className="h-3 w-3" />
+                  <span className="truncate">{service.location}</span>
+                </div>
+
+                <div className="flex items-center gap-1 text-xs font-medium text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 px-2 py-1 rounded-lg border border-green-100">
+                  <DollarSign className="h-3 w-3" />
+                  <span>
+                    {typeof service.price === "string"
+                      ? service.price === "0"
+                        ? "Gratuit"
+                        : `${service.price}€`
+                      : service.price === 0
+                      ? "Gratuit"
+                      : `${service.price}€`}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+
+        <CardFooter className="px-4 py-2 border-t">
+          <div className="flex gap-2 w-full">
+            <Button variant="outline" size="sm" asChild className="flex-1">
+              <Link href={`/services/${service.id}`}>Voir détails</Link>
+            </Button>
+
+            {onContact && (
+              <Button
+                size="sm"
+                onClick={() => onContact(service)}
+                className="flex-1"
+              >
+                <Phone className="h-4 w-4 mr-1" />
+                Contacter
+              </Button>
+            )}
+
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(service)}
+                className="flex-shrink-0"
+              >
+                Modifier
+              </Button>
+            )}
+
+            {onDelete && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => onDelete(service)}
+                className="flex-shrink-0"
+              >
+                Supprimer
+              </Button>
+            )}
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  } catch (error) {
+    console.error("Erreur lors du rendu de ServiceCardCompact:", error);
+    return (
+      <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white shadow-sm hover:scale-[1.01] rounded-xl overflow-hidden">
+        <CardContent className="p-4">
+          <p className="text-red-500">Impossible d'afficher ce service.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 }

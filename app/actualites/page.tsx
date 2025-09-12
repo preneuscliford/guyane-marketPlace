@@ -8,10 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PostImageUpload } from "@/components/ui/PostImageUpload";
 import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
-
-
-
-
+import ReportButton from "@/components/moderation/ReportButton";
 
 type Profile = {
   id: string;
@@ -383,7 +380,7 @@ export default function ActualitesPage() {
                     <span>{post?.likes?.length || 0}</span>
                   </button>
                   <Link
-                    href={`/actualites/${post.id}`}
+                    href={`/communaute/${post.id}`}
                     className="flex items-center space-x-1 rounded-lg px-3 py-1 text-sm text-slate-500 transition-colors hover:bg-slate-50 hover:text-teal-600"
                   >
                     <svg
@@ -402,14 +399,22 @@ export default function ActualitesPage() {
                     <span>{post?.comments_count || 0}</span>
                   </Link>
                 </div>
+                <ReportButton
+                  contentType="post"
+                  contentId={post.id}
+                  reportedUserId={post.user_id}
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-500 hover:text-red-600"
+                  showText={false}
+                />
               </div>
             </div>
           </div>
         ))}
       </div>
     );
-  }
-      
+  };
 
   return (
     <>
@@ -483,5 +488,4 @@ export default function ActualitesPage() {
       </ProtectedLayout>
     </>
   );
-
 }

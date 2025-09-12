@@ -6,14 +6,25 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { Menu, Bell, User, LogOut, Plus, ShoppingBag, Search, X } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  User,
+  LogOut,
+  Plus,
+  ShoppingBag,
+  Search,
+  X,
+  Shield,
+  MessageSquare,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export function Header({ className }: { className?: string }) {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const isCreateAnnouncePage = pathname === '/annonces/nouvelle';
+  const isCreateAnnouncePage = pathname === "/annonces/nouvelle";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -22,7 +33,10 @@ export function Header({ className }: { className?: string }) {
   // Close profile menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target as Node)
+      ) {
         setIsProfileMenuOpen(false);
       }
     }
@@ -40,9 +54,9 @@ export function Header({ className }: { className?: string }) {
     try {
       await signOut();
       setIsProfileMenuOpen(false);
-      router.push('/');
+      router.push("/");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -59,20 +73,28 @@ export function Header({ className }: { className?: string }) {
     { name: "Marketplace", href: "/marketplace" },
     { name: "Services", href: "/services" },
     { name: "Annonces", href: "/annonces" },
-    { name: "Actualités", href: "/actualites" },
+    { name: "Communauté", href: "/communaute" },
     ...(user ? [{ name: "Mes Publicités", href: "/publicites" }] : []),
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-[9999] border-b border-gray-200 shadow-sm ${className || ''}`}>
+    <header
+      className={`fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-[9999] border-b border-gray-200 shadow-sm ${
+        className || ""
+      }`}
+    >
       <div className="container mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex h-14 sm:h-16 items-center justify-between gap-4">
           {/* Logo et Navigation */}
           <div className="flex items-center min-w-0 flex-shrink-0">
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
-              <span className="ml-2 sm:ml-4 text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap hidden xs:block">Blada Market</span>
-              <span className="ml-2 text-sm font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap xs:hidden">BM</span>
+              <span className="ml-2 sm:ml-4 text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap hidden xs:block">
+                Blada Market
+              </span>
+              <span className="ml-2 text-sm font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap xs:hidden">
+                BM
+              </span>
             </Link>
           </div>
 
@@ -83,7 +105,9 @@ export function Header({ className }: { className?: string }) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-gray-700 hover:text-purple-600 font-medium whitespace-nowrap text-sm xl:text-base ${pathname === item.href ? 'text-purple-600' : ''}`}
+                  className={`text-gray-700 hover:text-purple-600 font-medium whitespace-nowrap text-sm xl:text-base ${
+                    pathname === item.href ? "text-purple-600" : ""
+                  }`}
                 >
                   {item.name}
                 </Link>
@@ -136,7 +160,7 @@ export function Header({ className }: { className?: string }) {
                   <span className="sm:hidden">+</span>
                 </Button>
 
-                <button 
+                <button
                   type="button"
                   className="relative p-1.5 sm:p-2 text-gray-600 hover:text-purple-600 rounded-full hover:bg-purple-50 transition-colors duration-300"
                   aria-label="Notifications"
@@ -149,9 +173,9 @@ export function Header({ className }: { className?: string }) {
                   <button
                     type="button"
                     onClick={() => {
-                if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-                setIsProfileMenuOpen(!isProfileMenuOpen);
-              }}
+                      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+                      setIsProfileMenuOpen(!isProfileMenuOpen);
+                    }}
                     className="flex items-center space-x-1 sm:space-x-2 p-1 sm:p-2 rounded-full hover:bg-purple-50 transition-all duration-300"
                   >
                     <div className="relative h-6 w-6 sm:h-8 sm:w-8 rounded-full overflow-hidden ring-1 sm:ring-2 ring-purple-100">
@@ -164,7 +188,7 @@ export function Header({ className }: { className?: string }) {
                       />
                     </div>
                     <span className="hidden lg:block text-gray-700 text-sm">
-                      {user.profile?.username || 'User'}
+                      {user.profile?.username || "User"}
                     </span>
                   </button>
 
@@ -203,6 +227,27 @@ export function Header({ className }: { className?: string }) {
                           <Menu className="h-4 w-4 mr-2" />
                           Paramètres
                         </Link>
+                        {/* Lien Admin pour les administrateurs */}
+                        {user?.profile?.role === "admin" && (
+                          <>
+                            <Link
+                              href="/admin/moderation"
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                              onClick={handleProfileMenuClick}
+                            >
+                              <Shield className="h-4 w-4 mr-2" />
+                              Modération
+                            </Link>
+                            <Link
+                              href="/admin/feedback"
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                              onClick={handleProfileMenuClick}
+                            >
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Feedbacks
+                            </Link>
+                          </>
+                        )}
                         <div className="border-t border-gray-100 my-1"></div>
                         <button
                           type="button"
@@ -219,13 +264,22 @@ export function Header({ className }: { className?: string }) {
               </>
             ) : (
               <div className="flex space-x-1 sm:space-x-2">
-                <Button variant="outline" size="sm" className="text-purple-600 border-purple-200 hover:bg-purple-50 text-xs sm:text-sm px-2 sm:px-3" asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-purple-600 border-purple-200 hover:bg-purple-50 text-xs sm:text-sm px-2 sm:px-3"
+                  asChild
+                >
                   <Link href="/auth">
                     <span className="hidden sm:inline">Connexion</span>
                     <span className="sm:hidden">Login</span>
                   </Link>
                 </Button>
-                <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm px-2 sm:px-3" asChild>
+                <Button
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm px-2 sm:px-3"
+                  asChild
+                >
                   <Link href="/auth?mode=signup">
                     <span className="hidden sm:inline">Inscription</span>
                     <span className="sm:hidden">Sign up</span>

@@ -74,38 +74,59 @@ export function FeaturedServices() {
   // Récupérer les services au montage du composant
   useEffect(() => {
     if (isMounted) {
+      console.log('FeaturedServices: Récupération des services...');
       fetchServices({
         sort_by: 'created_at',
         sort_order: 'desc',
         limit: 6
+      }).then(() => {
+        console.log('FeaturedServices: Services récupérés avec succès');
+      }).catch((error) => {
+        console.error('FeaturedServices: Erreur lors de la récupération des services:', error);
       });
     }
   }, [fetchServices, isMounted]);
 
   // Mapper les services de la base de données vers le format d'affichage
-  const featuredListings: ListingProps[] = services.map(service => {
-    // Utiliser le nom complet s'il existe, sinon le username, sinon "Utilisateur"
-    const displayName = service.profiles?.full_name?.trim() || 
-                       service.profiles?.username || 
-                       'Utilisateur';
+  console.log('FeaturedServices: Services disponibles:', services.length, services);
+  
+  let featuredListings: ListingProps[] = [];
+  
+  try {
+    featuredListings = services.map(service => {
+      console.log('FeaturedServices: Mapping service:', service.id, service.title);
+      
+      // Utiliser le nom complet s'il existe, sinon le username, sinon "Utilisateur"
+      const displayName = service.profiles?.full_name?.trim() || 
+                         service.profiles?.username || 
+                         'Utilisateur';
+      
+      const mappedService = {
+         id: service.id,
+         title: service.title,
+         image: service.images?.[0] || '/images/services.svg',
+         price: formatPrice(service.price),
+         location: service.location || 'Guyane',
+         rating: service.rating || 0,
+         reviewsCount: service.reviews_count || 0,
+         provider: {
+           name: displayName,
+           avatar: service.profiles?.avatar_url || '/default-avatar.svg',
+           level: getProviderLevel(service.rating || 0)
+         },
+         createdAt: formatCreatedAt(service.created_at),
+         isNew: isNewService(service.created_at)
+       };
+       
+       console.log('FeaturedServices: Service mappé:', mappedService);
+       return mappedService;
+    });
     
-    return {
-       id: service.id,
-       title: service.title,
-       image: service.images?.[0] || '/images/services.svg',
-       price: formatPrice(service.price),
-       location: service.location || 'Guyane',
-       rating: service.rating || 0,
-       reviewsCount: service.reviews_count || 0,
-       provider: {
-         name: displayName,
-         avatar: service.profiles?.avatar_url || '/default-avatar.svg',
-         level: getProviderLevel(service.rating || 0)
-       },
-       createdAt: formatCreatedAt(service.created_at),
-       isNew: isNewService(service.created_at)
-     };
-  });
+    console.log('FeaturedServices: Tous les services mappés:', featuredListings.length, featuredListings);
+  } catch (error) {
+    console.error('FeaturedServices: Erreur lors du mapping des services:', error);
+    featuredListings = [];
+  }
 
   // Afficher un état de chargement pendant le montage et le chargement des données
   if (!isMounted || loading) {

@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import MessageModal from "../../../components/messaging/MessageModal";
+import ReportButton from "@/components/ui/ReportButton";
 
 /**
  * Page de détails d'une annonce
@@ -427,6 +428,15 @@ export default function AnnouncementDetailPage() {
                   <Share2 className="w-4 h-4 mr-2" />
                   Partager
                 </Button>
+                <ReportButton
+                  contentType="announcement"
+                  contentId={announcement.id}
+                  reportedUserId={announcement.user_id}
+                  variant="outline"
+                  size="md"
+                  className="hover:border-red-200 hover:text-red-500 transition-all duration-200"
+                  showText={false}
+                />
               </div>
             </div>
 

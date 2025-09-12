@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { SearchIcon } from "lucide-react";
 import { motion } from "framer-motion";
-import { HeroAdvertisementCarousel } from "@/components/advertisements/AdvertisementCarousel";
+import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
 
 interface HeroSectionProps {
   onSearch: (query: string) => void;
@@ -100,15 +100,18 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
             </div>
           </motion.div>
           
-          {/* Carrousel de publicités en grand format */}
+          {/* Affiches sponsorisées en grand format */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="w-full max-w-6xl mx-auto mt-8 sm:mt-12 md:mt-16"
           >
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl border border-white/20">
-              <HeroAdvertisementCarousel />
+            <div className="h-64 sm:h-72 md:h-80">
+              <SponsoredBanner 
+                autoPlayInterval={6000}
+                showControls={true}
+              />
             </div>
           </motion.div>
         </div>
