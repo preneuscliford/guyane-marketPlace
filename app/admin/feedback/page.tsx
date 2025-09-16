@@ -5,12 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import {
   Select,
@@ -40,7 +35,7 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Eye
+  Eye,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -68,15 +63,27 @@ interface Feedback {
 const FEEDBACK_TYPES = {
   bug: { label: "Bug", icon: Bug, color: "text-red-600" },
   feature: { label: "Fonctionnalité", icon: Lightbulb, color: "text-blue-600" },
-  feedback: { label: "Commentaire", icon: MessageSquare, color: "text-green-600" },
-  complaint: { label: "Plainte", icon: AlertTriangle, color: "text-orange-600" }
+  feedback: {
+    label: "Commentaire",
+    icon: MessageSquare,
+    color: "text-green-600",
+  },
+  complaint: {
+    label: "Plainte",
+    icon: AlertTriangle,
+    color: "text-orange-600",
+  },
 };
 
 const STATUS_CONFIG = {
   pending: { label: "En attente", variant: "secondary" as const, icon: Clock },
   in_progress: { label: "En cours", variant: "default" as const, icon: Eye },
   resolved: { label: "Résolu", variant: "default" as const, icon: CheckCircle },
-  dismissed: { label: "Rejeté", variant: "destructive" as const, icon: XCircle }
+  dismissed: {
+    label: "Rejeté",
+    variant: "destructive" as const,
+    icon: XCircle,
+  },
 };
 
 /**
@@ -87,7 +94,9 @@ export default function AdminFeedbackPage() {
   const { user, loading: authLoading } = useAuth();
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
+    null
+  );
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [adminResponse, setAdminResponse] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -97,14 +106,14 @@ export default function AdminFeedbackPage() {
 
   // Vérification des permissions admin
   useEffect(() => {
-    if (!authLoading && (!user || user.profile?.role !== 'admin')) {
-      redirect('/');
+    if (!authLoading && (!user || user.profile?.role !== "admin")) {
+      redirect("/");
     }
   }, [user, authLoading]);
 
   // Chargement des feedbacks
   useEffect(() => {
-    if (user?.profile?.role === 'admin') {
+    if (user?.profile?.role === "admin") {
       fetchFeedbacks();
     }
   }, [user, filterStatus, filterType]);
@@ -115,24 +124,26 @@ export default function AdminFeedbackPage() {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
-      
+
       let query = supabase
-        .from('feedback')
-        .select(`
+        .from("feedback")
+        .select(
+          `
           *,
           profiles!feedback_user_id_fkey (
             username,
             email
           )
-        `)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .order("created_at", { ascending: false });
 
-      if (filterStatus !== 'all') {
-        query = query.eq('status', filterStatus);
+      if (filterStatus !== "all") {
+        query = query.eq("status", filterStatus);
       }
 
-      if (filterType !== 'all') {
-        query = query.eq('type', filterType);
+      if (filterType !== "all") {
+        query = query.eq("type", filterType);
       }
 
       const { data, error } = await query;
@@ -141,8 +152,8 @@ export default function AdminFeedbackPage() {
 
       setFeedbacks(data || []);
     } catch (error) {
-      console.error('Erreur lors du chargement des feedbacks:', error);
-      toast.error('Erreur lors du chargement des feedbacks');
+      console.error("Erreur lors du chargement des feedbacks:", error);
+      toast.error("Erreur lors du chargement des feedbacks");
     } finally {
       setLoading(false);
     }
@@ -151,13 +162,17 @@ export default function AdminFeedbackPage() {
   /**
    * Met à jour le statut d'un feedback
    */
-  const updateFeedbackStatus = async (feedbackId: string, status: string, response?: string) => {
+  const updateFeedbackStatus = async (
+    feedbackId: string,
+    status: string,
+    response?: string
+  ) => {
     try {
       setIsSubmitting(true);
-      
+
       const updateData: any = {
         status,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       if (response) {
@@ -165,20 +180,20 @@ export default function AdminFeedbackPage() {
       }
 
       const { error } = await supabase
-        .from('feedback')
+        .from("feedback")
         .update(updateData)
-        .eq('id', feedbackId);
+        .eq("id", feedbackId);
 
       if (error) throw error;
 
-      toast.success('Feedback mis à jour avec succès');
+      toast.success("Feedback mis à jour avec succès");
       fetchFeedbacks();
       setResponseModalOpen(false);
       setSelectedFeedback(null);
       setAdminResponse("");
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      toast.error('Erreur lors de la mise à jour du feedback');
+      console.error("Erreur lors de la mise à jour:", error);
+      toast.error("Erreur lors de la mise à jour du feedback");
     } finally {
       setIsSubmitting(false);
     }
@@ -196,7 +211,7 @@ export default function AdminFeedbackPage() {
   /**
    * Filtre les feedbacks selon le terme de recherche
    */
-  const filteredFeedbacks = feedbacks.filter(feedback => {
+  const filteredFeedbacks = feedbacks.filter((feedback) => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -220,7 +235,9 @@ export default function AdminFeedbackPage() {
    * Obtient le badge de statut
    */
   const getStatusBadge = (status: string) => {
-    const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
+    const config =
+      STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
+      STATUS_CONFIG.pending;
     const IconComponent = config.icon;
 
     return (
@@ -247,7 +264,9 @@ export default function AdminFeedbackPage() {
             <MessageSquare className="h-6 w-6 text-teal-600" />
             Gestion des Feedbacks
           </h1>
-          <p className="text-gray-600">Gérez les commentaires et suggestions des utilisateurs</p>
+          <p className="text-gray-600">
+            Gérez les commentaires et suggestions des utilisateurs
+          </p>
         </div>
       </div>
 
@@ -264,7 +283,7 @@ export default function AdminFeedbackPage() {
             />
           </div>
         </div>
-        
+
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-48">
             <SelectValue />
@@ -305,27 +324,45 @@ export default function AdminFeedbackPage() {
           </Card>
         ) : (
           filteredFeedbacks.map((feedback) => (
-            <Card key={feedback.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={feedback.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
                       {getTypeIcon(feedback.type)}
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{feedback.title}</h3>
+                        <h3 className="font-semibold text-lg">
+                          {feedback.title}
+                        </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                           <span>Par {feedback.profiles.username}</span>
                           <span>•</span>
-                          <span>{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true, locale: fr })}</span>
-                          {feedback.priority && feedback.type === 'bug' && (
+                          <span>
+                            {formatDistanceToNow(
+                              new Date(feedback.created_at),
+                              { addSuffix: true, locale: fr }
+                            )}
+                          </span>
+                          {feedback.priority && feedback.type === "bug" && (
                             <>
                               <span>•</span>
-                              <Badge variant="outline" className={`
-                                ${feedback.priority === 'critical' ? 'border-red-500 text-red-700' :
-                                  feedback.priority === 'high' ? 'border-orange-500 text-orange-700' :
-                                  feedback.priority === 'medium' ? 'border-yellow-500 text-yellow-700' :
-                                  'border-green-500 text-green-700'}
-                              `}>
+                              <Badge
+                                variant="outline"
+                                className={`
+                                ${
+                                  feedback.priority === "critical"
+                                    ? "border-red-500 text-red-700"
+                                    : feedback.priority === "high"
+                                    ? "border-orange-500 text-orange-700"
+                                    : feedback.priority === "medium"
+                                    ? "border-yellow-500 text-yellow-700"
+                                    : "border-green-500 text-green-700"
+                                }
+                              `}
+                              >
                                 Priorité {feedback.priority}
                               </Badge>
                             </>
@@ -340,25 +377,32 @@ export default function AdminFeedbackPage() {
 
                   {feedback.category && (
                     <div className="text-sm text-gray-500">
-                      <span className="font-medium">Catégorie:</span> {feedback.category}
+                      <span className="font-medium">Catégorie:</span>{" "}
+                      {feedback.category}
                     </div>
                   )}
 
                   {feedback.page_url && (
                     <div className="text-sm text-gray-500">
                       <span className="font-medium">Page:</span>
-                      <span className="ml-2 break-all">{feedback.page_url}</span>
+                      <span className="ml-2 break-all">
+                        {feedback.page_url}
+                      </span>
                     </div>
                   )}
 
                   {feedback.admin_response && (
                     <div className="bg-blue-50 p-3 rounded-lg">
-                      <span className="font-medium text-sm text-blue-800">Réponse admin:</span>
-                      <p className="mt-1 text-blue-700">{feedback.admin_response}</p>
+                      <span className="font-medium text-sm text-blue-800">
+                        Réponse admin:
+                      </span>
+                      <p className="mt-1 text-blue-700">
+                        {feedback.admin_response}
+                      </p>
                     </div>
                   )}
 
-                  {feedback.status === 'pending' && (
+                  {feedback.status === "pending" && (
                     <div className="flex gap-2 pt-4">
                       <Button
                         onClick={() => openResponseModal(feedback)}
@@ -368,13 +412,17 @@ export default function AdminFeedbackPage() {
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={() => updateFeedbackStatus(feedback.id, 'in_progress')}
+                        onClick={() =>
+                          updateFeedbackStatus(feedback.id, "in_progress")
+                        }
                       >
                         Marquer en cours
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={() => updateFeedbackStatus(feedback.id, 'dismissed')}
+                        onClick={() =>
+                          updateFeedbackStatus(feedback.id, "dismissed")
+                        }
                       >
                         Rejeter
                       </Button>
@@ -396,16 +444,20 @@ export default function AdminFeedbackPage() {
               Rédigez une réponse à ce feedback et mettez à jour son statut
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedFeedback && (
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium">{selectedFeedback.title}</h4>
-                <p className="text-sm text-gray-600 mt-1">{selectedFeedback.description}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {selectedFeedback.description}
+                </p>
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium">Réponse administrative</label>
+                <label className="text-sm font-medium">
+                  Réponse administrative
+                </label>
                 <Textarea
                   placeholder="Rédigez votre réponse..."
                   value={adminResponse}
@@ -415,7 +467,7 @@ export default function AdminFeedbackPage() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -425,11 +477,18 @@ export default function AdminFeedbackPage() {
               Annuler
             </Button>
             <Button
-              onClick={() => selectedFeedback && updateFeedbackStatus(selectedFeedback.id, 'resolved', adminResponse)}
+              onClick={() =>
+                selectedFeedback &&
+                updateFeedbackStatus(
+                  selectedFeedback.id,
+                  "resolved",
+                  adminResponse
+                )
+              }
               disabled={isSubmitting || !adminResponse.trim()}
               className="bg-teal-600 hover:bg-teal-700"
             >
-              {isSubmitting ? 'Envoi...' : 'Répondre et résoudre'}
+              {isSubmitting ? "Envoi..." : "Répondre et résoudre"}
             </Button>
           </DialogFooter>
         </DialogContent>
