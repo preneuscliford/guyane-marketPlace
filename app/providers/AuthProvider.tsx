@@ -9,17 +9,21 @@ export const AuthContext = createContext<UseAuthReturn>({
   user: null,
   session: null,
   loading: true,
-  signIn: async () => ({ }),
-  signInWithGoogle: async () => ({ }),
-  signUp: async () => ({ }),
+  signIn: async () => ({}),
+  signInWithGoogle: async () => ({}),
+  signUp: async () => ({}),
   signOut: async () => {},
-  updateProfile: async () => ({ }),
-  resetPassword: async () => ({ }),
-  updatePassword: async () => ({ }),
+  updateProfile: async () => ({}),
+  resetPassword: async () => ({}),
+  updatePassword: async () => ({}),
   isAuthenticated: false,
 });
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
+export default function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +32,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const initializeAuth = async () => {
       try {
         // Check active session
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
         if (error) throw error;
 
         if (session) {
@@ -36,9 +43,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           const { user } = session;
           if (user) {
             const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', user.id)
+              .from("profiles")
+              .select("*")
+              .eq("id", user.id)
               .single();
 
             setUser({ ...user, profile } as AuthUser);
@@ -46,28 +53,28 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         }
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            setSession(session);
-            if (session?.user) {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+          setSession(session);
+          if (session?.user) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
 
-              setUser({ ...session.user, profile } as AuthUser);
-            } else {
-              setUser(null);
-            }
+            setUser({ ...session.user, profile } as AuthUser);
+          } else {
+            setUser(null);
           }
-        );
+        });
 
         return () => {
           subscription.unsubscribe();
         };
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Auth initialization error:", error);
       } finally {
         setLoading(false);
       }
@@ -94,11 +101,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
    */
   const signInWithGoogle = async () => {
     try {
+      // Utiliser NEXT_PUBLIC_SITE_URL en priorité, sinon window.location.origin
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
+          redirectTo: `${siteUrl}/auth/callback`,
+        },
       });
       if (error) throw error;
       return { data };
@@ -111,13 +122,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     try {
       // Vérifier d'abord si le nom d'utilisateur est disponible
       const { data: existingUser, error: checkError } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('username', username)
+        .from("profiles")
+        .select("username")
+        .eq("username", username)
         .single();
 
       if (existingUser) {
-        throw new Error('Ce nom d\'utilisateur est déjà pris. Veuillez en choisir un autre.');
+        throw new Error(
+          "Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre."
+        );
       }
 
       // Créer le compte utilisateur avec les métadonnées
@@ -127,11 +140,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         options: {
           data: {
             username: username,
-            full_name: ''
-          }
-        }
+            full_name: "",
+          },
+        },
       });
-      
+
       if (error) throw error;
 
       return { data };
@@ -144,14 +157,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     await supabase.auth.signOut();
   };
 
-  const updateProfile = async (data: Partial<AuthUser['profile']>) => {
+  const updateProfile = async (data: Partial<AuthUser["profile"]>) => {
     try {
-      if (!user) throw new Error('User not authenticated');
+      if (!user) throw new Error("User not authenticated");
 
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(data)
-        .eq('id', user.id);
+        .eq("id", user.id);
 
       if (error) throw error;
 
@@ -160,7 +173,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         if (!prev) return null;
         return {
           ...prev,
-          profile: { ...prev.profile, ...data }
+          profile: { ...prev.profile, ...data },
         } as AuthUser;
       });
 
@@ -183,7 +196,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const updatePassword = async (newPassword: string) => {
     try {
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: newPassword,
       });
       if (error) throw error;
       return {};
@@ -212,4 +225,3 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     </AuthContext.Provider>
   );
 }
-
