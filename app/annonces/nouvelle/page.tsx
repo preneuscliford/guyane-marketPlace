@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,13 +7,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Header } from "@/components/layout/Header";
-import { Textarea } from "@/components/ui/Textarea";
-import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload, MapPin, Euro, Tag, FileText, Camera, AlertCircle, CheckCircle } from "lucide-react";
 
 const categories = [

@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/Textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import CommunityPost from "@/components/community/CommunityPost";
 import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
 import FeedbackModal from "@/components/feedback/FeedbackModal";

@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
-import { Label } from '@/components/ui/Label';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { RatingStars } from '@/components/ui/RatingStars';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star, Send, X } from 'lucide-react';
 
 interface ServiceReviewFormProps {
