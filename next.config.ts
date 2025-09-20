@@ -57,6 +57,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Permettre les fichiers SVG locaux
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Configuration PWA
   async headers() {

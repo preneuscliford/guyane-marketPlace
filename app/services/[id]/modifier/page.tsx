@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServices } from "@/hooks/useServices";
 import { ServiceForm } from "@/components/services/ServiceForm";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import type { Service } from "@/types/services";

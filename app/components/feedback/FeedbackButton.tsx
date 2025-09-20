@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MessageSquare } from "lucide-react";
 import FeedbackModal from "./FeedbackModal";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 /**
  * Bouton de feedback flottant affiché sur toutes les pages

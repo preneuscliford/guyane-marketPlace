@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
+import { useMVPBanner } from "@/components/providers/MVPBannerProvider";
+import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/ui/SearchBar";
 import {
   Menu,
@@ -22,6 +23,7 @@ import { useState, useEffect, useRef } from "react";
 
 export function Header({ className }: { className?: string }) {
   const { user, signOut } = useAuth();
+  const { isBannerVisible } = useMVPBanner();
   const pathname = usePathname();
   const router = useRouter();
   const isCreateAnnouncePage = pathname === "/annonces/nouvelle";
@@ -79,7 +81,9 @@ export function Header({ className }: { className?: string }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-[9999] border-b border-gray-200 shadow-sm ${
+      className={`fixed ${
+        isBannerVisible ? "top-14 sm:top-16" : "top-0"
+      } left-0 right-0 w-full bg-white/95 backdrop-blur-md z-[9999] border-b border-gray-200 shadow-sm ${
         className || ""
       }`}
     >
@@ -90,10 +94,10 @@ export function Header({ className }: { className?: string }) {
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
               <span className="ml-2 sm:ml-4 text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap hidden xs:block">
-                Blada Market
+                mcGuyane
               </span>
               <span className="ml-2 text-sm font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-teal-500 bg-clip-text text-transparent whitespace-nowrap xs:hidden">
-                BM
+                mcG
               </span>
             </Link>
           </div>
@@ -272,7 +276,7 @@ export function Header({ className }: { className?: string }) {
                 >
                   <Link href="/auth">
                     <span className="hidden sm:inline">Connexion</span>
-                    <span className="sm:hidden">Login</span>
+                    <span className="sm:hidden">Connexion</span>
                   </Link>
                 </Button>
                 <Button
@@ -282,7 +286,7 @@ export function Header({ className }: { className?: string }) {
                 >
                   <Link href="/auth?mode=signup">
                     <span className="hidden sm:inline">Inscription</span>
-                    <span className="sm:hidden">Sign up</span>
+                    <span className="sm:hidden">Inscription</span>
                   </Link>
                 </Button>
               </div>

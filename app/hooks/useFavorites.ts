@@ -12,10 +12,15 @@ export function useFavorites() {
   const fetchFavorites = useCallback(async () => {
     try {
       setLoading(true);
+      if (!user?.id) {
+        setFavorites([]);
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from("favorites")
         .select("announcement_id")
-        .eq("user_id", user?.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 

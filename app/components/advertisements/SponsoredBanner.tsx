@@ -1,27 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink, Eye } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 
 interface Advertisement {
   id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  target_url: string;
-  budget: number;
-  status: string;
-  start_date: string;
-  end_date: string;
-  created_at: string;
-  user_id: string;
+  title: string | null;
+  description: string | null;
+  image_url: string | null;
+  target_url: string | null;
+  budget: number | null;
+  status: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string | null;
+  user_id: string | null;
   profiles: {
-    username: string;
-    full_name?: string;
+    username: string | null;
+    full_name?: string | null;
   };
 }
 
@@ -35,12 +34,11 @@ interface SponsoredBannerProps {
  * Composant d'affichage des affiches sponsorisées avec carrousel automatique
  * pondéré par le budget publicitaire
  */
-export default function SponsoredBanner({ 
-  className = "", 
+export default function SponsoredBanner({
+  className = "",
   autoPlayInterval = 5000,
-  showControls = true 
+  showControls = true,
 }: SponsoredBannerProps) {
-  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -48,85 +46,9 @@ export default function SponsoredBanner({
   const [weightedAds, setWeightedAds] = useState<Advertisement[]>([]);
 
   /**
-   * Charge les publicités actives
+   * Mélange aléatoirement un tableau
    */
-  const fetchAdvertisements = async () => {
-    try {
-      const now = new Date().toISOString();
-      
-      // Récupérer les publicités actives
-      const { data: adsData, error: adsError } = await supabase
-        .from('advertisements')
-        .select('*')
-        .eq('status', 'active')
-        .lte('start_date', now)
-        .gte('end_date', now)
-        .gt('budget', 0)
-        .order('budget', { ascending: false });
-
-      if (adsError) throw adsError;
-
-      if (!adsData || adsData.length === 0) {
-        setAdvertisements([]);
-        setWeightedAds([]);
-        return;
-      }
-
-      // Récupérer les profils des utilisateurs
-      const userIds = adsData.map(ad => ad.user_id).filter(Boolean);
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, full_name')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Joindre les données
-      const adsWithProfiles = adsData.map(ad => ({
-        ...ad,
-        profiles: profilesData?.find(profile => profile.id === ad.user_id) || { username: '', full_name: '' }
-      }));
-
-      setAdvertisements(adsWithProfiles);
-      
-      // Créer un tableau pondéré basé sur le budget
-      if (adsWithProfiles.length > 0) {
-        const weighted = createWeightedArray(adsWithProfiles);
-        setWeightedAds(weighted);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des publicités:', error instanceof Error ? error.message : String(error));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Crée un tableau pondéré basé sur le budget des publicités
-   * Plus le budget est élevé, plus la publicité apparaît souvent
-   */
-  const createWeightedArray = (ads: Advertisement[]): Advertisement[] => {
-    const weighted: Advertisement[] = [];
-    const totalBudget = ads.reduce((sum, ad) => sum + ad.budget, 0);
-    
-    ads.forEach(ad => {
-      // Calcule le poids relatif (minimum 1, maximum basé sur le budget)
-      const weight = Math.max(1, Math.floor((ad.budget / totalBudget) * 100));
-      
-      // Ajoute la publicité plusieurs fois selon son poids
-      for (let i = 0; i < weight; i++) {
-        weighted.push(ad);
-      }
-    });
-    
-    // Mélange le tableau pour éviter les séquences prévisibles
-    return shuffleArray(weighted);
-  };
-
-  /**
-   * Mélange un tableau (algorithme Fisher-Yates)
-   */
-  const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffleArray = (array: Advertisement[]): Advertisement[] => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -136,20 +58,105 @@ export default function SponsoredBanner({
   };
 
   /**
+   * Crée un tableau pondéré basé sur le budget des publicités
+   * Plus le budget est élevé, plus la publicité apparaît souvent
+   */
+  const createWeightedArray = useCallback(
+    (ads: Advertisement[]): Advertisement[] => {
+      const weighted: Advertisement[] = [];
+      const totalBudget = ads.reduce((sum, ad) => sum + (ad.budget || 0), 0);
+
+      ads.forEach((ad) => {
+        // Calcule le poids relatif (minimum 1, maximum basé sur le budget)
+        const budget = ad.budget || 1;
+        const weight = Math.max(1, Math.floor((budget / totalBudget) * 100));
+
+        // Ajoute la publicité plusieurs fois selon son poids
+        for (let i = 0; i < weight; i++) {
+          weighted.push(ad);
+        }
+      });
+
+      // Mélange le tableau pour éviter les séquences prévisibles
+      return shuffleArray(weighted);
+    },
+    []
+  );
+
+  /**
+   * Charge les publicités actives
+   */
+  const fetchAdvertisements = useCallback(async () => {
+    try {
+      const now = new Date().toISOString();
+
+      // Récupérer les publicités actives
+      const { data: adsData, error: adsError } = await supabase
+        .from("advertisements")
+        .select("*")
+        .eq("status", "active")
+        .lte("start_date", now)
+        .gte("end_date", now)
+        .gt("budget", 0)
+        .order("budget", { ascending: false });
+
+      if (adsError) throw adsError;
+
+      if (!adsData || adsData.length === 0) {
+        setWeightedAds([]);
+        return;
+      }
+
+      // Récupérer les profils des utilisateurs
+      const userIds = adsData
+        .map((ad) => ad.user_id)
+        .filter(Boolean) as string[];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, username, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Joindre les données
+      const adsWithProfiles = adsData.map((ad) => ({
+        ...ad,
+        profiles: profilesData?.find(
+          (profile) => profile.id === ad.user_id
+        ) || { username: "", full_name: "" },
+      }));
+
+      // Créer un tableau pondéré basé sur le budget
+      if (adsWithProfiles.length > 0) {
+        const weighted = createWeightedArray(adsWithProfiles);
+        setWeightedAds(weighted);
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors du chargement des publicités:",
+        error instanceof Error ? error.message : String(error)
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [createWeightedArray]);
+
+  /**
    * Enregistre une impression publicitaire
    */
   const recordImpression = async (adId: string) => {
     try {
-      await supabase
-        .from('advertisement_impressions')
-        .insert({
-          advertisement_id: adId,
-          user_agent: navigator.userAgent,
-          ip_address: 'unknown', // À implémenter côté serveur
-          page_url: window.location.href
-        });
+      // Table advertisement_impressions n'existe pas encore, on utilise advertisement_clicks pour l'instant
+      await supabase.from("advertisement_clicks").insert({
+        advertisement_id: adId,
+        user_agent: navigator.userAgent,
+        ip_address: null,
+      });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'impression:', error instanceof Error ? error.message : String(error));
+      console.error(
+        "Erreur lors de l'enregistrement de l'impression:",
+        error instanceof Error ? error.message : String(error)
+      );
     }
   };
 
@@ -158,34 +165,37 @@ export default function SponsoredBanner({
    */
   const recordClick = async (adId: string) => {
     try {
-      await supabase
-        .from('advertisement_clicks')
-        .insert({
-          advertisement_id: adId,
-          user_agent: navigator.userAgent,
-          ip_address: 'unknown', // À implémenter côté serveur
-          page_url: window.location.href
-        });
+      await supabase.from("advertisement_clicks").insert({
+        advertisement_id: adId,
+        user_agent: navigator.userAgent,
+        ip_address: "unknown", // À implémenter côté serveur
+        page_url: window.location.href,
+      });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement du clic:', error instanceof Error ? error.message : String(error));
+      console.error(
+        "Erreur lors de l'enregistrement du clic:",
+        error instanceof Error ? error.message : String(error)
+      );
     }
   };
 
   /**
    * Passe à la publicité suivante
    */
-  const nextAd = () => {
+  const nextAd = useCallback(() => {
     if (weightedAds.length > 0) {
       setCurrentIndex((prev) => (prev + 1) % weightedAds.length);
     }
-  };
+  }, [weightedAds.length]);
 
   /**
    * Passe à la publicité précédente
    */
   const prevAd = () => {
     if (weightedAds.length > 0) {
-      setCurrentIndex((prev) => (prev - 1 + weightedAds.length) % weightedAds.length);
+      setCurrentIndex(
+        (prev) => (prev - 1 + weightedAds.length) % weightedAds.length
+      );
     }
   };
 
@@ -202,13 +212,13 @@ export default function SponsoredBanner({
     if (!isPaused && weightedAds.length > 1) {
       intervalRef.current = setInterval(nextAd, autoPlayInterval);
     }
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPaused, weightedAds.length, autoPlayInterval]);
+  }, [isPaused, weightedAds.length, autoPlayInterval, nextAd]);
 
   // Effet pour enregistrer les impressions
   useEffect(() => {
@@ -220,7 +230,7 @@ export default function SponsoredBanner({
   // Chargement initial
   useEffect(() => {
     fetchAdvertisements();
-  }, []);
+  }, [fetchAdvertisements]);
 
   // Pause/reprise au survol
   const handleMouseEnter = () => setIsPaused(true);
@@ -228,7 +238,9 @@ export default function SponsoredBanner({
 
   if (isLoading) {
     return (
-      <div className={`relative w-full h-full bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl overflow-hidden ${className}`}>
+      <div
+        className={`relative w-full h-full bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl overflow-hidden ${className}`}
+      >
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-white"></div>
         </div>
@@ -238,7 +250,9 @@ export default function SponsoredBanner({
 
   if (weightedAds.length === 0) {
     return (
-      <div className={`relative w-full h-full bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl overflow-hidden flex items-center justify-center ${className}`}>
+      <div
+        className={`relative w-full h-full bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl overflow-hidden flex items-center justify-center ${className}`}
+      >
         <div className="text-center text-white">
           <h3 className="text-2xl font-bold mb-2">Marketplace Guyane</h3>
           <p className="text-teal-100">Votre plateforme locale de confiance</p>
@@ -250,46 +264,60 @@ export default function SponsoredBanner({
   const currentAd = weightedAds[currentIndex];
 
   return (
-    <div 
+    <div
       className={`relative w-full h-full rounded-xl overflow-hidden group ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Image de fond */}
       <div className="absolute inset-0">
-        <Image
-          src={currentAd.image_url}
-          alt={currentAd.title}
-          fill
-          className="object-cover"
-          priority
-        />
+        {currentAd.image_url && (
+          <Image
+            src={currentAd.image_url}
+            alt={(currentAd.title || "Publicité") as string}
+            fill
+            className="object-cover"
+            priority
+            unoptimized={currentAd.image_url.endsWith(".svg")}
+          />
+        )}
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Contenu de la publicité */}
-      <Link
-        href={currentAd.target_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => handleAdClick(currentAd)}
-        className="absolute inset-0 flex items-center justify-center text-center text-white hover:bg-black/10 transition-colors"
-      >
-        <div className="max-w-2xl px-6">
-          <h2 className="text-3xl font-bold mb-3 drop-shadow-lg">
-            {currentAd.title}
-          </h2>
-          <p className="text-lg text-gray-100 mb-4 drop-shadow">
-            {currentAd.description}
-          </p>
-          <div className="flex items-center justify-center gap-2 text-teal-200">
-            <ExternalLink className="h-5 w-5" />
-            <span className="font-medium">
-              Par {currentAd.profiles.full_name || currentAd.profiles.username}
-            </span>
+      {currentAd.target_url ? (
+        <Link
+          href={currentAd.target_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => handleAdClick(currentAd)}
+          className="absolute inset-0 flex items-center justify-center text-center text-white hover:bg-black/10 transition-colors"
+        >
+          <div className="max-w-2xl px-6">
+            <h2 className="text-3xl font-bold mb-3 drop-shadow-lg">
+              {currentAd.title || "Titre non disponible"}
+            </h2>
+            <p className="text-lg mb-4 drop-shadow-md opacity-90">
+              {currentAd.description || "Description non disponible"}
+            </p>
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+              <ExternalLink className="w-4 h-4" />
+              Cliquez pour découvrir
+            </div>
+          </div>
+        </Link>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-center text-white">
+          <div className="max-w-2xl px-6">
+            <h2 className="text-3xl font-bold mb-3 drop-shadow-lg">
+              {currentAd.title || "Titre non disponible"}
+            </h2>
+            <p className="text-lg mb-4 drop-shadow-md opacity-90">
+              {currentAd.description || "Description non disponible"}
+            </p>
           </div>
         </div>
-      </Link>
+      )}
 
       {/* Contrôles de navigation */}
       {showControls && weightedAds.length > 1 && (
@@ -301,7 +329,7 @@ export default function SponsoredBanner({
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
-          
+
           <button
             onClick={nextAd}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
@@ -315,24 +343,28 @@ export default function SponsoredBanner({
       {/* Indicateurs de pagination */}
       {weightedAds.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {Array.from(new Set(weightedAds.map(ad => ad.id))).map((adId, index) => {
-            const isActive = weightedAds[currentIndex]?.id === adId;
-            return (
-              <button
-                key={adId}
-                onClick={() => {
-                  const targetIndex = weightedAds.findIndex(ad => ad.id === adId);
-                  if (targetIndex !== -1) {
-                    setCurrentIndex(targetIndex);
-                  }
-                }}
-                className={`h-2 w-8 rounded-full transition-all ${
-                  isActive ? 'bg-white' : 'bg-white/50 hover:bg-white/70'
-                }`}
-                aria-label={`Aller à la publicité ${index + 1}`}
-              />
-            );
-          })}
+          {Array.from(new Set(weightedAds.map((ad) => ad.id))).map(
+            (adId, index) => {
+              const isActive = weightedAds[currentIndex]?.id === adId;
+              return (
+                <button
+                  key={adId}
+                  onClick={() => {
+                    const targetIndex = weightedAds.findIndex(
+                      (ad) => ad.id === adId
+                    );
+                    if (targetIndex !== -1) {
+                      setCurrentIndex(targetIndex);
+                    }
+                  }}
+                  className={`h-2 w-8 rounded-full transition-all ${
+                    isActive ? "bg-white" : "bg-white/50 hover:bg-white/70"
+                  }`}
+                  aria-label={`Aller à la publicité ${index + 1}`}
+                />
+              );
+            }
+          )}
         </div>
       )}
 

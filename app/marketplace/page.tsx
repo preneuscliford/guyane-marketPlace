@@ -7,7 +7,6 @@ import { HeroSection } from "@/components/marketplace/HeroSection";
 import { FeaturedCategories } from "@/components/marketplace/FeaturedCategories";
 import { FeaturedServices } from "@/components/marketplace/FeaturedServices";
 import { HowItWorks } from "@/components/marketplace/HowItWorks";
-import { Testimonials } from "@/components/marketplace/Testimonials";
 import ProductGrid from "../../components/marketplace/ProductGrid";
 import { FilterBar } from "@/components/marketplace/FilterBar";
 
@@ -39,50 +38,54 @@ export default function MarketplacePage() {
     priceRange: [0, 1000],
     category: "",
     location: "",
-    sortBy: "recent"
+    sortBy: "recent",
   });
 
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       let query = supabase
-        .from('products')
-        .select('*')
-        .gte('price', filters.priceRange[0])
-        .lte('price', filters.priceRange[1]);
+        .from("products")
+        .select("*")
+        .gte("price", filters.priceRange[0])
+        .lte("price", filters.priceRange[1]);
 
       if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        query = query.or(
+          `title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+        );
       }
 
       if (filters.category && filters.category !== "Tous") {
-        query = query.eq('category', filters.category);
+        query = query.eq("category", filters.category);
       }
 
       if (filters.location && filters.location !== "Toute la Guyane") {
-        query = query.eq('location', filters.location);
+        query = query.eq("location", filters.location);
       }
 
       switch (filters.sortBy) {
-        case 'price-asc':
-          query = query.order('price', { ascending: true });
+        case "price-asc":
+          query = query.order("price", { ascending: true });
           break;
-        case 'price-desc':
-          query = query.order('price', { ascending: false });
+        case "price-desc":
+          query = query.order("price", { ascending: false });
           break;
         default:
-          query = query.order('created_at', { ascending: false });
+          query = query.order("created_at", { ascending: false });
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      setProducts((data || []).map(product => ({
-        ...product,
-        images: product.images || []
-      })));
+      setProducts(
+        (data || []).map((product) => ({
+          ...product,
+          images: product.images || [],
+        }))
+      );
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
@@ -99,7 +102,7 @@ export default function MarketplacePage() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setShowAllProducts(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleFilterChange = (newFilters: typeof filters) => {
@@ -109,16 +112,16 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen">
-      
-      
       {/* Afficher l'interface de recherche ou l'interface de navigation principale */}
       {showAllProducts || searchQuery ? (
         // Interface de recherche
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h1 className="text-2xl sm:text-3xl font-bold">Résultats de recherche</h1>
-              <button 
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Résultats de recherche
+              </h1>
+              <button
                 onClick={() => {
                   setShowAllProducts(false);
                   setSearchQuery("");
@@ -128,7 +131,7 @@ export default function MarketplacePage() {
                 Retour à l&apos;accueil
               </button>
             </div>
-            
+
             <div className="mt-6">
               <FilterBar onFilterChange={handleFilterChange} />
             </div>
@@ -139,7 +142,7 @@ export default function MarketplacePage() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
             </div>
           ) : (
-            <ProductGrid 
+            <ProductGrid
               searchQuery={searchQuery}
               selectedCategory={filters.category}
               selectedLocation={filters.location}
@@ -153,13 +156,17 @@ export default function MarketplacePage() {
           <FeaturedCategories />
           <FeaturedServices />
           <HowItWorks />
-          <Testimonials />
-          
+
           {/* Call to Action */}
           <section className="py-12 sm:py-16 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Prêt à proposer vos services en Guyane ?</h2>
-              <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">Rejoignez notre communauté et commencez à partager vos talents avec la Guyane dès aujourd&apos;hui.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
+                Prêt à proposer vos services en Guyane ?
+              </h2>
+              <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+                Rejoignez notre communauté et commencez à partager vos talents
+                avec la Guyane dès aujourd&apos;hui.
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button className="px-6 sm:px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:shadow-lg transition-shadow text-sm sm:text-base">
                   Proposer un service
@@ -170,7 +177,7 @@ export default function MarketplacePage() {
               </div>
             </div>
           </section>
-          
+
           {/* Footer est géré séparément dans le Header component */}
         </>
       )}

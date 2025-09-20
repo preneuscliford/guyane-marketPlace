@@ -91,7 +91,7 @@ export function useAdvertisements() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Récupère les publicités de l'utilisateur connecté
@@ -118,7 +118,7 @@ export function useAdvertisements() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   /**
    * Crée une nouvelle publicité
@@ -186,7 +186,7 @@ export function useAdvertisements() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   /**
    * Met à jour une publicité
@@ -221,7 +221,7 @@ export function useAdvertisements() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Supprime une publicité
@@ -247,7 +247,7 @@ export function useAdvertisements() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Récupère une publicité par son ID
@@ -267,7 +267,7 @@ export function useAdvertisements() {
       console.error('Erreur lors de la récupération de la publicité:', err);
       return null;
     }
-  }, [supabase]);
+  }, []);
 
   return {
     advertisements,
@@ -299,31 +299,43 @@ export function useAdvertisementStats() {
     setError(null);
 
     try {
-      let query = supabase
-        .from('advertisement_stats')
+      // Récupérer la publicité et ses clics
+      const { data: advertisement, error: adError } = await supabase
+        .from('advertisements')
         .select('*')
-        .eq('advertisement_id', advertisementId)
-        .order('date', { ascending: false });
+        .eq('id', advertisementId)
+        .single();
+
+      if (adError) throw adError;
+
+      let clickQuery = supabase
+        .from('advertisement_clicks')
+        .select('*')
+        .eq('advertisement_id', advertisementId);
 
       if (dateRange) {
-        query = query
-          .gte('date', dateRange.start)
-          .lte('date', dateRange.end);
+        clickQuery = clickQuery
+          .gte('created_at', dateRange.start)
+          .lte('created_at', dateRange.end);
       }
 
-      const { data, error } = await query;
+      const { data: clicks, error: clickError } = await clickQuery;
 
-      if (error) throw error;
+      if (clickError) throw clickError;
 
-      setStats((data || []).filter((stat): stat is AdvertisementStats => 
-        stat.advertisement_id !== null &&
-        stat.clicks !== null &&
-        stat.cost_per_click !== null &&
-        stat.created_at !== null &&
-        stat.date !== null &&
-        stat.impressions !== null
-      ));
-      return data || [];
+      // Construire les statistiques basées sur l'annonce et les clics réels
+      const stats: AdvertisementStats[] = [{
+        id: `${advertisementId}-${Date.now()}`, // ID généré temporairement
+        advertisement_id: advertisementId,
+        impressions: advertisement?.impressions || 0,
+        clicks: clicks?.length || 0,
+        cost_per_click: 0, // À calculer selon la logique métier
+        date: new Date().toISOString().split('T')[0],
+        created_at: advertisement?.created_at || new Date().toISOString()
+      }];
+
+      setStats(stats);
+      return stats;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des statistiques';
       setError(errorMessage);
@@ -331,7 +343,7 @@ export function useAdvertisementStats() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Enregistre une impression
@@ -355,7 +367,7 @@ export function useAdvertisementStats() {
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement de l\'impression:', err);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Enregistre un clic
@@ -379,7 +391,7 @@ export function useAdvertisementStats() {
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement du clic:', err);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Calcule les analytics d'une publicité
@@ -389,19 +401,27 @@ export function useAdvertisementStats() {
     setError(null);
 
     try {
-      // Récupérer les statistiques
-      const { data: statsData, error: statsError } = await supabase
-        .from('advertisement_stats')
+      // Récupérer la publicité
+      const { data: advertisement, error: adError } = await supabase
+        .from('advertisements')
         .select('*')
-        .eq('advertisement_id', advertisementId)
-        .order('date', { ascending: true });
+        .eq('id', advertisementId)
+        .single();
 
-      if (statsError) throw statsError;
+      if (adError) throw adError;
 
-      const stats = statsData || [];
-      const totalImpressions = stats.reduce((sum, stat) => sum + (stat.impressions ?? 0), 0);
-      const totalClicks = stats.reduce((sum, stat) => sum + (stat.clicks ?? 0), 0);
-      const totalCost = stats.reduce((sum, stat) => sum + ((stat.clicks ?? 0) * (stat.cost_per_click ?? 0)), 0);
+      // Récupérer les clics
+      const { data: clicksData, error: clicksError } = await supabase
+        .from('advertisement_clicks')
+        .select('*')
+        .eq('advertisement_id', advertisementId);
+
+      if (clicksError) throw clicksError;
+
+      const clicks = clicksData || [];
+      const totalImpressions = advertisement?.impressions || 0;
+      const totalClicks = clicks.length;
+      const totalCost = advertisement?.total_spent || 0;
 
       const analytics: AdvertisementAnalytics = {
         advertisement_id: advertisementId,
@@ -410,16 +430,12 @@ export function useAdvertisementStats() {
         click_through_rate: totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0,
         total_cost: totalCost,
         average_cost_per_click: totalClicks > 0 ? totalCost / totalClicks : 0,
-        daily_stats: stats.filter((stat): stat is AdvertisementStats =>
-          stat.date !== null && 
-          stat.impressions !== null && 
-          stat.clicks !== null
-        ).map(stat => ({
-          date: stat.date,
-          impressions: stat.impressions,
-          clicks: stat.clicks,
-          cost: (stat.clicks ?? 0) * (stat.cost_per_click ?? 0)
-        }))
+        daily_stats: [{ // Utilisation de données basiques pour l'instant
+          date: new Date().toISOString().split('T')[0],
+          impressions: totalImpressions,
+          clicks: totalClicks,
+          cost: totalCost
+        }]
       };
 
       setAnalytics(analytics);
@@ -431,7 +447,7 @@ export function useAdvertisementStats() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   return {
     stats,
@@ -512,7 +528,7 @@ export function useWeightedCarousel() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, calculateWeight]);
+  }, [calculateWeight]);
 
   /**
    * Sélectionne une publicité aléatoirement basée sur les poids
@@ -558,5 +574,60 @@ export function useWeightedCarousel() {
     selectRandomAdvertisement,
     startCarousel,
     setCurrentAd
+  };
+}
+
+/**
+ * Hook simple pour récupérer les publicités actives pour le carousel
+ */
+export function useActiveAdvertisementsForCarousel() {
+  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchActiveAdvertisements = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔍 Fetching active advertisements...');
+
+      const { data, error } = await supabase
+        .from('advertisements')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      console.log('📥 Supabase response:', { data, error });
+
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw error;
+      }
+
+      console.log('✅ Active advertisements found:', data?.length || 0);
+      setAdvertisements((data || []).map(ad => ({
+        ...ad,
+        user_id: ad.user_id || '', // Garantir que user_id ne soit jamais null
+        image_url: ad.image_url || undefined // Convertir null en undefined
+      } as Advertisement)));
+    } catch (err) {
+      console.error('❌ Error fetching active advertisements:', err);
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchActiveAdvertisements();
+  }, [fetchActiveAdvertisements]);
+
+  return {
+    advertisements,
+    loading,
+    error,
+    refetch: fetchActiveAdvertisements
   };
 }

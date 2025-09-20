@@ -13,6 +13,7 @@ export interface AuthUser extends User {
     skills?: string[];
     phone?: string;
     website?: string;
+    role?: string;
   };
 }
 

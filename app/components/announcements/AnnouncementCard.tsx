@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useAuth } from "@/hooks/useAuth";
 
 import Link from "next/link";
-import { Button } from "@components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { ReportButton } from "@/components/ui/ReportButton";
 
@@ -55,7 +55,7 @@ export default function AnnouncementCard({
     <div className="bg-white p-6 rounded-lg shadow-md relative">
       {/* Boutons de favoris et signalement */}
       <div className="absolute top-4 right-4 flex gap-2">
-        <ReportButton 
+        <ReportButton
           contentType="announcement"
           contentId={announcement.id}
           reportedUserId={announcement.user_id}
@@ -66,7 +66,7 @@ export default function AnnouncementCard({
         />
         <FavoriteButton announcementId={announcement.id} size="sm" />
       </div>
-      
+
       <div className="flex justify-between items-start pr-10">
         <div>
           <h3 className="text-xl font-semibold text-gray-900">

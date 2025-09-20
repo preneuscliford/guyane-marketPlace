@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/Textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import {
@@ -381,7 +381,7 @@ export default function CommunityPost({
         if (!error && data) {
           userProfile = {
             id: data.id,
-            username: data.username,
+            username: data.username || "Utilisateur",
             avatar_url: data.avatar_url,
             full_name: data.full_name,
           };

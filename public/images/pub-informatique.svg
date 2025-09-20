@@ -1,0 +1,46 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4B0082;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8A2BE2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="#F8F8FF"/>
+  
+  <!-- Ordinateur portable -->
+  <rect x="100" y="120" width="120" height="80" fill="#2F4F4F" rx="5"/>
+  <rect x="105" y="125" width="110" height="65" fill="#000"/>
+  <rect x="110" y="130" width="100" height="55" fill="#1E90FF"/>
+  
+  <!-- Clavier -->
+  <rect x="115" y="200" width="90" height="20" fill="#D3D3D3" rx="3"/>
+  <rect x="120" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="132" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="144" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="156" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="168" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="180" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  <rect x="192" y="203" width="10" height="3" fill="#fff" rx="1"/>
+  
+  <!-- Smartphone -->
+  <rect x="260" y="100" width="60" height="100" fill="#2F4F4F" rx="10"/>
+  <rect x="265" y="110" width="50" height="70" fill="#000"/>
+  <rect x="270" y="115" width="40" height="60" fill="#00FA9A"/>
+  <circle cx="290" cy="190" r="8" fill="#D3D3D3"/>
+  
+  <!-- Gaming controller -->
+  <ellipse cx="150" cy="80" rx="40" ry="20" fill="url(#techGrad)"/>
+  <circle cx="130" cy="75" r="6" fill="#FFD700"/>
+  <circle cx="170" cy="75" r="6" fill="#FF6347"/>
+  <rect x="140" y="70" width="20" height="8" fill="#32CD32" rx="4"/>
+  
+  <!-- Icônes tech -->
+  <circle cx="50" cy="150" r="15" fill="#FF1493"/>
+  <text x="50" y="155" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#FFF">Wi-Fi</text>
+  
+  <circle cx="350" cy="180" r="15" fill="#00CED1"/>
+  <text x="350" y="185" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#FFF">USB</text>
+  
+  <text x="200" y="40" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4B0082">CYBER GUYANE</text>
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#8A2BE2">High-tech & Gaming</text>
+</svg>

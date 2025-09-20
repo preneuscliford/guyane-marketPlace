@@ -32,7 +32,7 @@ interface UseReviewsParams {
 export function useReviews(params: UseReviewsParams = {}) {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState<ReviewStats>({
+  const [stats] = useState<ReviewStats>({
     averageRating: 0,
     totalReviews: 0,
     ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
@@ -106,34 +106,7 @@ export function useReviews(params: UseReviewsParams = {}) {
     } finally {
       setLoading(false);
     }
-  }, [params.targetUserId, params.announcementId, user]);
-
-  // Calculate statistics from reviews
-  const calculateStats = (reviewsData: Review[]) => {
-    if (reviewsData.length === 0) {
-      setStats({
-        averageRating: 0,
-        totalReviews: 0,
-        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-      });
-      return;
-    }
-
-    const totalRating = reviewsData.reduce((sum, review) => sum + review.rating, 0);
-    const average = totalRating / reviewsData.length;
-    
-    // Calculate rating distribution
-    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    reviewsData.forEach(review => {
-      distribution[review.rating as keyof typeof distribution]++;
-    });
-
-    setStats({
-      averageRating: parseFloat(average.toFixed(1)),
-      totalReviews: reviewsData.length,
-      ratingDistribution: distribution
-    });
-  };
+  }, [params, user]);
 
   // Add a new review
   const addReview = async (reviewData: {

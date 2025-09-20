@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-;
+import { generateGuyaneSEO, SEO_TEMPLATES } from "@/lib/seo";
+import GoogleTagManager, {
+  GoogleTagManagerNoScript,
+} from "@/components/analytics/GoogleTagManager";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 import { Footer } from "@/components/layout/Footer";
+import { MVPBanner } from "@/components/layout/MVPBanner";
+import { DynamicPadding } from "@/components/layout/DynamicPadding";
 import PWAManager from "@/components/PWAManager";
 import PWAStyles from "@/components/PWAStyles";
 import { Toaster } from "sonner";
 import { HeaderWrapper } from "./components/layout/HeaderWrapper";
 import AuthProviderWrapper from "./components/providers/AuthProviderWrapper";
+import { MVPBannerProvider } from "./components/providers/MVPBannerProvider";
+import { QueryProvider } from "./providers/QueryProvider";
 import FeedbackButton from "./components/feedback/FeedbackButton";
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,45 +30,15 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Guyane Marketplace - La marketplace guyanaise",
-  description: "La place de marché communautaire de la Guyane française. Achetez et vendez localement avec un système publicitaire innovant.",
-  keywords: "marketplace, guyane, française, annonces, publicités, local, commerce",
-  authors: [{ name: "Guyane Marketplace" }],
-  creator: "Guyane Marketplace",
-  publisher: "Guyane Marketplace",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  ...generateGuyaneSEO({
+    ...SEO_TEMPLATES.home,
+    canonicalUrl: "/",
+  }),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Guyane Marketplace",
-  },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "https://guyane-marketplace.com",
-    title: "Guyane Marketplace - La marketplace guyanaise",
-    description: "La place de marché communautaire de la Guyane française",
-    siteName: "Guyane Marketplace",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Guyane Marketplace - La marketplace guyanaise",
-    description: "La place de marché communautaire de la Guyane française",
-  },
-  other: {
-    "theme-color": "#667eea",
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "Guyane Marketplace",
-    "application-name": "Guyane Marketplace",
-    "msapplication-TileColor": "#667eea",
-    "msapplication-config": "/browserconfig.xml",
+    title: "Guyane Market",
   },
 };
 
@@ -70,6 +47,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+
   return (
     <html lang="fr" className="h-full">
       <head>
@@ -78,27 +57,42 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#667eea" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col pt-14 sm:pt-16`}>
-        <AuthProviderWrapper>
-          <PWAStyles />
-          <HeaderWrapper />
-          <div className="flex-1 flex flex-col">
-            {children}
-          </div>
-          <Footer />
-          <FeedbackButton />
-          <PWAManager />
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: 'white',
-                border: '1px solid #e2e8f0',
-                color: '#1e293b',
-              },
-            }}
-          />
-        </AuthProviderWrapper>
+      <body
+        className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col pt-28 sm:pt-32`}
+      >
+        {/* Google Tag Manager (noscript) - doit être au début du body */}
+        {gtmId && <GoogleTagManagerNoScript gtmId={gtmId} />}
+
+        {/* Google Tag Manager Script */}
+        {gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+        {/* Google Analytics */}
+        <GoogleAnalytics />
+
+        <QueryProvider>
+          <AuthProviderWrapper>
+            <MVPBannerProvider>
+              <PWAStyles />
+              <DynamicPadding />
+              <MVPBanner />
+              <HeaderWrapper />
+              <div className="flex-1 flex flex-col">{children}</div>
+              <Footer />
+              <FeedbackButton />
+              <PWAManager />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    background: "white",
+                    border: "1px solid #e2e8f0",
+                    color: "#1e293b",
+                  },
+                }}
+              />
+            </MVPBannerProvider>
+          </AuthProviderWrapper>
+        </QueryProvider>
       </body>
     </html>
   );

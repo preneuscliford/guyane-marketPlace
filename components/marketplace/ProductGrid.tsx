@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Button } from '../../app/components/ui/Button';
-import { Badge } from '../../app/components/ui/badge';
-import { Card, CardContent } from '../../app/components/ui/Card';
-import ReportButton from '../../app/components/moderation/ReportButton';
-import { 
-  Heart, 
-  MapPin, 
-  Eye, 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../app/components/ui/badge";
+import { Card, CardContent } from "../../app/components/ui/Card";
+import ReportButton from "../../app/components/moderation/ReportButton";
+import {
+  Heart,
+  MapPin,
+  Eye,
   Star,
   MessageCircle,
-  Calendar
-} from 'lucide-react';
-import { toast } from 'sonner';
+  Calendar,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Product {
   id: string;
@@ -45,10 +45,10 @@ interface ProductGridProps {
  * Composant grille de produits pour la marketplace
  * Affiche les produits avec possibilité de filtrage et navigation vers les détails
  */
-export default function ProductGrid({ 
-  searchQuery = '', 
-  selectedCategory = '', 
-  selectedLocation = '' 
+export default function ProductGrid({
+  searchQuery = "",
+  selectedCategory = "",
+  selectedLocation = "",
 }: ProductGridProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,40 +59,44 @@ export default function ProductGrid({
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      
+
       let query = supabase
-        .from('products')
-        .select(`
+        .from("products")
+        .select(
+          `
           *,
           profiles (
             username,
             avatar_url
           )
-        `)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .order("created_at", { ascending: false });
 
       // Appliquer les filtres
       if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        query = query.or(
+          `title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+        );
       }
-      
-      if (selectedCategory && selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
+
+      if (selectedCategory && selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
       }
-      
-      if (selectedLocation && selectedLocation !== 'all') {
-        query = query.eq('location', selectedLocation);
+
+      if (selectedLocation && selectedLocation !== "all") {
+        query = query.eq("location", selectedLocation);
       }
 
       const { data, error } = await query;
 
       if (error) {
-        console.error('Erreur lors du chargement des produits:', error);
-        toast.error('Erreur lors du chargement des produits');
+        console.error("Erreur lors du chargement des produits:", error);
+        toast.error("Erreur lors du chargement des produits");
       } else {
         setProducts(data || []);
       }
-      
+
       setLoading(false);
     };
 
@@ -102,16 +106,18 @@ export default function ProductGrid({
   // Récupérer les likes de l'utilisateur
   useEffect(() => {
     const fetchUserLikes = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: likes } = await supabase
-        .from('product_likes')
-        .select('product_id')
-        .eq('user_id', user.id);
+        .from("product_likes")
+        .select("product_id")
+        .eq("user_id", user.id);
 
       if (likes) {
-        setLikedProducts(new Set(likes.map(like => like.product_id)));
+        setLikedProducts(new Set(likes.map((like) => like.product_id)));
       }
     };
 
@@ -121,25 +127,27 @@ export default function ProductGrid({
   // Fonction pour gérer les likes
   const handleLike = async (productId: string, e: React.MouseEvent) => {
     e.preventDefault(); // Empêcher la navigation vers la page de détails
-    
-    const { data: { user } } = await supabase.auth.getUser();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
-      toast.error('Vous devez être connecté pour aimer un produit');
+      toast.error("Vous devez être connecté pour aimer un produit");
       return;
     }
 
     const isLiked = likedProducts.has(productId);
-    
+
     try {
       if (isLiked) {
         // Retirer le like
         await supabase
-          .from('product_likes')
+          .from("product_likes")
           .delete()
-          .eq('product_id', productId)
-          .eq('user_id', user.id);
-        
-        setLikedProducts(prev => {
+          .eq("product_id", productId)
+          .eq("user_id", user.id);
+
+        setLikedProducts((prev) => {
           const newSet = new Set(prev);
           newSet.delete(productId);
           return newSet;
@@ -147,30 +155,30 @@ export default function ProductGrid({
       } else {
         // Ajouter le like
         await supabase
-          .from('product_likes')
+          .from("product_likes")
           .insert({ product_id: productId, user_id: user.id });
-        
-        setLikedProducts(prev => new Set([...prev, productId]));
+
+        setLikedProducts((prev) => new Set([...prev, productId]));
       }
     } catch (error) {
-      console.error('Erreur lors du like:', error);
-      toast.error('Erreur lors de l\'action');
+      console.error("Erreur lors du like:", error);
+      toast.error("Erreur lors de l'action");
     }
   };
 
   // Fonction pour formater le prix
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(price);
   };
 
   // Fonction pour formater la date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short'
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
     });
   };
 
@@ -221,39 +229,37 @@ export default function ProductGrid({
               {/* Image du produit */}
               <div className="relative aspect-video overflow-hidden">
                 <img
-                  src={product.images?.[0] || '/placeholder-product.jpg'}
+                  src={product.images?.[0] || "/placeholder-product.jpg"}
                   alt={product.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                
+
                 {/* Badge catégorie */}
-                <Badge 
-                  className="absolute top-3 left-3 bg-white/90 text-gray-700 hover:bg-white"
-                >
+                <Badge className="absolute top-3 left-3 bg-white/90 text-gray-700 hover:bg-white">
                   {product.category}
                 </Badge>
-                
+
                 {/* Bouton like */}
                 <Button
                   size="sm"
                   variant="ghost"
                   className={`absolute top-3 right-3 h-8 w-8 p-0 rounded-full bg-white/90 hover:bg-white ${
-                    likedProducts.has(product.id) 
-                      ? 'text-red-500 hover:text-red-600' 
-                      : 'text-gray-600 hover:text-red-500'
+                    likedProducts.has(product.id)
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-gray-600 hover:text-red-500"
                   }`}
                   onClick={(e) => handleLike(product.id, e)}
                 >
-                  <Heart 
+                  <Heart
                     className={`h-4 w-4 ${
-                      likedProducts.has(product.id) ? 'fill-current' : ''
-                    }`} 
+                      likedProducts.has(product.id) ? "fill-current" : ""
+                    }`}
                   />
                 </Button>
-                
+
                 {/* Bouton de signalement */}
                 <ReportButton
-                  contentType="product"
+                  contentType="service"
                   contentId={product.id}
                   reportedUserId={product.user_id}
                   variant="ghost"
@@ -295,13 +301,13 @@ export default function ProductGrid({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
-                      {product.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                      {product.profiles?.username?.[0]?.toUpperCase() || "U"}
                     </div>
                     <span className="text-sm text-gray-600">
-                      {product.profiles?.username || 'Utilisateur'}
+                      {product.profiles?.username || "Utilisateur"}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 text-sm text-gray-500">
                     {product.view_count && (
                       <div className="flex items-center gap-1">

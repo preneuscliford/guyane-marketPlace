@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   XMarkIcon,
   ChartBarIcon,
@@ -10,17 +10,20 @@ import {
   BanknotesIcon,
   CalendarIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon
-} from '@heroicons/react/24/outline';
-import { useAdvertisementStats } from '../../hooks/useAdvertisements';
-import { Advertisement, AdvertisementAnalytics as AnalyticsType } from '../../types/advertisements';
-import { formatCurrency, formatNumber, formatDate } from '../../lib/utils';
+  ArrowTrendingDownIcon,
+} from "@heroicons/react/24/outline";
+import { useAdvertisementStats } from "../../hooks/useAdvertisements";
+import {
+  Advertisement,
+  AdvertisementAnalytics as AnalyticsType,
+} from "../../types/advertisements";
+import { formatCurrency, formatNumber, formatDate } from "../../lib/utils";
 // ... existing code ...
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 // ... existing code ...
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 interface AdvertisementAnalyticsProps {
   advertisement: Advertisement;
@@ -32,12 +35,15 @@ interface AdvertisementAnalyticsProps {
  */
 export default function AdvertisementAnalytics({
   advertisement,
-  onClose
+  onClose,
 }: AdvertisementAnalyticsProps) {
-  const { calculateAnalytics, fetchAdvertisementStats, loading } = useAdvertisementStats();
+  const { calculateAnalytics, fetchAdvertisementStats, loading } =
+    useAdvertisementStats();
   const [analytics, setAnalytics] = useState<AnalyticsType | null>(null);
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">(
+    "30d"
+  );
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Charger les analytics
   useEffect(() => {
@@ -46,7 +52,7 @@ export default function AdvertisementAnalytics({
         const data = await calculateAnalytics(advertisement.id);
         setAnalytics(data);
       } catch (err) {
-        console.error('Erreur lors du chargement des analytics:', err);
+        console.error("Erreur lors du chargement des analytics:", err);
       }
     };
 
@@ -56,7 +62,10 @@ export default function AdvertisementAnalytics({
   /**
    * Calcule le pourcentage de changement
    */
-  const calculatePercentageChange = (current: number, previous: number): number => {
+  const calculatePercentageChange = (
+    current: number,
+    previous: number
+  ): number => {
     if (previous === 0) return current > 0 ? 100 : 0;
     return ((current - previous) / previous) * 100;
   };
@@ -66,26 +75,43 @@ export default function AdvertisementAnalytics({
    */
   const getPreviousPeriodData = () => {
     if (!analytics || analytics.daily_stats.length < 14) return null;
-    
+
     const midPoint = Math.floor(analytics.daily_stats.length / 2);
     const currentPeriod = analytics.daily_stats.slice(midPoint);
     const previousPeriod = analytics.daily_stats.slice(0, midPoint);
-    
-    const currentImpressions = currentPeriod.reduce((sum, day) => sum + day.impressions, 0);
-    const previousImpressions = previousPeriod.reduce((sum, day) => sum + day.impressions, 0);
-    const currentClicks = currentPeriod.reduce((sum, day) => sum + day.clicks, 0);
-    const previousClicks = previousPeriod.reduce((sum, day) => sum + day.clicks, 0);
+
+    const currentImpressions = currentPeriod.reduce(
+      (sum, day) => sum + day.impressions,
+      0
+    );
+    const previousImpressions = previousPeriod.reduce(
+      (sum, day) => sum + day.impressions,
+      0
+    );
+    const currentClicks = currentPeriod.reduce(
+      (sum, day) => sum + day.clicks,
+      0
+    );
+    const previousClicks = previousPeriod.reduce(
+      (sum, day) => sum + day.clicks,
+      0
+    );
     const currentCost = currentPeriod.reduce((sum, day) => sum + day.cost, 0);
     const previousCost = previousPeriod.reduce((sum, day) => sum + day.cost, 0);
-    
+
     return {
-      impressions: calculatePercentageChange(currentImpressions, previousImpressions),
+      impressions: calculatePercentageChange(
+        currentImpressions,
+        previousImpressions
+      ),
       clicks: calculatePercentageChange(currentClicks, previousClicks),
       cost: calculatePercentageChange(currentCost, previousCost),
       ctr: calculatePercentageChange(
         currentImpressions > 0 ? (currentClicks / currentImpressions) * 100 : 0,
-        previousImpressions > 0 ? (previousClicks / previousImpressions) * 100 : 0
-      )
+        previousImpressions > 0
+          ? (previousClicks / previousImpressions) * 100
+          : 0
+      ),
     };
   };
 
@@ -98,7 +124,9 @@ export default function AdvertisementAnalytics({
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
           </div>
-          <p className="text-center mt-4 text-gray-600">Chargement des analytics...</p>
+          <p className="text-center mt-4 text-gray-600">
+            Chargement des analytics...
+          </p>
         </div>
       </div>
     );
@@ -115,13 +143,19 @@ export default function AdvertisementAnalytics({
         {/* En-tête */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Analytics - {advertisement.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Analytics - {advertisement.title}
+            </h2>
             <p className="text-gray-600 mt-1">
               Performances détaillées de votre publicité
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant={advertisement.status === 'active' ? 'default' : 'secondary'}>
+            <Badge
+              variant={
+                advertisement.status === "active" ? "default" : "secondary"
+              }
+            >
               {advertisement.status}
             </Badge>
             <button
@@ -179,7 +213,10 @@ export default function AdvertisementAnalytics({
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                <OverviewTab analytics={analytics} advertisement={advertisement} />
+                <OverviewTab
+                  analytics={analytics}
+                  advertisement={advertisement}
+                />
               </TabsContent>
 
               <TabsContent value="performance" className="space-y-6">
@@ -191,7 +228,10 @@ export default function AdvertisementAnalytics({
               </TabsContent>
 
               <TabsContent value="optimization" className="space-y-6">
-                <OptimizationTab analytics={analytics} advertisement={advertisement} />
+                <OptimizationTab
+                  analytics={analytics}
+                  advertisement={advertisement}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -202,9 +242,7 @@ export default function AdvertisementAnalytics({
           <Button variant="outline" onClick={onClose}>
             Fermer
           </Button>
-          <Button onClick={() => window.print()}>
-            Exporter le rapport
-          </Button>
+          <Button onClick={() => window.print()}>Exporter le rapport</Button>
         </div>
       </motion.div>
     </div>
@@ -219,19 +257,19 @@ function MetricCard({
   value,
   change,
   icon,
-  color
+  color,
 }: {
   title: string;
   value: string;
   change?: number;
   icon: React.ReactNode;
-  color: 'blue' | 'green' | 'purple' | 'orange';
+  color: "blue" | "green" | "purple" | "orange";
 }) {
   const colorClasses = {
-    blue: 'text-blue-500',
-    green: 'text-green-500',
-    purple: 'text-purple-500',
-    orange: 'text-orange-500'
+    blue: "text-blue-500",
+    green: "text-green-500",
+    purple: "text-purple-500",
+    orange: "text-orange-500",
   };
 
   return (
@@ -248,17 +286,18 @@ function MetricCard({
                 ) : (
                   <ArrowTrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
                 )}
-                <span className={`text-sm font-medium ${
-                  change >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+                <span
+                  className={`text-sm font-medium ${
+                    change >= 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {change >= 0 ? "+" : ""}
+                  {change.toFixed(1)}%
                 </span>
               </div>
             )}
           </div>
-          <div className={`${colorClasses[color]}`}>
-            {icon}
-          </div>
+          <div className={`${colorClasses[color]}`}>{icon}</div>
         </div>
       </CardContent>
     </Card>
@@ -270,17 +309,19 @@ function MetricCard({
  */
 function OverviewTab({
   analytics,
-  advertisement
+  advertisement,
 }: {
   analytics: AnalyticsType;
   advertisement: Advertisement;
 }) {
-  const efficiency = analytics.total_impressions > 0 
-    ? (analytics.total_clicks / analytics.total_impressions) * 100 
-    : 0;
-  
+  const efficiency =
+    analytics.total_impressions > 0
+      ? (analytics.total_clicks / analytics.total_impressions) * 100
+      : 0;
+
   const remainingBudget = advertisement.budget - advertisement.total_spent;
-  const budgetUtilization = (advertisement.total_spent / advertisement.budget) * 100;
+  const budgetUtilization =
+    (advertisement.total_spent / advertisement.budget) * 100;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -292,21 +333,31 @@ function OverviewTab({
         <CardContent className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Statut</span>
-            <Badge variant={advertisement.status === 'active' ? 'default' : 'secondary'}>
+            <Badge
+              variant={
+                advertisement.status === "active" ? "default" : "secondary"
+              }
+            >
               {advertisement.status}
             </Badge>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Budget total</span>
-            <span className="font-semibold">{formatCurrency(advertisement.budget)}</span>
+            <span className="font-semibold">
+              {formatCurrency(advertisement.budget)}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Dépensé</span>
-            <span className="font-semibold">{formatCurrency(advertisement.total_spent)}</span>
+            <span className="font-semibold">
+              {formatCurrency(advertisement.total_spent)}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Restant</span>
-            <span className="font-semibold text-green-600">{formatCurrency(remainingBudget)}</span>
+            <span className="font-semibold text-green-600">
+              {formatCurrency(remainingBudget)}
+            </span>
           </div>
           <div className="pt-2">
             <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -314,7 +365,7 @@ function OverviewTab({
               <span>{budgetUtilization.toFixed(1)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-primary-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(budgetUtilization, 100)}%` }}
               />
@@ -335,24 +386,28 @@ function OverviewTab({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Coût par clic moyen</span>
-            <span className="font-semibold">{formatCurrency(analytics.average_cost_per_click)}</span>
+            <span className="font-semibold">
+              {formatCurrency(analytics.average_cost_per_click)}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Impressions par jour</span>
             <span className="font-semibold">
-              {analytics.daily_stats.length > 0 
-                ? Math.round(analytics.total_impressions / analytics.daily_stats.length)
-                : 0
-              }
+              {analytics.daily_stats.length > 0
+                ? Math.round(
+                    analytics.total_impressions / analytics.daily_stats.length
+                  )
+                : 0}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Clics par jour</span>
             <span className="font-semibold">
-              {analytics.daily_stats.length > 0 
-                ? Math.round(analytics.total_clicks / analytics.daily_stats.length)
-                : 0
-              }
+              {analytics.daily_stats.length > 0
+                ? Math.round(
+                    analytics.total_clicks / analytics.daily_stats.length
+                  )
+                : 0}
             </span>
           </div>
         </CardContent>
@@ -365,14 +420,14 @@ function OverviewTab({
  * Onglet Performance
  */
 function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
-  const bestDay = analytics.daily_stats.reduce((best, day) => 
-    day.clicks > best.clicks ? day : best, 
-    analytics.daily_stats[0] || { date: '', clicks: 0, impressions: 0, cost: 0 }
+  const bestDay = analytics.daily_stats.reduce(
+    (best, day) => (day.clicks > best.clicks ? day : best),
+    analytics.daily_stats[0] || { date: "", clicks: 0, impressions: 0, cost: 0 }
   );
 
-  const worstDay = analytics.daily_stats.reduce((worst, day) => 
-    day.clicks < worst.clicks ? day : worst, 
-    analytics.daily_stats[0] || { date: '', clicks: 0, impressions: 0, cost: 0 }
+  const worstDay = analytics.daily_stats.reduce(
+    (worst, day) => (day.clicks < worst.clicks ? day : worst),
+    analytics.daily_stats[0] || { date: "", clicks: 0, impressions: 0, cost: 0 }
   );
 
   return (
@@ -385,12 +440,14 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
         <CardContent>
           <div className="h-64 flex items-end justify-between gap-2 p-4 bg-gray-50 rounded-lg">
             {analytics.daily_stats.slice(-14).map((day, index) => {
-              const maxClicks = Math.max(...analytics.daily_stats.map(d => d.clicks));
+              const maxClicks = Math.max(
+                ...analytics.daily_stats.map((d) => d.clicks)
+              );
               const height = maxClicks > 0 ? (day.clicks / maxClicks) * 200 : 0;
-              
+
               return (
                 <div key={day.date} className="flex flex-col items-center">
-                  <div 
+                  <div
                     className="bg-primary-500 rounded-t min-h-[4px] w-6 transition-all duration-300 hover:bg-primary-600"
                     style={{ height: `${height}px` }}
                     title={`${day.clicks} clics le ${formatDate(day.date)}`}
@@ -413,7 +470,9 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-lg font-semibold">{formatDate(bestDay.date)}</p>
+              <p className="text-lg font-semibold">
+                {formatDate(bestDay.date)}
+              </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-600">Clics</p>
@@ -426,15 +485,19 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
                 <div>
                   <p className="text-gray-600">CTR</p>
                   <p className="font-semibold">
-                    {bestDay.impressions > 0 
-                      ? ((bestDay.clicks / bestDay.impressions) * 100).toFixed(2)
-                      : 0
-                    }%
+                    {bestDay.impressions > 0
+                      ? ((bestDay.clicks / bestDay.impressions) * 100).toFixed(
+                          2
+                        )
+                      : 0}
+                    %
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-600">Coût</p>
-                  <p className="font-semibold">{formatCurrency(bestDay.cost)}</p>
+                  <p className="font-semibold">
+                    {formatCurrency(bestDay.cost)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -443,11 +506,15 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-red-600">Jour le moins performant</CardTitle>
+            <CardTitle className="text-red-600">
+              Jour le moins performant
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-lg font-semibold">{formatDate(worstDay.date)}</p>
+              <p className="text-lg font-semibold">
+                {formatDate(worstDay.date)}
+              </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-600">Clics</p>
@@ -460,15 +527,20 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
                 <div>
                   <p className="text-gray-600">CTR</p>
                   <p className="font-semibold">
-                    {worstDay.impressions > 0 
-                      ? ((worstDay.clicks / worstDay.impressions) * 100).toFixed(2)
-                      : 0
-                    }%
+                    {worstDay.impressions > 0
+                      ? (
+                          (worstDay.clicks / worstDay.impressions) *
+                          100
+                        ).toFixed(2)
+                      : 0}
+                    %
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-600">Coût</p>
-                  <p className="font-semibold">{formatCurrency(worstDay.cost)}</p>
+                  <p className="font-semibold">
+                    {formatCurrency(worstDay.cost)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -492,8 +564,8 @@ function AudienceTab({ analytics }: { analytics: AnalyticsType }) {
         <CardContent>
           <p className="text-gray-600">
             Les données d'audience détaillées seront disponibles prochainement.
-            Cette section inclura des informations sur la démographie, 
-            les appareils utilisés, et les heures de pointe.
+            Cette section inclura des informations sur la démographie, les
+            appareils utilisés, et les heures de pointe.
           </p>
         </CardContent>
       </Card>
@@ -504,40 +576,46 @@ function AudienceTab({ analytics }: { analytics: AnalyticsType }) {
 /**
  * Onglet Optimisation
  */
-function OptimizationTab({ 
-  analytics, 
-  advertisement 
-}: { 
-  analytics: AnalyticsType; 
-  advertisement: Advertisement; 
+function OptimizationTab({
+  analytics,
+  advertisement,
+}: {
+  analytics: AnalyticsType;
+  advertisement: Advertisement;
 }) {
   const recommendations = [];
-  
+
   // Générer des recommandations basées sur les performances
   if (analytics.click_through_rate < 1) {
     recommendations.push({
-      type: 'warning',
-      title: 'Taux de clic faible',
-      description: 'Votre CTR est inférieur à 1%. Considérez améliorer votre titre ou votre image.',
-      action: 'Modifier la publicité'
+      type: "warning",
+      title: "Taux de clic faible",
+      description:
+        "Votre CTR est inférieur à 1%. Considérez améliorer votre titre ou votre image.",
+      action: "Modifier la publicité",
     });
   }
-  
+
   if (analytics.average_cost_per_click > 1) {
     recommendations.push({
-      type: 'info',
-      title: 'Coût par clic élevé',
-      description: 'Votre CPC est élevé. Vous pourriez optimiser votre ciblage.',
-      action: 'Ajuster le budget'
+      type: "info",
+      title: "Coût par clic élevé",
+      description:
+        "Votre CPC est élevé. Vous pourriez optimiser votre ciblage.",
+      action: "Ajuster le budget",
     });
   }
-  
-  if (advertisement.budget - advertisement.total_spent < advertisement.daily_budget * 3) {
+
+  if (
+    advertisement.budget - advertisement.total_spent <
+    advertisement.daily_budget * 3
+  ) {
     recommendations.push({
-      type: 'warning',
-      title: 'Budget bientôt épuisé',
-      description: 'Il vous reste moins de 3 jours de budget. Considérez augmenter votre budget.',
-      action: 'Augmenter le budget'
+      type: "warning",
+      title: "Budget bientôt épuisé",
+      description:
+        "Il vous reste moins de 3 jours de budget. Considérez augmenter votre budget.",
+      action: "Augmenter le budget",
     });
   }
 
@@ -555,7 +633,9 @@ function OptimizationTab({
                   <div className="flex items-start justify-between">
                     <div>
                       <h4 className="font-medium text-gray-900">{rec.title}</h4>
-                      <p className="text-gray-600 text-sm mt-1">{rec.description}</p>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {rec.description}
+                      </p>
                     </div>
                     <Button variant="outline" size="sm">
                       {rec.action}

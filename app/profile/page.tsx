@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Loader2, Camera, X } from "lucide-react";
 
 export default function ProfilePage() {

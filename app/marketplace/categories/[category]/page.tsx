@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ArrowLeft, Filter, Grid, List } from "lucide-react";
 import { motion } from "framer-motion";
 import ProductGrid from "../../../../components/marketplace/ProductGrid";
-import { Button } from "../../../components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface Product {
   id: string;
@@ -32,7 +32,7 @@ const categoryMapping: { [key: string]: string } = {
   "marketing-digital": "Marketing",
   "traduction-langues": "Formation",
   "services-guyane": "Services",
-  "informatique": "Informatique"
+  informatique: "Informatique",
 };
 
 // Mapping inverse pour l'affichage
@@ -42,7 +42,7 @@ const displayNames: { [key: string]: string } = {
   "marketing-digital": "Marketing Digital",
   "traduction-langues": "Traduction & Langues",
   "services-guyane": "Services en Guyane",
-  "informatique": "Informatique"
+  informatique: "Informatique",
 };
 
 /**
@@ -54,12 +54,16 @@ export default function CategoryPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('recent');
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState("recent");
 
   const categorySlug = Array.isArray(category) ? category[0] : category;
-  const categoryName = categorySlug ? (categoryMapping[categorySlug] || categorySlug) : '';
-  const displayName = categorySlug ? displayNames[categorySlug] || categorySlug : '';
+  const categoryName = categorySlug
+    ? categoryMapping[categorySlug] || categorySlug
+    : "";
+  const displayName = categorySlug
+    ? displayNames[categorySlug] || categorySlug
+    : "";
 
   /**
    * Récupère les produits de la catégorie depuis Supabase
@@ -67,32 +71,34 @@ export default function CategoryPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      
+
       let query = supabase
-        .from('products')
-        .select(`
+        .from("products")
+        .select(
+          `
           *,
           profiles (
             username,
             avatar_url
           )
-        `)
-        .eq('category', categoryName)
-        .eq('status', 'active');
+        `
+        )
+        .eq("category", categoryName)
+        .eq("status", "active");
 
       // Appliquer le tri
       switch (sortBy) {
-        case 'price-asc':
-          query = query.order('price', { ascending: true });
+        case "price-asc":
+          query = query.order("price", { ascending: true });
           break;
-        case 'price-desc':
-          query = query.order('price', { ascending: false });
+        case "price-desc":
+          query = query.order("price", { ascending: false });
           break;
-        case 'title':
-          query = query.order('title', { ascending: true });
+        case "title":
+          query = query.order("title", { ascending: true });
           break;
         default:
-          query = query.order('created_at', { ascending: false });
+          query = query.order("created_at", { ascending: false });
       }
 
       const { data, error } = await query;
@@ -100,7 +106,7 @@ export default function CategoryPage() {
       if (error) throw error;
       setProducts(data || []);
     } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
+      console.error("Erreur lors du chargement des produits:", error);
     } finally {
       setLoading(false);
     }
@@ -134,9 +140,12 @@ export default function CategoryPage() {
                 </Link>
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{displayName}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {displayName}
+                </h1>
                 <p className="text-gray-600 mt-1">
-                  {products.length} produit{products.length > 1 ? 's' : ''} trouvé{products.length > 1 ? 's' : ''}
+                  {products.length} produit{products.length > 1 ? "s" : ""}{" "}
+                  trouvé{products.length > 1 ? "s" : ""}
                 </p>
               </div>
             </div>
@@ -144,7 +153,9 @@ export default function CategoryPage() {
             {/* Contrôles de vue et tri */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">Trier par:</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Trier par:
+                </label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -159,14 +170,22 @@ export default function CategoryPage() {
 
               <div className="flex items-center border border-gray-300 rounded-md">
                 <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-purple-100 text-purple-600' : 'text-gray-600'}`}
+                  onClick={() => setViewMode("grid")}
+                  className={`p-2 ${
+                    viewMode === "grid"
+                      ? "bg-purple-100 text-purple-600"
+                      : "text-gray-600"
+                  }`}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-purple-100 text-purple-600' : 'text-gray-600'}`}
+                  onClick={() => setViewMode("list")}
+                  className={`p-2 ${
+                    viewMode === "list"
+                      ? "bg-purple-100 text-purple-600"
+                      : "text-gray-600"
+                  }`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -201,8 +220,8 @@ export default function CategoryPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <ProductGrid 
-              searchQuery="" 
+            <ProductGrid
+              searchQuery=""
               selectedCategory={categoryName}
               selectedLocation=""
             />

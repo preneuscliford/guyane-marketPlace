@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Clock } from 'lucide-react';
 import { useWeightedCarousel, useAdvertisementStats } from '@/hooks/useAdvertisements';
 import { Advertisement } from '@/types/advertisements';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 

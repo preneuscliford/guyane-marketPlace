@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 // import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Header } from "@/components/layout/Header";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 

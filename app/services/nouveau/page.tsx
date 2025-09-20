@@ -4,7 +4,7 @@ import React from 'react';
 import { ServiceForm } from '@/components/services/ServiceForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRequireAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
@@ -183,11 +183,13 @@ export default function ModerationDashboard() {
           (data || []).map(async (report) => {
             try {
               // Récupérer les infos du rapporteur
-              const { data: reporter } = await supabase
-                .from("profiles")
-                .select("username")
-                .eq("id", report.reporter_id)
-                .single();
+              const { data: reporter } = report.reporter_id
+                ? await supabase
+                    .from("profiles")
+                    .select("username")
+                    .eq("id", report.reporter_id)
+                    .single()
+                : { data: null };
 
               // Récupérer les infos de l'utilisateur signalé
               const { data: reportedUser } = await supabase

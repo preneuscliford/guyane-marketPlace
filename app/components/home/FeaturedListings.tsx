@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, MapPin, Clock, TrendingUp, Heart, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useServices } from '@/hooks/useServices';
 import { useEffect } from 'react';

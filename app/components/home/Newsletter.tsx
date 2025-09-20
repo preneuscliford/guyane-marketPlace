@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Mail, Bell, CheckCircle, Gift, Zap, Users, Send } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 export function Newsletter() {

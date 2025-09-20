@@ -2,6 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Breakpoints responsives améliorés */
+@layer base {
+  /* Styles pour les très petits écrans (320px-374px) */
+  @media (max-width: 374px) {
+    .text-responsive-xs {
+      @apply text-sm;
+    }
+
+    .text-responsive-sm {
+      @apply text-base;
+    }
+
+    .text-responsive-md {
+      @apply text-lg;
+    }
+
+    .text-responsive-lg {
+      @apply text-xl;
+    }
+
+    .px-responsive {
+      @apply px-3;
+    }
+
+    .py-responsive {
+      @apply py-2;
+    }
+  }
+
+  /* Styles PWA spécifiques */
+  .pwa-mode {
+    /* Ajustements pour mode PWA */
+    --header-height: 64px;
+  }
+
+  .ios-pwa {
+    /* Padding top pour la barre de statut iOS */
+    --status-bar-height: env(safe-area-inset-top, 20px);
+    padding-top: var(--status-bar-height);
+  }
+
+  /* Styles responsive pour les textes */
+  .text-responsive-title {
+    @apply text-2xl;
+  }
+
+  @media (min-width: 375px) {
+    .text-responsive-title {
+      @apply text-3xl;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .text-responsive-title {
+      @apply text-4xl;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .text-responsive-title {
+      @apply text-5xl;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .text-responsive-title {
+      @apply text-6xl;
+    }
+  }
+}
+
 :root {
   --primary: #6366f1;
   --primary-hover: #4f46e5;
@@ -115,13 +186,13 @@
     hover:bg-primary-hover transition-all duration-300 
     shadow-lg hover:shadow-xl hover:-translate-y-0.5;
   }
-  
+
   .input-field {
     @apply w-full px-4 py-2.5 rounded-xl border border-border/40 
     bg-input/80 focus:outline-none focus:ring-2 focus:ring-primary/20 
     focus:border-primary transition-all duration-300;
   }
-  
+
   .card {
     @apply bg-card/90 backdrop-blur-sm rounded-2xl shadow-lg 
     hover:shadow-xl border border-border/30 p-6 
@@ -175,12 +246,12 @@ body {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
-  
+
   /* Reduce font sizes on very small screens */
   .text-xl {
     font-size: 1.125rem;
   }
-  
+
   .text-lg {
     font-size: 1rem;
   }
@@ -191,12 +262,12 @@ body {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   /* Further reduce spacing on 320px screens */
   .space-x-4 > * + * {
     margin-left: 0.5rem;
   }
-  
+
   .space-x-2 > * + * {
     margin-left: 0.25rem;
   }
@@ -208,7 +279,7 @@ body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .header-fixed {
     top: env(safe-area-inset-top) !important;
   }
@@ -225,13 +296,19 @@ body {
 
 /* Improve touch targets for mobile */
 @media (hover: none) and (pointer: coarse) {
-  button, .btn, [role="button"] {
+  button,
+  .btn,
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Ensure clickable elements are large enough */
-  a, button, input, select, textarea {
+  a,
+  button,
+  input,
+  select,
+  textarea {
     touch-action: manipulation;
   }
 }
@@ -293,13 +370,14 @@ body {
   .flex.space-x-4 {
     gap: 0.25rem;
   }
-  
+
   .flex.space-x-2 {
     gap: 0.125rem;
   }
-  
+
   /* Réduction des paddings sur les boutons */
-  .btn, button {
+  .btn,
+  button {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
@@ -321,10 +399,6 @@ body {
     border-width: 0.5px;
   }
 }
-
-
-
-
 
 @layer base {
   * {

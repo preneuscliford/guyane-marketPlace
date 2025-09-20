@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import ReportModal from "@/components/moderation/ReportModal";
 import { Flag } from "lucide-react";
 

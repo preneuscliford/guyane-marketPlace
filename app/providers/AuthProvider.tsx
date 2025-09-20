@@ -105,10 +105,6 @@ export default function AuthProvider({
       const siteUrl =
         process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
-      console.log("🔗 OAuth Redirect URL:", `${siteUrl}/auth/callback`);
-      console.log("🌍 Site URL:", siteUrl);
-      console.log("🪟 Window origin:", window.location.origin);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

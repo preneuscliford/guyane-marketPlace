@@ -1,131 +1,140 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { SearchIcon } from "lucide-react";
-import { motion } from "framer-motion";
-import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/Card";
+import { useActiveAdvertisementsForCarousel } from "@/hooks/useAdvertisements";
+import Autoplay from "embla-carousel-autoplay";
 
 interface HeroSectionProps {
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
 }
 
 export function HeroSection({ onSearch }: HeroSectionProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchQuery);
+  const { advertisements, loading, error } =
+    useActiveAdvertisementsForCarousel();
+
+  console.log("🎯 HeroSection render - advertisements:", advertisements);
+  console.log("🎯 HeroSection render - loading:", loading);
+  console.log("🎯 HeroSection render - error:", error);
+  console.log(
+    "🎯 HeroSection render - advertisements.length:",
+    advertisements.length
+  );
+
+  const handleAdvertisementClick = (ad: any) => {
+    if (ad.target_url) {
+      window.open(ad.target_url, "_blank");
+    }
   };
 
-  const popularSearches = [
-    "Design Logo", 
-    "Développement Web", 
-    "Traduction", 
-    "Marketing Digital",
-    "Immobilier"
-  ];
-
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Background with gradient overlay */}
-      <div className="absolute inset-0 z-0">
-        <Image 
-          src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=800&fit=crop&crop=center" 
-          alt="Blada Market Hero"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-800/70 via-fuchsia-700/60 to-cyan-600/70" />
-      </div>
-      
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-16 sm:py-20 md:py-32">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.h1 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Trouvez des services parfaits pour vos besoins en Guyane
-          </motion.h1>
-          
-          <motion.p 
-            className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-10 leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            La marketplace locale qui connecte les talents guyanais
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <form onSubmit={handleSubmit} className="relative max-w-2xl mx-auto">
-              <div className="relative flex items-center">
-                <input 
-                  type="text" 
-                  placeholder="Que recherchez-vous aujourd'hui ?" 
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-full text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button 
-                  type="submit" 
-                  className="absolute right-1 sm:right-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white p-2 sm:p-3 rounded-full hover:from-purple-700 hover:to-fuchsia-700 transition-all"
-                >
-                  <SearchIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-                </button>
-              </div>
-            </form>
-            
-            <div className="flex flex-wrap justify-center mt-4 gap-2">
-              {popularSearches.map((term, index) => (
-                <button
-                  key={index}
-                  className="text-white bg-white/20 backdrop-blur-sm hover:bg-white/30 px-3 py-1 rounded-full text-xs sm:text-sm transition-colors"
-                  onClick={() => {
-                    setSearchQuery(term);
-                    onSearch(term);
-                  }}
-                >
-                  {term}
-                </button>
-              ))}
+    <div className="relative w-full mt-4 sm:mt-6">
+      {/* Carousel Publicités plein écran collé au top */}
+      <div className="bg-white">
+        <div className="container mx-auto px-4">
+          {loading ? (
+            <div className="flex justify-center items-center h-80 sm:h-96">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
             </div>
-          </motion.div>
-          
-          {/* Affiches sponsorisées en grand format */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="w-full max-w-6xl mx-auto mt-8 sm:mt-12 md:mt-16"
-          >
-            <div className="h-64 sm:h-72 md:h-80">
-              <SponsoredBanner 
-                autoPlayInterval={6000}
-                showControls={true}
-              />
+          ) : error ? (
+            <div className="text-center py-16 sm:py-20">
+              <p className="text-xl text-gray-500">
+                Impossible de charger les publicités
+              </p>
             </div>
-          </motion.div>
+          ) : advertisements.length === 0 ? (
+            <div className="text-center py-16 sm:py-20">
+              <p className="text-xl text-gray-500">
+                Aucune publicité disponible pour le moment
+              </p>
+            </div>
+          ) : (
+            <Carousel
+              plugins={[
+                Autoplay({
+                  delay: 4000,
+                }),
+              ]}
+              className="w-full"
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {advertisements.map((ad) => (
+                  <CarouselItem key={ad.id} className="pl-2 md:pl-4 basis-full">
+                    <Card
+                      className="cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
+                      onClick={() => handleAdvertisementClick(ad)}
+                    >
+                      <CardContent className="p-0">
+                        <div className="relative h-80 sm:h-96 md:h-[400px] lg:h-[500px] overflow-hidden rounded-lg">
+                          {ad.image_url ? (
+                            <Image
+                              src={ad.image_url}
+                              alt={ad.title}
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-500"
+                              priority
+                              quality={95}
+                              sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-cyan-500 flex items-center justify-center">
+                              <div className="text-center text-white p-8 max-w-2xl">
+                                <h3 className="text-3xl sm:text-4xl font-bold mb-4">
+                                  {ad.title}
+                                </h3>
+                                <p className="text-lg sm:text-xl opacity-90">
+                                  {ad.description}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Overlay avec informations toujours visible */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end">
+                            <div className="w-full p-6 sm:p-8">
+                              <div className="text-white max-w-3xl">
+                                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 drop-shadow-lg">
+                                  {ad.title}
+                                </h3>
+                                <p className="text-base sm:text-lg md:text-xl opacity-95 mb-4 line-clamp-3 drop-shadow-md">
+                                  {ad.description}
+                                </p>
+                                <div className="flex flex-wrap gap-3">
+                                  {ad.category && (
+                                    <span className="px-4 py-2 bg-white/90 text-gray-800 backdrop-blur-sm rounded-full text-sm font-semibold shadow-lg">
+                                      📂 {ad.category}
+                                    </span>
+                                  )}
+                                  {ad.location && (
+                                    <span className="px-4 py-2 bg-white/90 text-gray-800 backdrop-blur-sm rounded-full text-sm font-semibold shadow-lg">
+                                      📍 {ad.location}
+                                    </span>
+                                  )}
+                                  <span className="px-4 py-2 bg-purple-600/95 backdrop-blur-sm rounded-full text-sm font-semibold shadow-lg">
+                                    👆 Cliquez pour découvrir
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          )}
         </div>
-      </div>
-      
-      {/* Wave shape at bottom */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full h-auto">
-          <path 
-            fill="#ffffff" 
-            fillOpacity="1" 
-            d="M0,64L60,64C120,64,240,64,360,58.7C480,53,600,43,720,48C840,53,960,75,1080,80C1200,85,1320,75,1380,69.3L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"
-          />
-        </svg>
       </div>
     </div>
   );

@@ -1,0 +1,35 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="carGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4169E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E90FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="#E6F3FF"/>
+  
+  <!-- Voiture -->
+  <rect x="80" y="160" width="240" height="60" fill="url(#carGrad)" rx="15"/>
+  <rect x="100" y="140" width="200" height="30" fill="url(#carGrad)" rx="10"/>
+  
+  <!-- Roues -->
+  <circle cx="120" cy="220" r="20" fill="#2F4F4F"/>
+  <circle cx="120" cy="220" r="12" fill="#696969"/>
+  <circle cx="280" cy="220" r="20" fill="#2F4F4F"/>
+  <circle cx="280" cy="220" r="12" fill="#696969"/>
+  
+  <!-- Fenêtres -->
+  <rect x="110" y="145" width="50" height="20" fill="#87CEEB" rx="5"/>
+  <rect x="170" y="145" width="60" height="20" fill="#87CEEB" rx="5"/>
+  <rect x="240" y="145" width="50" height="20" fill="#87CEEB" rx="5"/>
+  
+  <!-- Phares -->
+  <circle cx="85" cy="180" r="8" fill="#FFFF00"/>
+  <circle cx="315" cy="180" r="8" fill="#FF0000"/>
+  
+  <!-- Panneau "L" -->
+  <rect x="160" y="100" width="80" height="30" fill="#FFFFFF" stroke="#FF0000" stroke-width="3" rx="5"/>
+  <text x="200" y="120" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#FF0000">L</text>
+  
+  <text x="200" y="50" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1E90FF">AUTO-ÉCOLE PERMIS PLUS</text>
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#4169E1">Réussite Garantie - 89%</text>
+</svg>

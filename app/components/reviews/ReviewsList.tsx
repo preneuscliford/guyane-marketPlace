@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useReviews } from "@/hooks/useReviews";
 import { RatingStars } from "@/components/ui/RatingStars";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Loader2, MessageSquare, Flag, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";

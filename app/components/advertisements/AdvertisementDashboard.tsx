@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   PlusIcon,
   ChartBarIcon,
@@ -11,17 +11,23 @@ import {
   PlayIcon,
   PauseIcon,
   PencilIcon,
-  TrashIcon
-} from '@heroicons/react/24/outline';
-import { useAdvertisements, useAdvertisementStats } from '../../hooks/useAdvertisements';
-import { Advertisement, AdvertisementAnalytics as AdvertisementAnalyticsType } from '../../types/advertisements';
-import { formatCurrency, formatNumber, formatDate } from '../../lib/utils';
-import { Button } from '../ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import AdvertisementForm from './AdvertisementForm';
-import AdvertisementAnalytics from './AdvertisementAnalytics';
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import {
+  useAdvertisements,
+  useAdvertisementStats,
+} from "../../hooks/useAdvertisements";
+import {
+  Advertisement,
+  AdvertisementAnalytics as AdvertisementAnalyticsType,
+} from "../../types/advertisements";
+import { formatCurrency, formatNumber, formatDate } from "../../lib/utils";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import { Badge } from "../ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import AdvertisementForm from "./AdvertisementForm";
+import AdvertisementAnalytics from "./AdvertisementAnalytics";
 
 /**
  * Dashboard principal pour gérer les publicités
@@ -33,16 +39,18 @@ export default function AdvertisementDashboard() {
     error,
     fetchUserAdvertisements,
     updateAdvertisement,
-    deleteAdvertisement
+    deleteAdvertisement,
   } = useAdvertisements();
-  
+
   const { calculateAnalytics } = useAdvertisementStats();
-  
+
   const [selectedAd, setSelectedAd] = useState<Advertisement | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [analytics, setAnalytics] = useState<Record<string, AdvertisementAnalyticsType>>({});
-  const [activeTab, setActiveTab] = useState('overview');
+  const [analytics, setAnalytics] = useState<
+    Record<string, AdvertisementAnalyticsType>
+  >({});
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Charger les publicités de l'utilisateur
   useEffect(() => {
@@ -53,16 +61,19 @@ export default function AdvertisementDashboard() {
   useEffect(() => {
     const loadAnalytics = async () => {
       const analyticsData: Record<string, AdvertisementAnalyticsType> = {};
-      
+
       for (const ad of advertisements) {
         try {
           const data = await calculateAnalytics(ad.id);
           analyticsData[ad.id] = data;
         } catch (err) {
-          console.error(`Erreur lors du chargement des analytics pour ${ad.id}:`, err);
+          console.error(
+            `Erreur lors du chargement des analytics pour ${ad.id}:`,
+            err
+          );
         }
       }
-      
+
       setAnalytics(analyticsData);
     };
 
@@ -76,12 +87,24 @@ export default function AdvertisementDashboard() {
    */
   const globalStats = React.useMemo(() => {
     const totalBudget = advertisements.reduce((sum, ad) => sum + ad.budget, 0);
-    const totalSpent = advertisements.reduce((sum, ad) => sum + ad.total_spent, 0);
-    const activeAds = advertisements.filter(ad => ad.status === 'active').length;
-    
-    const totalImpressions = Object.values(analytics).reduce((sum, data) => sum + data.total_impressions, 0);
-    const totalClicks = Object.values(analytics).reduce((sum, data) => sum + data.total_clicks, 0);
-    const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+    const totalSpent = advertisements.reduce(
+      (sum, ad) => sum + ad.total_spent,
+      0
+    );
+    const activeAds = advertisements.filter(
+      (ad) => ad.status === "active"
+    ).length;
+
+    const totalImpressions = Object.values(analytics).reduce(
+      (sum, data) => sum + data.total_impressions,
+      0
+    );
+    const totalClicks = Object.values(analytics).reduce(
+      (sum, data) => sum + data.total_clicks,
+      0
+    );
+    const averageCTR =
+      totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
     return {
       totalBudget,
@@ -90,18 +113,21 @@ export default function AdvertisementDashboard() {
       totalAds: advertisements.length,
       totalImpressions,
       totalClicks,
-      averageCTR
+      averageCTR,
     };
   }, [advertisements, analytics]);
 
   /**
    * Gère le changement de statut d'une publicité
    */
-  const handleStatusChange = async (ad: Advertisement, newStatus: Advertisement['status']) => {
+  const handleStatusChange = async (
+    ad: Advertisement,
+    newStatus: Advertisement["status"]
+  ) => {
     try {
       await updateAdvertisement(ad.id, { status: newStatus });
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du statut:', err);
+      console.error("Erreur lors de la mise à jour du statut:", err);
     }
   };
 
@@ -109,11 +135,13 @@ export default function AdvertisementDashboard() {
    * Gère la suppression d'une publicité
    */
   const handleDelete = async (ad: Advertisement) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette publicité ?')) {
+    if (
+      window.confirm("Êtes-vous sûr de vouloir supprimer cette publicité ?")
+    ) {
       try {
         await deleteAdvertisement(ad.id);
       } catch (err) {
-        console.error('Erreur lors de la suppression:', err);
+        console.error("Erreur lors de la suppression:", err);
       }
     }
   };
@@ -185,7 +213,9 @@ export default function AdvertisementDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Budget Total</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Budget Total
+                </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {formatCurrency(globalStats.totalBudget)}
                 </p>
@@ -227,7 +257,9 @@ export default function AdvertisementDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Taux de Clic</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Taux de Clic
+                </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {globalStats.averageCTR.toFixed(2)}%
                 </p>
@@ -242,7 +274,9 @@ export default function AdvertisementDashboard() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="active">Actives ({globalStats.activeAds})</TabsTrigger>
+          <TabsTrigger value="active">
+            Actives ({globalStats.activeAds})
+          </TabsTrigger>
           <TabsTrigger value="all">Toutes ({globalStats.totalAds})</TabsTrigger>
         </TabsList>
 
@@ -252,7 +286,9 @@ export default function AdvertisementDashboard() {
 
         <TabsContent value="active" className="space-y-6">
           <AdvertisementList
-            advertisements={advertisements.filter(ad => ad.status === 'active')}
+            advertisements={advertisements.filter(
+              (ad) => ad.status === "active"
+            )}
             analytics={analytics}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -300,22 +336,27 @@ export default function AdvertisementDashboard() {
  */
 function OverviewTab({
   advertisements,
-  analytics
+  analytics,
 }: {
   advertisements: Advertisement[];
   analytics: Record<string, AdvertisementAnalyticsType>;
 }) {
   const topPerformers = advertisements
-    .map(ad => ({
+    .map((ad) => ({
       ...ad,
-      analytics: analytics[ad.id]
+      analytics: analytics[ad.id],
     }))
-    .filter(ad => ad.analytics)
-    .sort((a, b) => b.analytics.click_through_rate - a.analytics.click_through_rate)
+    .filter((ad) => ad.analytics)
+    .sort(
+      (a, b) => b.analytics.click_through_rate - a.analytics.click_through_rate
+    )
     .slice(0, 5);
 
   const recentAds = advertisements
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
     .slice(0, 5);
 
   return (
@@ -328,7 +369,10 @@ function OverviewTab({
         <CardContent>
           <div className="space-y-4">
             {topPerformers.map((ad, index) => (
-              <div key={ad.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div
+                key={ad.id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                     {index + 1}
@@ -340,7 +384,9 @@ function OverviewTab({
                     </p>
                   </div>
                 </div>
-                <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
+                <Badge
+                  variant={ad.status === "active" ? "default" : "secondary"}
+                >
                   {ad.status}
                 </Badge>
               </div>
@@ -361,8 +407,11 @@ function OverviewTab({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentAds.map(ad => (
-              <div key={ad.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            {recentAds.map((ad) => (
+              <div
+                key={ad.id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
                 <div>
                   <p className="font-medium text-gray-900">{ad.title}</p>
                   <p className="text-sm text-gray-600">
@@ -370,7 +419,9 @@ function OverviewTab({
                   </p>
                 </div>
                 <div className="text-right">
-                  <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={ad.status === "active" ? "default" : "secondary"}
+                  >
                     {ad.status}
                   </Badge>
                   <p className="text-sm text-gray-600 mt-1">
@@ -400,13 +451,13 @@ function AdvertisementList({
   onEdit,
   onDelete,
   onStatusChange,
-  onViewAnalytics
+  onViewAnalytics,
 }: {
   advertisements: Advertisement[];
   analytics: Record<string, AdvertisementAnalyticsType>;
   onEdit: (ad: Advertisement) => void;
   onDelete: (ad: Advertisement) => void;
-  onStatusChange: (ad: Advertisement, status: Advertisement['status']) => void;
+  onStatusChange: (ad: Advertisement, status: Advertisement["status"]) => void;
   onViewAnalytics: (ad: Advertisement) => void;
 }) {
   if (advertisements.length === 0) {
@@ -414,7 +465,8 @@ function AdvertisementList({
       <div className="text-center py-12">
         <p className="text-gray-500 mb-4">Aucune publicité trouvée</p>
         <p className="text-sm text-gray-400">
-          Créez votre première publicité pour commencer à promouvoir vos produits
+          Créez votre première publicité pour commencer à promouvoir vos
+          produits
         </p>
       </div>
     );
@@ -422,9 +474,9 @@ function AdvertisementList({
 
   return (
     <div className="grid grid-cols-1 gap-6">
-      {advertisements.map(ad => {
+      {advertisements.map((ad) => {
         const adAnalytics = analytics[ad.id];
-        
+
         return (
           <motion.div
             key={ad.id}
@@ -437,13 +489,19 @@ function AdvertisementList({
                 {/* Informations principales */}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{ad.title}</h3>
-                    <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {ad.title}
+                    </h3>
+                    <Badge
+                      variant={ad.status === "active" ? "default" : "secondary"}
+                    >
                       {ad.status}
                     </Badge>
                   </div>
-                  <p className="text-gray-600 mb-3 line-clamp-2">{ad.description}</p>
-                  
+                  <p className="text-gray-600 mb-3 line-clamp-2">
+                    {ad.description}
+                  </p>
+
                   {/* Métadonnées */}
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                     <span>Budget: {formatCurrency(ad.budget)}</span>
@@ -486,7 +544,7 @@ function AdvertisementList({
                   >
                     <ChartBarIcon className="w-4 h-4" />
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -494,21 +552,24 @@ function AdvertisementList({
                   >
                     <PencilIcon className="w-4 h-4" />
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => 
-                      onStatusChange(ad, ad.status === 'active' ? 'paused' : 'active')
+                    onClick={() =>
+                      onStatusChange(
+                        ad,
+                        ad.status === "active" ? "paused" : "active"
+                      )
                     }
                   >
-                    {ad.status === 'active' ? (
+                    {ad.status === "active" ? (
                       <PauseIcon className="w-4 h-4" />
                     ) : (
                       <PlayIcon className="w-4 h-4" />
                     )}
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"

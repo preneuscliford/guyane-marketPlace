@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   Service,
@@ -112,7 +112,7 @@ export function useServices() {
       }
 
       // Calculer les statistiques d'avis pour chaque service
-      const servicesWithStats = data ? data.map(service => {
+      const servicesWithStats = data ? data.map((service: any) => {
         try {
           const reviews = service.reviews || [];
           let rating = 0;
@@ -151,7 +151,7 @@ export function useServices() {
       console.log('Services récupérés:', servicesWithStats.length, servicesWithStats);
 
       // Tri intelligent : services récents et bien notés en premier
-      const sortedServices = servicesWithStats.sort((a, b) => {
+      const sortedServices = servicesWithStats.sort((a: any, b: any) => {
         // Calculer un score composite basé sur la note et la récence
         const now = new Date().getTime();
         const aDate = new Date(a.created_at).getTime();
@@ -184,7 +184,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Récupère un service par son ID
@@ -244,7 +244,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   /**
    * Crée un nouveau service
@@ -308,7 +308,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user, fetchServices]);
+  }, [user, fetchServices]);
 
   /**
    * Met à jour un service existant
@@ -336,7 +336,7 @@ export function useServices() {
       }
 
       // Mettre à jour la liste locale
-      setServices(prev => prev.map(s => s.id === id ? { ...s, ...(service as ServiceWithProfile) } : s));
+      setServices(prev => prev.map(s => s.id === id ? { ...s, ...(service as unknown as ServiceWithProfile) } : s));
       
       return service as Service;
     } catch (err) {
@@ -347,7 +347,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   /**
    * Supprime un service
@@ -382,7 +382,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   /**
    * Récupère les services de l'utilisateur connecté
@@ -416,7 +416,7 @@ export function useServices() {
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [user]);
 
   return {
     services,
@@ -458,7 +458,7 @@ export function useServiceStats() {
 
       const totalServices = services.length;
       const activeServices = services.filter(s => s.status === 'active').length;
-      const totalViews = services.reduce((sum, s) => sum + (s.total_views || s.views || 0), 0);
+      const totalViews = services.reduce((sum, s) => sum + (s.views || 0), 0);
       const averageRating = services.length > 0 
         ? services.reduce((sum, s) => sum + (s.rating || 0), 0) / services.length 
         : 0;
@@ -487,7 +487,7 @@ export function useServiceStats() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   return {
     stats,

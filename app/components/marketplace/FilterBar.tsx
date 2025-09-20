@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/Slider";
 import { Filter, ChevronDown } from "lucide-react";
 

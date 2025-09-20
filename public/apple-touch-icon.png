@@ -1,0 +1,30 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond principal -->
+  <rect width="192" height="192" rx="32" fill="url(#gradient)"/>
+  
+  <!-- Icône de marketplace -->
+  <g transform="translate(32, 32)">
+    <!-- Panier de shopping -->
+    <path d="M20 40h88l8-24H16l-4-12H4v8h12l16 48h64v-8H32l-4-12h72z" fill="white" fill-opacity="0.9"/>
+    <circle cx="40" cy="112" r="8" fill="white"/>
+    <circle cx="96" cy="112" r="8" fill="white"/>
+    
+    <!-- Éléments décoratifs -->
+    <rect x="48" y="24" width="32" height="4" rx="2" fill="white" fill-opacity="0.7"/>
+    <rect x="48" y="32" width="24" height="4" rx="2" fill="white" fill-opacity="0.7"/>
+    <rect x="48" y="40" width="28" height="4" rx="2" fill="white" fill-opacity="0.7"/>
+    
+    <!-- Badge de notification -->
+    <circle cx="108" cy="20" r="12" fill="#10B981"/>
+    <path d="M102 20l3 3 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Dégradé -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

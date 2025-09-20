@@ -1,7 +1,5 @@
 {
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
+  "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "deno.unstable": [
     "bare-node-builtins",
@@ -20,5 +18,15 @@
   ],
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "chat.mcp.serverSampling": {
+    "guyanemarketplace/.vscode/mcp.json: supabase": {
+      "allowedModels": [
+        "copilot/gpt-4.1",
+        "copilot/claude-sonnet-4",
+        "copilot/gpt-4o",
+        "copilot/gpt-5"
+      ]
+    }
   }
 }

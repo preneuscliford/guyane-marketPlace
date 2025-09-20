@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Heart, Share2, MapPin, Calendar, Eye, MessageCircle, Edit, Trash2, Star, TrendingUp, Phone, Mail, Globe, Clock, Shield, Award } from "lucide-react";
 import Image from "next/image";

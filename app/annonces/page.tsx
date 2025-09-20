@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { Header } from "@/components/layout/Header";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/supabase";

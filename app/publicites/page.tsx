@@ -4,7 +4,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Header } from '@/components/layout/Header';
 import AdvertisementDashboard from '@/components/advertisements/AdvertisementDashboard';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PlusIcon, ChartBarIcon, MegaphoneIcon } from '@heroicons/react/24/outline';
 

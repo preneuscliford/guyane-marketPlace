@@ -1,13 +1,20 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 // import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useWeightedCarousel, useAdvertisementStats } from '../../hooks/useAdvertisements';
-import { WeightedAdvertisement } from '../../types/advertisements';
-import { useAuth } from '../../hooks/useAuth';
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import {
+  useWeightedCarousel,
+  useAdvertisementStats,
+} from "../../hooks/useAdvertisements";
+import { WeightedAdvertisement } from "../../types/advertisements";
+import { useAuth } from "../../hooks/useAuth";
 
 interface AdvertisementCarouselProps {
   autoRotate?: boolean;
@@ -26,9 +33,9 @@ export default function AdvertisementCarousel({
   autoRotate = true,
   rotationInterval = 8000,
   maxAds = 5,
-  className = '',
+  className = "",
   showControls = true,
-  showCloseButton = false
+  showCloseButton = false,
 }: AdvertisementCarouselProps) {
   const {
     weightedAds,
@@ -36,12 +43,12 @@ export default function AdvertisementCarousel({
     loading,
     fetchWeightedAdvertisements,
     selectRandomAdvertisement,
-    setCurrentAd
+    setCurrentAd,
   } = useWeightedCarousel();
-  
+
   const { recordImpression, recordClick } = useAdvertisementStats();
   const { user } = useAuth();
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -74,29 +81,40 @@ export default function AdvertisementCarousel({
       const availableAds = weightedAds.slice(0, maxAds);
       const selected = selectRandomAdvertisement(availableAds);
       setCurrentAd(selected);
-      
+
       // Mettre à jour l'index pour les indicateurs
       if (selected) {
-        const index = availableAds.findIndex(ad => ad.id === selected.id);
+        const index = availableAds.findIndex((ad) => ad.id === selected.id);
         setCurrentIndex(index >= 0 ? index : 0);
       }
     }, rotationInterval);
 
     return () => clearInterval(interval);
-  }, [autoRotate, hasInteracted, weightedAds, maxAds, rotationInterval, selectRandomAdvertisement, setCurrentAd]);
+  }, [
+    autoRotate,
+    hasInteracted,
+    weightedAds,
+    maxAds,
+    rotationInterval,
+    selectRandomAdvertisement,
+    setCurrentAd,
+  ]);
 
   /**
    * Gère le clic sur une publicité
    */
-  const handleAdClick = useCallback(async (ad: WeightedAdvertisement) => {
-    // Enregistrer le clic
-    await recordClick(ad.id, user?.id);
-    
-    // Ouvrir le lien dans un nouvel onglet si spécifié
-    if (ad.target_url) {
-      window.open(ad.target_url, '_blank', 'noopener,noreferrer');
-    }
-  }, [recordClick, user?.id]);
+  const handleAdClick = useCallback(
+    async (ad: WeightedAdvertisement) => {
+      // Enregistrer le clic
+      await recordClick(ad.id, user?.id);
+
+      // Ouvrir le lien dans un nouvel onglet si spécifié
+      if (ad.target_url) {
+        window.open(ad.target_url, "_blank", "noopener,noreferrer");
+      }
+    },
+    [recordClick, user?.id]
+  );
 
   /**
    * Navigation manuelle vers la publicité précédente
@@ -104,7 +122,8 @@ export default function AdvertisementCarousel({
   const goToPrevious = useCallback(() => {
     setHasInteracted(true);
     const availableAds = weightedAds.slice(0, maxAds);
-    const newIndex = currentIndex > 0 ? currentIndex - 1 : availableAds.length - 1;
+    const newIndex =
+      currentIndex > 0 ? currentIndex - 1 : availableAds.length - 1;
     setCurrentIndex(newIndex);
     setCurrentAd(availableAds[newIndex]);
   }, [currentIndex, weightedAds, maxAds, setCurrentAd]);
@@ -115,7 +134,8 @@ export default function AdvertisementCarousel({
   const goToNext = useCallback(() => {
     setHasInteracted(true);
     const availableAds = weightedAds.slice(0, maxAds);
-    const newIndex = currentIndex < availableAds.length - 1 ? currentIndex + 1 : 0;
+    const newIndex =
+      currentIndex < availableAds.length - 1 ? currentIndex + 1 : 0;
     setCurrentIndex(newIndex);
     setCurrentAd(availableAds[newIndex]);
   }, [currentIndex, weightedAds, maxAds, setCurrentAd]);
@@ -123,12 +143,15 @@ export default function AdvertisementCarousel({
   /**
    * Navigation directe vers une publicité
    */
-  const goToAd = useCallback((index: number) => {
-    setHasInteracted(true);
-    const availableAds = weightedAds.slice(0, maxAds);
-    setCurrentIndex(index);
-    setCurrentAd(availableAds[index]);
-  }, [weightedAds, maxAds, setCurrentAd]);
+  const goToAd = useCallback(
+    (index: number) => {
+      setHasInteracted(true);
+      const availableAds = weightedAds.slice(0, maxAds);
+      setCurrentIndex(index);
+      setCurrentAd(availableAds[index]);
+    },
+    [weightedAds, maxAds, setCurrentAd]
+  );
 
   /**
    * Ferme le carrousel
@@ -145,7 +168,9 @@ export default function AdvertisementCarousel({
   const availableAds = weightedAds.slice(0, maxAds);
 
   return (
-    <div className={`relative w-full bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl overflow-hidden shadow-soft ${className}`}>
+    <div
+      className={`relative w-full bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl overflow-hidden shadow-soft ${className}`}
+    >
       {/* Bouton de fermeture */}
       {showCloseButton && (
         <button
@@ -164,10 +189,10 @@ export default function AdvertisementCarousel({
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           className="relative"
         >
-          <div 
+          <div
             className="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-6 cursor-pointer group"
             onClick={() => handleAdClick(currentAd)}
           >
@@ -180,6 +205,7 @@ export default function AdvertisementCarousel({
                   fill
                   className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 80px, 128px"
+                  unoptimized={currentAd.image_url.endsWith(".svg")}
                 />
               </div>
             )}
@@ -192,7 +218,7 @@ export default function AdvertisementCarousel({
               <p className="text-gray-600 text-sm sm:text-sm md:text-base line-clamp-2 mb-3 leading-relaxed">
                 {currentAd.description}
               </p>
-              
+
               {/* Métadonnées */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-xs md:text-sm text-gray-500">
                 {currentAd.category && (
@@ -215,8 +241,18 @@ export default function AdvertisementCarousel({
             {currentAd.target_url && (
               <div className="flex-shrink-0 mt-4 sm:mt-0 sm:ml-4 self-center">
                 <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center group-hover:bg-primary-600 transition-colors duration-200">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
                   </svg>
                 </div>
               </div>
@@ -236,7 +272,7 @@ export default function AdvertisementCarousel({
           >
             <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
           </button>
-          
+
           <button
             onClick={goToNext}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-all duration-200 hover:scale-110 z-10"
@@ -253,8 +289,8 @@ export default function AdvertisementCarousel({
                 onClick={() => goToAd(index)}
                 className={`w-2 h-2 rounded-full transition-all duration-200 ${
                   index === currentIndex
-                    ? 'bg-primary-500 w-6'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? "bg-primary-500 w-6"
+                    : "bg-white/60 hover:bg-white/80"
                 }`}
                 aria-label={`Aller à la publicité ${index + 1}`}
               />
@@ -264,9 +300,10 @@ export default function AdvertisementCarousel({
       )}
 
       {/* Badge de pondération (visible en mode développement) */}
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
-          Poids: {currentAd.weight.toFixed(1)} | Prob: {(currentAd.probability * 100).toFixed(1)}%
+          Poids: {currentAd.weight.toFixed(1)} | Prob:{" "}
+          {(currentAd.probability * 100).toFixed(1)}%
         </div>
       )}
     </div>
@@ -276,7 +313,11 @@ export default function AdvertisementCarousel({
 /**
  * Composant carrousel compact pour la sidebar
  */
-export function CompactAdvertisementCarousel({ className = '' }: { className?: string }) {
+export function CompactAdvertisementCarousel({
+  className = "",
+}: {
+  className?: string;
+}) {
   return (
     <AdvertisementCarousel
       autoRotate={true}
@@ -292,7 +333,11 @@ export function CompactAdvertisementCarousel({ className = '' }: { className?: s
 /**
  * Composant carrousel pour la page d'accueil
  */
-export function HeroAdvertisementCarousel({ className = '' }: { className?: string }) {
+export function HeroAdvertisementCarousel({
+  className = "",
+}: {
+  className?: string;
+}) {
   return (
     <AdvertisementCarousel
       autoRotate={true}
@@ -308,7 +353,11 @@ export function HeroAdvertisementCarousel({ className = '' }: { className?: stri
 /**
  * Composant carrousel mobile optimisé
  */
-export function MobileAdvertisementCarousel({ className = '' }: { className?: string }) {
+export function MobileAdvertisementCarousel({
+  className = "",
+}: {
+  className?: string;
+}) {
   return (
     <AdvertisementCarousel
       autoRotate={true}
