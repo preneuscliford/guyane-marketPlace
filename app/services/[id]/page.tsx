@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/AvatarComponent';
-import { Separator } from '@/components/ui/separator';
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/AvatarComponent";
+import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   MapPin,
@@ -23,19 +27,19 @@ import {
   Heart,
   MessageCircle,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
-import { useServices } from '@/hooks/useServices';
-import { useAuth } from '@/hooks/useAuth';
-import { useAutoServiceViews } from '@/hooks/useServiceViews';
-import { ServiceViewsSimple } from '@/components/services/ServiceViewsDisplay';
-import { ServiceReviews } from '@/components/services/ServiceReviews';
-import { ServiceWithProfile } from '@/types/services';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import Link from 'next/link';
-import { toast } from 'sonner';
-import ReportButton from '@/components/ui/ReportButton';
+  ChevronRight,
+} from "lucide-react";
+import { useServices } from "@/hooks/useServices";
+import { useAuth } from "@/hooks/useAuth";
+import { useAutoServiceViews } from "@/hooks/useServiceViews";
+import { ServiceViewsSimple } from "@/components/services/ServiceViewsDisplay";
+import { ServiceReviews } from "@/components/services/ServiceReviews";
+import { ServiceWithProfile } from "@/types/services";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import Link from "next/link";
+import { toast } from "sonner";
+import ReportButton from "@/components/ui/ReportButton";
 
 /**
  * Page de détail d'un service
@@ -45,12 +49,12 @@ export default function ServiceDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { getServiceById, deleteService, loading } = useServices();
-  
+
   const [service, setService] = useState<ServiceWithProfile | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // Utiliser le nouveau système de vues intelligent
   const { viewResult, loading: viewsLoading } = useAutoServiceViews(
     params.id as string,
@@ -61,18 +65,21 @@ export default function ServiceDetailPage() {
    * Gère la suppression du service
    */
   const handleDelete = async () => {
-    if (!service || !window.confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+    if (
+      !service ||
+      !window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")
+    ) {
       return;
     }
 
     try {
       setIsDeleting(true);
       await deleteService(service.id);
-      toast.success('Service supprimé avec succès');
-      router.push('/services');
+      toast.success("Service supprimé avec succès");
+      router.push("/services");
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-      toast.error('Erreur lors de la suppression du service');
+      console.error("Erreur lors de la suppression:", error);
+      toast.error("Erreur lors de la suppression du service");
     } finally {
       setIsDeleting(false);
     }
@@ -81,8 +88,8 @@ export default function ServiceDetailPage() {
   // Charger le service
   useEffect(() => {
     const loadService = async () => {
-      if (!params.id || typeof params.id !== 'string') {
-        setError('ID de service invalide');
+      if (!params.id || typeof params.id !== "string") {
+        setError("ID de service invalide");
         return;
       }
 
@@ -91,11 +98,11 @@ export default function ServiceDetailPage() {
         if (serviceData) {
           setService(serviceData);
         } else {
-          setError('Service non trouvé');
+          setError("Service non trouvé");
         }
       } catch (err) {
-        console.error('Erreur lors du chargement du service:', err);
-        setError('Erreur lors du chargement du service');
+        console.error("Erreur lors du chargement du service:", err);
+        setError("Erreur lors du chargement du service");
       }
     };
 
@@ -106,21 +113,21 @@ export default function ServiceDetailPage() {
    * Formate le prix selon le type
    */
   const formatPrice = (price: number, priceType: string) => {
-    if (price === 0) return 'Gratuit';
-    
-    const formattedPrice = new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
+    if (price === 0) return "Gratuit";
+
+    const formattedPrice = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(price);
 
     switch (priceType) {
-      case 'hourly':
+      case "hourly":
         return `${formattedPrice}/h`;
-      case 'daily':
+      case "daily":
         return `${formattedPrice}/jour`;
-      case 'monthly':
+      case "monthly":
         return `${formattedPrice}/mois`;
-      case 'negotiable':
+      case "negotiable":
         return `${formattedPrice} (négociable)`;
       default:
         return formattedPrice;
@@ -132,14 +139,14 @@ export default function ServiceDetailPage() {
    */
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
-      case 'available':
-        return 'bg-green-100 text-green-800';
-      case 'busy':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'unavailable':
-        return 'bg-red-100 text-red-800';
+      case "available":
+        return "bg-green-100 text-green-800";
+      case "busy":
+        return "bg-yellow-100 text-yellow-800";
+      case "unavailable":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -148,29 +155,29 @@ export default function ServiceDetailPage() {
    */
   const getAvailabilityText = (availability: string) => {
     switch (availability) {
-      case 'available':
-        return 'Disponible';
-      case 'busy':
-        return 'Occupé';
-      case 'unavailable':
-        return 'Indisponible';
+      case "available":
+        return "Disponible";
+      case "busy":
+        return "Occupé";
+      case "unavailable":
+        return "Indisponible";
       default:
-        return 'Non spécifié';
+        return "Non spécifié";
     }
   };
 
   /**
    * Gère le contact avec le prestataire
    */
-  const handleContact = (type: 'phone' | 'email') => {
+  const handleContact = (type: "phone" | "email") => {
     if (!service) return;
 
-    if (type === 'phone' && service.contact_info?.phone) {
+    if (type === "phone" && service.contact_info?.phone) {
       window.open(`tel:${service.contact_info.phone}`);
-    } else if (type === 'email' && service.contact_info?.email) {
+    } else if (type === "email" && service.contact_info?.email) {
       window.open(`mailto:${service.contact_info.email}`);
     } else {
-      toast.error('Information de contact non disponible');
+      toast.error("Information de contact non disponible");
     }
   };
 
@@ -183,19 +190,19 @@ export default function ServiceDetailPage() {
     const shareData = {
       title: service.title,
       text: service.description,
-      url: window.location.href
+      url: window.location.href,
     };
 
     if (navigator.share) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log('Partage annulé');
+        console.log("Partage annulé");
       }
     } else {
       // Fallback: copier l'URL
       await navigator.clipboard.writeText(window.location.href);
-      toast.success('Lien copié dans le presse-papiers!');
+      toast.success("Lien copié dans le presse-papiers!");
     }
   };
 
@@ -204,7 +211,7 @@ export default function ServiceDetailPage() {
    */
   const nextImage = () => {
     if (service?.images && service.images.length > 1) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === service.images!.length - 1 ? 0 : prev + 1
       );
     }
@@ -212,7 +219,7 @@ export default function ServiceDetailPage() {
 
   const prevImage = () => {
     if (service?.images && service.images.length > 1) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === 0 ? service.images!.length - 1 : prev - 1
       );
     }
@@ -235,8 +242,8 @@ export default function ServiceDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || 'Service non trouvé'}</p>
-            <Button onClick={() => router.push('/services')} variant="outline">
+            <p className="text-red-600 mb-4">{error || "Service non trouvé"}</p>
+            <Button onClick={() => router.push("/services")} variant="outline">
               Retour aux services
             </Button>
           </CardContent>
@@ -255,7 +262,7 @@ export default function ServiceDetailPage() {
             Retour aux services
           </Link>
         </Button>
-        
+
         <div className="flex gap-2 ml-auto">
           <Button variant="outline" size="sm" onClick={handleShare}>
             <Share2 className="h-4 w-4 mr-2" />
@@ -286,10 +293,10 @@ export default function ServiceDetailPage() {
                     alt={`${service.title} - Image ${currentImageIndex + 1}`}
                     className="w-full h-96 object-cover rounded-t-lg"
                     onError={(e) => {
-                      e.currentTarget.src = '/placeholder-service.jpg';
+                      e.currentTarget.src = "/placeholder-service.jpg";
                     }}
                   />
-                  
+
                   {/* Navigation des images */}
                   {service.images.length > 1 && (
                     <>
@@ -309,7 +316,7 @@ export default function ServiceDetailPage() {
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
-                      
+
                       {/* Indicateurs */}
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
                         {service.images.map((_, index) => (
@@ -317,23 +324,31 @@ export default function ServiceDetailPage() {
                             key={index}
                             onClick={() => setCurrentImageIndex(index)}
                             className={`w-2 h-2 rounded-full transition-colors ${
-                              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                              index === currentImageIndex
+                                ? "bg-white"
+                                : "bg-white/50"
                             }`}
                           />
                         ))}
                       </div>
                     </>
                   )}
-                  
+
                   {/* Badge de disponibilité */}
                   <div className="absolute top-4 right-4">
-                    <Badge className={getAvailabilityColor(service.availability as unknown as string)}>
+                    <Badge
+                      className={getAvailabilityColor(
+                        service.availability as unknown as string
+                      )}
+                    >
                       <Clock className="h-3 w-3 mr-1" />
-                      {getAvailabilityText(service.availability as unknown as string)}
-                    </Badge>    
+                      {getAvailabilityText(
+                        service.availability as unknown as string
+                      )}
+                    </Badge>
                   </div>
                 </div>
-                
+
                 {/* Miniatures */}
                 {service.images.length > 1 && (
                   <div className="p-4 flex gap-2 overflow-x-auto">
@@ -342,7 +357,9 @@ export default function ServiceDetailPage() {
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                          index === currentImageIndex ? 'border-blue-500' : 'border-gray-200'
+                          index === currentImageIndex
+                            ? "border-blue-500"
+                            : "border-gray-200"
                         }`}
                       >
                         <img
@@ -363,7 +380,9 @@ export default function ServiceDetailPage() {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-2xl mb-2">{service.title}</CardTitle>
+                  <CardTitle className="text-2xl mb-2">
+                    {service.title}
+                  </CardTitle>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
@@ -374,17 +393,17 @@ export default function ServiceDetailPage() {
                       <span>
                         {formatDistanceToNow(new Date(service.created_at), {
                           addSuffix: true,
-                          locale: fr
+                          locale: fr,
                         })}
                       </span>
                     </div>
-                    <ServiceViewsSimple 
+                    <ServiceViewsSimple
                       totalViews={service.total_views}
                       views={service.views}
                     />
                   </div>
                 </div>
-                
+
                 <div className="text-right">
                   <div className="text-2xl font-bold text-green-600">
                     {formatPrice(service.price ?? 0, service.price_type)}
@@ -393,14 +412,16 @@ export default function ServiceDetailPage() {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{service.description}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {service.description}
+                  </p>
                 </div>
-                
+
                 {/* Tags */}
                 {service.tags && service.tags.length > 0 && (
                   <div>
@@ -422,7 +443,7 @@ export default function ServiceDetailPage() {
           </Card>
 
           {/* Section des avis */}
-          <ServiceReviews 
+          <ServiceReviews
             serviceId={service.id}
             serviceOwnerId={service.user_id}
           />
@@ -439,14 +460,16 @@ export default function ServiceDetailPage() {
               <CardContent>
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={service.profiles.avatar_url || ''} />
+                    <AvatarImage src={service.profiles.avatar_url || ""} />
                     <AvatarFallback>
                       <User className="h-6 w-6" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <h4 className="font-semibold">
-                      {service.profiles.full_name || service.profiles.username || 'Utilisateur'}
+                      {service.profiles.full_name ||
+                        service.profiles.username ||
+                        "Utilisateur"}
                     </h4>
                     {service.profiles.location && (
                       <p className="text-sm text-gray-500 flex items-center gap-1">
@@ -456,12 +479,12 @@ export default function ServiceDetailPage() {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Actions de contact */}
                 <div className="space-y-2">
                   {service.contact_info?.phone && (
                     <Button
-                      onClick={() => handleContact('phone')}
+                      onClick={() => handleContact("phone")}
                       className="w-full"
                       variant="outline"
                     >
@@ -469,10 +492,10 @@ export default function ServiceDetailPage() {
                       Appeler
                     </Button>
                   )}
-                  
+
                   {service.contact_info?.email && (
                     <Button
-                      onClick={() => handleContact('email')}
+                      onClick={() => handleContact("email")}
                       className="w-full"
                       variant="outline"
                     >
@@ -480,7 +503,7 @@ export default function ServiceDetailPage() {
                       Envoyer un email
                     </Button>
                   )}
-                  
+
                   {user && user.id !== service.user_id && (
                     <Button className="w-full">
                       <MessageCircle className="h-4 w-4 mr-2" />
@@ -504,14 +527,16 @@ export default function ServiceDetailPage() {
                   <span>{service.contact_info.phone}</span>
                 </div>
               )}
-              
+
               {service.contact_info?.email && (
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="break-all">{service.contact_info.email}</span>
+                  <span className="break-all">
+                    {service.contact_info.email}
+                  </span>
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-gray-400" />
                 <span>{service.location}</span>
@@ -531,13 +556,13 @@ export default function ServiceDetailPage() {
                     Modifier le service
                   </Link>
                 </Button>
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   className="w-full"
                   onClick={handleDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? 'Suppression...' : 'Supprimer le service'}
+                  {isDeleting ? "Suppression..." : "Supprimer le service"}
                 </Button>
               </CardContent>
             </Card>

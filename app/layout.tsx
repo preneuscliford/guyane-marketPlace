@@ -18,6 +18,7 @@ import AuthProviderWrapper from "./components/providers/AuthProviderWrapper";
 import { MVPBannerProvider } from "./components/providers/MVPBannerProvider";
 import { QueryProvider } from "./providers/QueryProvider";
 import FeedbackButton from "./components/feedback/FeedbackButton";
+import AuthURLCleaner from "./components/auth/AuthURLCleaner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -73,6 +74,7 @@ export default function RootLayout({
           <AuthProviderWrapper>
             <MVPBannerProvider>
               <PWAStyles />
+              <AuthURLCleaner />
               <DynamicPadding />
               <MVPBanner />
               <HeaderWrapper />

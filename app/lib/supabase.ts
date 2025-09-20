@@ -9,7 +9,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce', // Plus sécurisé, évite l'exposition du token dans l'URL
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined
   }
 });
 

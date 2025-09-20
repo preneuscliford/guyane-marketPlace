@@ -5,12 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase, createAuthenticatedClient } from "@/lib/supabase";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -35,7 +30,7 @@ import {
   BarChart3,
   MessageSquare,
   Ban,
-  Clock
+  Clock,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -65,7 +60,7 @@ interface BannedUser {
 
 interface HiddenContent {
   id: string;
-  content_type: 'post' | 'comment' | 'service' | 'announcement';
+  content_type: "post" | "comment" | "service" | "announcement";
   content_id: string;
   hidden_at: string;
   reason: string;
@@ -105,20 +100,22 @@ export default function ModerationPage() {
     resolved_reports: 0,
     banned_users: 0,
     hidden_content: 0,
-    actions_today: 0
+    actions_today: 0,
   });
   const [bannedUsers, setBannedUsers] = useState<BannedUser[]>([]);
   const [hiddenContent, setHiddenContent] = useState<HiddenContent[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'banned' | 'hidden' | 'users'>('dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "banned" | "hidden" | "users"
+  >("dashboard");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showBanModal, setShowBanModal] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [banReason, setBanReason] = useState('');
+  const [banReason, setBanReason] = useState("");
   const [banDuration, setBanDuration] = useState<number | null>(null);
-  const [warningMessage, setWarningMessage] = useState('');
-  const [warningType, setWarningType] = useState('general');
+  const [warningMessage, setWarningMessage] = useState("");
+  const [warningType, setWarningType] = useState("general");
   const [moderationActions, setModerationActions] = useState<any[]>([]);
 
   /**
@@ -129,28 +126,28 @@ export default function ModerationPage() {
 
     try {
       const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
         .single();
 
       if (error) {
-        console.error('Erreur lors de la récupération du profil:', error);
-        toast.error('Erreur lors de la vérification du rôle.');
-        redirect('/');
+        console.error("Erreur lors de la récupération du profil:", error);
+        toast.error("Erreur lors de la vérification du rôle.");
+        redirect("/");
         return;
       }
 
-      const role = profile?.role || 'user';
+      const role = profile?.role || "user";
       setUserRole(role);
-      
-      if (role !== 'admin') {
-        toast.error('Accès refusé. Vous devez être administrateur.');
-        redirect('/');
+
+      if (role !== "admin") {
+        toast.error("Accès refusé. Vous devez être administrateur.");
+        redirect("/");
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification du rôle:', error);
-      redirect('/');
+      console.error("Erreur lors de la vérification du rôle:", error);
+      redirect("/");
     }
   };
 
@@ -159,16 +156,19 @@ export default function ModerationPage() {
    */
   const fetchModerationActions = async () => {
     try {
-      const response = await fetch('/api/admin/moderation-actions');
+      const response = await fetch("/api/admin/moderation-actions");
       if (response.ok) {
         const data = await response.json();
         setModerationActions(data);
       } else {
-        console.warn('Erreur lors du chargement des actions de modération');
+        console.warn("Erreur lors du chargement des actions de modération");
         setModerationActions([]);
       }
     } catch (error) {
-      console.warn('Erreur lors du chargement des actions de modération:', error);
+      console.warn(
+        "Erreur lors du chargement des actions de modération:",
+        error
+      );
       setModerationActions([]);
     }
   };
@@ -178,12 +178,12 @@ export default function ModerationPage() {
    */
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      const response = await fetch("/api/admin/stats");
       if (response.ok) {
         const data = await response.json();
         setStats(data);
       } else {
-        console.warn('Erreur lors du chargement des statistiques');
+        console.warn("Erreur lors du chargement des statistiques");
         // Utiliser des valeurs par défaut en cas d'erreur
         setStats({
           total_reports: 0,
@@ -191,11 +191,11 @@ export default function ModerationPage() {
           resolved_reports: 0,
           banned_users: 0,
           hidden_content: 0,
-          actions_today: 0
+          actions_today: 0,
         });
       }
     } catch (error) {
-      console.warn('Erreur lors du chargement des statistiques:', error);
+      console.warn("Erreur lors du chargement des statistiques:", error);
       // Utiliser des valeurs par défaut en cas d'erreur
       setStats({
         total_reports: 0,
@@ -203,7 +203,7 @@ export default function ModerationPage() {
         resolved_reports: 0,
         banned_users: 0,
         hidden_content: 0,
-        actions_today: 0
+        actions_today: 0,
       });
     }
   };
@@ -216,16 +216,16 @@ export default function ModerationPage() {
    */
   const fetchBannedUsers = async () => {
     try {
-      const response = await fetch('/api/admin/banned-users');
+      const response = await fetch("/api/admin/banned-users");
       if (response.ok) {
         const data = await response.json();
         setBannedUsers(data.data || []);
       } else {
-        console.warn('Erreur lors du chargement des utilisateurs bannis');
+        console.warn("Erreur lors du chargement des utilisateurs bannis");
         setBannedUsers([]);
       }
     } catch (error) {
-      console.warn('Erreur lors du chargement des utilisateurs bannis:', error);
+      console.warn("Erreur lors du chargement des utilisateurs bannis:", error);
       setBannedUsers([]);
     }
   };
@@ -235,16 +235,16 @@ export default function ModerationPage() {
    */
   const fetchHiddenContent = async () => {
     try {
-      const response = await fetch('/api/admin/hidden-content');
+      const response = await fetch("/api/admin/hidden-content");
       if (response.ok) {
         const data = await response.json();
         setHiddenContent(data.data || []);
       } else {
-        console.warn('Erreur lors du chargement du contenu masqué');
+        console.warn("Erreur lors du chargement du contenu masqué");
         setHiddenContent([]);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement du contenu masqué:', error);
+      console.error("Erreur lors du chargement du contenu masqué:", error);
       setHiddenContent([]);
     }
   };
@@ -255,18 +255,18 @@ export default function ModerationPage() {
   const unbanUser = async (userId: string) => {
     try {
       const { error } = await supabase
-        .from('banned_users')
+        .from("banned_users")
         .delete()
-        .eq('user_id', userId);
+        .eq("user_id", userId);
 
       if (error) throw error;
 
-      toast.success('Utilisateur débanni avec succès');
+      toast.success("Utilisateur débanni avec succès");
       fetchBannedUsers();
       fetchStats();
     } catch (error) {
-      console.error('Erreur lors du déban:', error);
-      toast.error('Erreur lors du déban');
+      console.error("Erreur lors du déban:", error);
+      toast.error("Erreur lors du déban");
     }
   };
 
@@ -276,20 +276,26 @@ export default function ModerationPage() {
   const restoreContent = async (contentType: string, contentId: string) => {
     try {
       const { error } = await supabase
-        .from(contentType === 'post' ? 'posts' : 
-              contentType === 'comment' ? 'comments' :
-              contentType === 'service' ? 'services' : 'announcements')
+        .from(
+          contentType === "post"
+            ? "posts"
+            : contentType === "comment"
+            ? "comments"
+            : contentType === "service"
+            ? "services"
+            : "announcements"
+        )
         .update({ is_hidden: false })
-        .eq('id', contentId);
+        .eq("id", contentId);
 
       if (error) throw error;
 
-      toast.success('Contenu restauré avec succès');
+      toast.success("Contenu restauré avec succès");
       fetchHiddenContent();
       fetchStats();
     } catch (error) {
-      console.error('Erreur lors de la restauration:', error);
-      toast.error('Erreur lors de la restauration');
+      console.error("Erreur lors de la restauration:", error);
+      toast.error("Erreur lors de la restauration");
     }
   };
 
@@ -298,16 +304,16 @@ export default function ModerationPage() {
    */
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch("/api/admin/users");
       if (response.ok) {
         const data = await response.json();
         setUsers(data.data || []);
       } else {
-        console.warn('Erreur lors du chargement des utilisateurs');
+        console.warn("Erreur lors du chargement des utilisateurs");
         setUsers([]);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des utilisateurs:', error);
+      console.error("Erreur lors du chargement des utilisateurs:", error);
       setUsers([]);
     }
   };
@@ -317,16 +323,18 @@ export default function ModerationPage() {
    */
   const banUsers = async () => {
     if (selectedUsers.length === 0 || !banReason.trim()) {
-      toast.error('Veuillez sélectionner des utilisateurs et fournir une raison');
+      toast.error(
+        "Veuillez sélectionner des utilisateurs et fournir une raison"
+      );
       return;
     }
 
     try {
       for (const userId of selectedUsers) {
-        const response = await fetch('/api/admin/ban-user', {
-          method: 'POST',
+        const response = await fetch("/api/admin/ban-user", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             user_id: userId,
@@ -336,21 +344,25 @@ export default function ModerationPage() {
         });
 
         if (!response.ok) {
-          throw new Error(`Erreur lors du bannissement de l'utilisateur ${userId}`);
+          throw new Error(
+            `Erreur lors du bannissement de l'utilisateur ${userId}`
+          );
         }
       }
 
-      toast.success(`${selectedUsers.length} utilisateur(s) banni(s) avec succès`);
+      toast.success(
+        `${selectedUsers.length} utilisateur(s) banni(s) avec succès`
+      );
       setSelectedUsers([]);
-      setBanReason('');
+      setBanReason("");
       setBanDuration(null);
       setShowBanModal(false);
       fetchUsers();
       fetchBannedUsers();
       fetchStats();
     } catch (error) {
-      console.error('Erreur lors du bannissement:', error);
-      toast.error('Erreur lors du bannissement');
+      console.error("Erreur lors du bannissement:", error);
+      toast.error("Erreur lors du bannissement");
     }
   };
 
@@ -359,47 +371,52 @@ export default function ModerationPage() {
    */
   const sendWarnings = async () => {
     if (selectedUsers.length === 0 || !warningMessage.trim()) {
-      toast.error('Veuillez sélectionner des utilisateurs et fournir un message');
+      toast.error(
+        "Veuillez sélectionner des utilisateurs et fournir un message"
+      );
       return;
     }
 
     try {
-      const response = await fetch('/api/admin/send-warning', {
-        method: 'POST',
+      const response = await fetch("/api/admin/send-warning", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userIds: selectedUsers,
           moderatorId: user?.id,
           warningType,
-          message: warningMessage
-        })
+          message: warningMessage,
+        }),
       });
 
       if (response.ok) {
-        toast.success(`Avertissement envoyé à ${selectedUsers.length} utilisateur(s)`);
+        toast.success(
+          `Avertissement envoyé à ${selectedUsers.length} utilisateur(s)`
+        );
         setSelectedUsers([]);
-        setWarningMessage('');
-        setWarningType('general');
+        setWarningMessage("");
+        setWarningType("general");
         setShowWarningModal(false);
         fetchUsers();
       } else {
-        toast.error('Erreur lors de l\'envoi d\'avertissement');
+        toast.error("Erreur lors de l'envoi d'avertissement");
       }
     } catch (error) {
-      console.error('Erreur lors de l\'envoi d\'avertissement:', error);
-      toast.error('Erreur lors de l\'envoi d\'avertissement');
+      console.error("Erreur lors de l'envoi d'avertissement:", error);
+      toast.error("Erreur lors de l'envoi d'avertissement");
     }
   };
 
   /**
    * Filtre les utilisateurs selon la recherche
    */
-  const filteredUsers = users.filter(user => 
-    user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.location?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.location?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => {
@@ -409,11 +426,13 @@ export default function ModerationPage() {
   }, [user]);
 
   useEffect(() => {
-    if (userRole === 'admin' && user && user.profile) {
+    if (userRole === "admin" && user && user.profile) {
       // Ajouter un délai pour s'assurer que l'authentification est complète
       const timer = setTimeout(async () => {
         // Vérifier que la session Supabase est active avant de lancer les requêtes
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (session && session.user) {
           fetchStats();
           fetchBannedUsers();
@@ -421,10 +440,14 @@ export default function ModerationPage() {
           fetchUsers();
           fetchModerationActions();
         } else {
-          console.warn('Session Supabase non active, tentative de reconnexion...');
+          console.warn(
+            "Session Supabase non active, tentative de reconnexion..."
+          );
           // Attendre un peu plus et réessayer
           setTimeout(async () => {
-            const { data: { session: retrySession } } = await supabase.auth.getSession();
+            const {
+              data: { session: retrySession },
+            } = await supabase.auth.getSession();
             if (retrySession && retrySession.user) {
               fetchStats();
               fetchBannedUsers();
@@ -436,7 +459,7 @@ export default function ModerationPage() {
         }
         setLoading(false);
       }, 500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [userRole, user]);
@@ -449,7 +472,7 @@ export default function ModerationPage() {
     );
   }
 
-  if (userRole !== 'admin') {
+  if (userRole !== "admin") {
     return null;
   }
 
@@ -465,7 +488,8 @@ export default function ModerationPage() {
                 Administration - Modération
               </h1>
               <p className="text-gray-600 mt-2">
-                Gérez les signalements, les utilisateurs bannis et le contenu masqué
+                Gérez les signalements, les utilisateurs bannis et le contenu
+                masqué
               </p>
             </div>
           </div>
@@ -474,37 +498,49 @@ export default function ModerationPage() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600">{stats.pending_reports}</div>
+                <div className="text-2xl font-bold text-orange-600">
+                  {stats.pending_reports}
+                </div>
                 <div className="text-sm text-gray-600">En attente</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{stats.total_reports}</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {stats.total_reports}
+                </div>
                 <div className="text-sm text-gray-600">Total signalements</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{stats.resolved_reports}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.resolved_reports}
+                </div>
                 <div className="text-sm text-gray-600">Résolus</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">{stats.banned_users}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {stats.banned_users}
+                </div>
                 <div className="text-sm text-gray-600">Utilisateurs bannis</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">{stats.hidden_content}</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  {stats.hidden_content}
+                </div>
                 <div className="text-sm text-gray-600">Contenu masqué</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-teal-600">{stats.actions_today}</div>
+                <div className="text-2xl font-bold text-teal-600">
+                  {stats.actions_today}
+                </div>
                 <div className="text-sm text-gray-600">Actions aujourd'hui</div>
               </CardContent>
             </Card>
@@ -513,32 +549,32 @@ export default function ModerationPage() {
           {/* Navigation */}
           <div className="flex space-x-1 mt-6">
             <Button
-              variant={activeTab === 'dashboard' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('dashboard')}
+              variant={activeTab === "dashboard" ? "default" : "outline"}
+              onClick={() => setActiveTab("dashboard")}
               className="flex items-center gap-2"
             >
               <BarChart3 className="h-4 w-4" />
               Signalements
             </Button>
             <Button
-              variant={activeTab === 'users' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('users')}
+              variant={activeTab === "users" ? "default" : "outline"}
+              onClick={() => setActiveTab("users")}
               className="flex items-center gap-2"
             >
               <Users className="h-4 w-4" />
               Gestion utilisateurs ({users.length})
             </Button>
             <Button
-              variant={activeTab === 'banned' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('banned')}
+              variant={activeTab === "banned" ? "default" : "outline"}
+              onClick={() => setActiveTab("banned")}
               className="flex items-center gap-2"
             >
               <UserX className="h-4 w-4" />
               Utilisateurs bannis ({stats.banned_users})
             </Button>
             <Button
-              variant={activeTab === 'hidden' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('hidden')}
+              variant={activeTab === "hidden" ? "default" : "outline"}
+              onClick={() => setActiveTab("hidden")}
               className="flex items-center gap-2"
             >
               <EyeOff className="h-4 w-4" />
@@ -550,12 +586,12 @@ export default function ModerationPage() {
 
       <div className="container mx-auto px-4 py-6">
         {/* Tableau de bord des signalements */}
-        {activeTab === 'dashboard' && (
+        {activeTab === "dashboard" && (
           <ModerationDashboard onStatsUpdate={fetchStats} />
         )}
 
         {/* Liste des utilisateurs bannis */}
-        {activeTab === 'banned' && (
+        {activeTab === "banned" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -572,12 +608,15 @@ export default function ModerationPage() {
               ) : (
                 <div className="space-y-4">
                   {bannedUsers.map((bannedUser) => (
-                    <div key={bannedUser.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={bannedUser.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
                           {bannedUser.profiles.avatar_url ? (
-                            <img 
-                              src={bannedUser.profiles.avatar_url} 
+                            <img
+                              src={bannedUser.profiles.avatar_url}
                               alt={bannedUser.profiles.username}
                               className="h-10 w-10 rounded-full object-cover"
                             />
@@ -586,17 +625,33 @@ export default function ModerationPage() {
                           )}
                         </div>
                         <div>
-                          <div className="font-medium">{bannedUser.profiles.username}</div>
-                          <div className="text-sm text-gray-500">{bannedUser.profiles.email}</div>
-                          <div className="text-sm text-gray-500">
-                            Banni {formatDistanceToNow(new Date(bannedUser.banned_at), { addSuffix: true, locale: fr })}
+                          <div className="font-medium">
+                            {bannedUser.profiles.username}
                           </div>
-                          <div className="text-sm text-red-600">Raison: {bannedUser.reason}</div>
+                          <div className="text-sm text-gray-500">
+                            {bannedUser.profiles.email}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Banni{" "}
+                            {formatDistanceToNow(
+                              new Date(bannedUser.banned_at),
+                              { addSuffix: true, locale: fr }
+                            )}
+                          </div>
+                          <div className="text-sm text-red-600">
+                            Raison: {bannedUser.reason}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant={bannedUser.is_permanent ? 'destructive' : 'secondary'}>
-                          {bannedUser.is_permanent ? 'Permanent' : 'Temporaire'}
+                        <Badge
+                          variant={
+                            bannedUser.is_permanent
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {bannedUser.is_permanent ? "Permanent" : "Temporaire"}
                         </Badge>
                         <Button
                           variant="outline"
@@ -615,7 +670,7 @@ export default function ModerationPage() {
         )}
 
         {/* Gestion des utilisateurs */}
-        {activeTab === 'users' && (
+        {activeTab === "users" && (
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -668,7 +723,10 @@ export default function ModerationPage() {
                 ) : (
                   <div className="space-y-4">
                     {filteredUsers.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
@@ -677,16 +735,18 @@ export default function ModerationPage() {
                               if (e.target.checked) {
                                 setSelectedUsers([...selectedUsers, user.id]);
                               } else {
-                                setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                                setSelectedUsers(
+                                  selectedUsers.filter((id) => id !== user.id)
+                                );
                               }
                             }}
                             className="rounded"
                           />
                           <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
                             {user.avatar_url ? (
-                              <img 
-                                src={user.avatar_url} 
-                                alt={user.username || 'Utilisateur'}
+                              <img
+                                src={user.avatar_url}
+                                alt={user.username || "Utilisateur"}
                                 className="h-10 w-10 rounded-full object-cover"
                               />
                             ) : (
@@ -695,20 +755,30 @@ export default function ModerationPage() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <div className="font-medium">{user.username || 'Utilisateur sans nom'}</div>
+                              <div className="font-medium">
+                                {user.username || "Utilisateur sans nom"}
+                              </div>
                               {user.is_banned && (
                                 <Badge variant="destructive">Banni</Badge>
                               )}
-                              {user.role && user.role !== 'user' && (
+                              {user.role && user.role !== "user" && (
                                 <Badge variant="secondary">{user.role}</Badge>
                               )}
                             </div>
-                            <div className="text-sm text-gray-500">{user.full_name}</div>
+                            <div className="text-sm text-gray-500">
+                              {user.full_name}
+                            </div>
                             {user.location && (
-                              <div className="text-sm text-gray-500">{user.location}</div>
+                              <div className="text-sm text-gray-500">
+                                {user.location}
+                              </div>
                             )}
                             <div className="text-xs text-gray-400">
-                              Inscrit {formatDistanceToNow(new Date(user.created_at), { addSuffix: true, locale: fr })}
+                              Inscrit{" "}
+                              {formatDistanceToNow(new Date(user.created_at), {
+                                addSuffix: true,
+                                locale: fr,
+                              })}
                             </div>
                           </div>
                         </div>
@@ -736,7 +806,7 @@ export default function ModerationPage() {
         )}
 
         {/* Liste du contenu masqué */}
-        {activeTab === 'hidden' && (
+        {activeTab === "hidden" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -753,25 +823,45 @@ export default function ModerationPage() {
               ) : (
                 <div className="space-y-4">
                   {hiddenContent.map((content) => (
-                    <div key={`${content.content_type}-${content.id}`} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={`${content.content_type}-${content.id}`}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">
-                            {content.content_type === 'post' ? 'Post' :
-                             content.content_type === 'comment' ? 'Commentaire' :
-                             content.content_type === 'service' ? 'Service' : 'Annonce'}
+                            {content.content_type === "post"
+                              ? "Post"
+                              : content.content_type === "comment"
+                              ? "Commentaire"
+                              : content.content_type === "service"
+                              ? "Service"
+                              : "Annonce"}
                           </Badge>
-                          <span className="text-sm text-gray-500">par {content.author_username}</span>
+                          <span className="text-sm text-gray-500">
+                            par {content.author_username}
+                          </span>
                         </div>
-                        <div className="text-sm text-gray-700 mb-2">{content.content_preview}</div>
+                        <div className="text-sm text-gray-700 mb-2">
+                          {content.content_preview}
+                        </div>
                         <div className="text-xs text-gray-500">
-                          Masqué {formatDistanceToNow(new Date(content.hidden_at), { addSuffix: true, locale: fr })}
+                          Masqué{" "}
+                          {formatDistanceToNow(new Date(content.hidden_at), {
+                            addSuffix: true,
+                            locale: fr,
+                          })}
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => restoreContent(content.content_type, content.content_id)}
+                        onClick={() =>
+                          restoreContent(
+                            content.content_type,
+                            content.content_id
+                          )
+                        }
                         className="ml-4"
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -800,8 +890,8 @@ export default function ModerationPage() {
                 size="sm"
                 onClick={() => {
                   setShowBanModal(false);
-                  setBanReason('');
-                  setBanDuration('');
+                  setBanReason("");
+                  setBanDuration("");
                 }}
               >
                 ×
@@ -809,7 +899,9 @@ export default function ModerationPage() {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Raison du bannissement</label>
+                <label className="block text-sm font-medium mb-2">
+                  Raison du bannissement
+                </label>
                 <textarea
                   value={banReason}
                   onChange={(e) => setBanReason(e.target.value)}
@@ -820,7 +912,9 @@ export default function ModerationPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Durée du bannissement</label>
+                <label className="block text-sm font-medium mb-2">
+                  Durée du bannissement
+                </label>
                 <select
                   value={banDuration}
                   onChange={(e) => setBanDuration(e.target.value)}
@@ -843,8 +937,8 @@ export default function ModerationPage() {
                 variant="outline"
                 onClick={() => {
                   setShowBanModal(false);
-                  setBanReason('');
-                  setBanDuration('');
+                  setBanReason("");
+                  setBanDuration("");
                 }}
                 className="flex-1"
               >
@@ -878,8 +972,8 @@ export default function ModerationPage() {
                 size="sm"
                 onClick={() => {
                   setShowWarningModal(false);
-                  setWarningMessage('');
-                  setWarningType('warning');
+                  setWarningMessage("");
+                  setWarningType("warning");
                 }}
               >
                 ×
@@ -887,7 +981,9 @@ export default function ModerationPage() {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Type d'avertissement</label>
+                <label className="block text-sm font-medium mb-2">
+                  Type d'avertissement
+                </label>
                 <select
                   value={warningType}
                   onChange={(e) => setWarningType(e.target.value)}
@@ -899,7 +995,9 @@ export default function ModerationPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Message d'avertissement</label>
+                <label className="block text-sm font-medium mb-2">
+                  Message d'avertissement
+                </label>
                 <textarea
                   value={warningMessage}
                   onChange={(e) => setWarningMessage(e.target.value)}
@@ -915,8 +1013,8 @@ export default function ModerationPage() {
                 variant="outline"
                 onClick={() => {
                   setShowWarningModal(false);
-                  setWarningMessage('');
-                  setWarningType('warning');
+                  setWarningMessage("");
+                  setWarningType("warning");
                 }}
                 className="flex-1"
               >
