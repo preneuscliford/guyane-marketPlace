@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from "../../app/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "../../app/components/ui/Textarea";
-import { Input } from "../../app/components/ui/Input";
-import { Label } from "../../app/components/ui/Label";
+import { Textarea } from "../../app/components/ui/textarea";
+import { Input } from "../../app/components/ui/input";
+import { Label } from "../../app/components/ui/label";
 import { Send, X, MessageCircle } from "lucide-react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { toast } from "sonner";

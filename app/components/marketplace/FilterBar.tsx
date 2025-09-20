@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/Slider";
+import { Slider } from "@/components/ui/slider";
 import { Filter, ChevronDown } from "lucide-react";
 
 interface FilterBarProps {
@@ -22,7 +22,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     priceRange: [0, 1000],
     category: "",
     location: "",
-    sortBy: "recent"
+    sortBy: "recent",
   });
 
   const categories = [
@@ -32,7 +32,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     "Maison",
     "Sports",
     "Véhicules",
-    "Autres"
+    "Autres",
   ];
 
   const locations = [
@@ -40,7 +40,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     "Cayenne",
     "Kourou",
     "Saint-Laurent",
-    "Matoury"
+    "Matoury",
   ];
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
@@ -59,7 +59,11 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
         >
           <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
           Filtres
-          <ChevronDown className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          <ChevronDown
+            className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
         </Button>
 
         <select
@@ -91,7 +95,9 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
           </div>
 
           <div>
-            <label className="text-xs sm:text-sm font-medium">Localisation</label>
+            <label className="text-xs sm:text-sm font-medium">
+              Localisation
+            </label>
             <select
               value={filters.location}
               onChange={(e) => handleFilterChange({ location: e.target.value })}
@@ -113,7 +119,9 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                 min={0}
                 max={1000}
                 step={10}
-                onValueChange={(value) => handleFilterChange({ priceRange: value as [number, number] })}
+                onValueChange={(value) =>
+                  handleFilterChange({ priceRange: value as [number, number] })
+                }
               />
               <div className="mt-2 flex justify-between text-xs sm:text-sm text-muted-foreground">
                 <span>{filters.priceRange[0]}€</span>

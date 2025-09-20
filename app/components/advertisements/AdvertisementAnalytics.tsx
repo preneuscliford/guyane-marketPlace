@@ -19,7 +19,7 @@ import {
 } from "../../types/advertisements";
 import { formatCurrency, formatNumber, formatDate } from "../../lib/utils";
 // ... existing code ...
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 // ... existing code ...
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";

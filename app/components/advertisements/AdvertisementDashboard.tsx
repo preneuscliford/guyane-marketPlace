@@ -23,7 +23,7 @@ import {
 } from "../../types/advertisements";
 import { formatCurrency, formatNumber, formatDate } from "../../lib/utils";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import AdvertisementForm from "./AdvertisementForm";

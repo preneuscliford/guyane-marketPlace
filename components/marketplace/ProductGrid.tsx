@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "../../app/components/ui/badge";
-import { Card, CardContent } from "../../app/components/ui/Card";
+import { Card, CardContent } from "../../app/components/ui/card";
 import ReportButton from "../../app/components/moderation/ReportButton";
 import {
   Heart,

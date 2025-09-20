@@ -16,10 +16,10 @@ import {
   UpdateAdvertisementData,
 } from "../../types/advertisements";
 import { Button } from "../ui/button";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
-import { Textarea } from "../ui/Textarea";
-import { Slider } from "../ui/Slider";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { Slider } from "../ui/slider";
 import {
   Select,
   SelectContent,
@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import { toast } from "sonner";
