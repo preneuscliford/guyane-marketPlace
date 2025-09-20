@@ -48,15 +48,15 @@ export const createAuthenticatedClient = async () => {
 };
 
 /**
- * Crée un client Supabase administrateur avec la clé de service
- * À utiliser uniquement pour les opérations administratives
+ * Client Supabase administrateur - UNIQUEMENT pour les API routes côté serveur
+ * NE PAS utiliser côté client !
  */
-export const createAdminClient = () => {
-  const serviceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+export const createServerAdminClient = () => {
+  // Accessible uniquement dans les API routes (côté serveur)
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey) {
-    console.error('Clé de service Supabase non trouvée');
-    return null;
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY not found - server-side only');
   }
 
   return createClient(supabaseUrl, serviceRoleKey, {

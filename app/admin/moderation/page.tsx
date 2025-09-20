@@ -322,21 +322,22 @@ export default function ModerationPage() {
     }
 
     try {
-      const adminClient = createAdminClient();
-      if (!adminClient) {
-        toast.error('Erreur d\'authentification');
-        return;
-      }
-
       for (const userId of selectedUsers) {
-        const { error } = await adminClient.rpc('ban_user', {
-          p_user_id: userId,
-          p_moderator_id: user?.id,
-          p_reason: banReason,
-          p_duration_hours: banDuration
+        const response = await fetch('/api/admin/ban-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            moderator_id: user?.id,
+            reason: banReason,
+          }),
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+          throw new Error(`Erreur lors du bannissement de l'utilisateur ${userId}`);
+        }
       }
 
       toast.success(`${selectedUsers.length} utilisateur(s) banni(s) avec succès`);
