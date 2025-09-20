@@ -26,35 +26,119 @@ interface SEOConfig {
 
 // Mots-clés géolocalisés pour la Guyane
 const LOCATION_KEYWORDS = {
-  cayenne: 'Cayenne, centre-ville Cayenne, quartier Cayenne, Guyane française',
-  kourou: 'Kourou, base spatiale, centre spatial guyanais, Kourou Guyane',
-  'saint-laurent': 'Saint-Laurent-du-Maroni, Saint-Laurent Maroni, ouest Guyane',
-  maripasoula: 'Maripasoula, sud Guyane, fleuve Maroni',
-  'grand-santi': 'Grand-Santi, Maroni, communauté Guyane',
-  apatou: 'Apatou, ouest Guyane, fleuve Maroni'
+  cayenne: 'Cayenne, centre-ville Cayenne, quartier Cayenne, Guyane française, chef-lieu Guyane, capitale Guyane, agglomération cayennaise, Rémire-Montjoly, Matoury',
+  kourou: 'Kourou, base spatiale, centre spatial guyanais, Kourou Guyane, CSG, Ariane, lanceur spatial, ville spatiale, technopole Kourou',
+  'saint-laurent': 'Saint-Laurent-du-Maroni, Saint-Laurent Maroni, ouest Guyane, Maroni, frontière Suriname, sous-préfecture ouest',
+  maripasoula: 'Maripasoula, sud Guyane, fleuve Maroni, parc amazonien, commune isolée, Haut-Maroni, territoire amérindien',
+  'grand-santi': 'Grand-Santi, Maroni, communauté Guyane, Haut-Maroni, villages amérindiens, cultures traditionnelles',
+  apatou: 'Apatou, ouest Guyane, fleuve Maroni, frontière Suriname, communauté bushinengue, cultures traditionnelles'
 };
 
 // Mots-clés spécifiques aux catégories en Guyane
 const CATEGORY_KEYWORDS = {
-  marketplace: 'marketplace Guyane, place marché guyanaise, vente achat Guyane, commerce local Guyane',
-  services: 'services Guyane, prestataires Guyane, artisans Guyane, professionnels Guyane française',
-  annonces: 'petites annonces Guyane, annonces classées Guyane, vendre acheter Guyane',
-  communaute: 'communauté Guyane, forums Guyane, échanges habitants Guyane, discussion Guyane, questions réponses Guyane',
-  publicites: 'publicité Guyane, promotion entreprise Guyane, marketing local Guyane'
+  marketplace: 'marketplace Guyane, place marché guyanaise, vente achat Guyane, commerce local Guyane, boutique en ligne Guyane, e-commerce Guyane française, marché local guyanais, produits Guyane, articles Guyane',
+  services: 'services Guyane, prestataires Guyane, artisans Guyane, professionnels Guyane française, dépannage Guyane, réparation Guyane, maintenance Guyane, travaux Guyane, bricolage Guyane, jardinage Guyane, nettoyage Guyane, transport Guyane, livraison Guyane, cours particuliers Guyane, formation Guyane, consulting Guyane',
+  annonces: 'petites annonces Guyane, annonces classées Guyane, vendre acheter Guyane, annonces gratuites Guyane française, vente occasion Guyane, achat occasion Guyane, immobilier Guyane, véhicules Guyane, emploi Guyane, location Guyane, recherche Guyane, offres demandes Guyane',
+  communaute: 'communauté Guyane, forums Guyane, échanges habitants Guyane, discussion Guyane, questions réponses Guyane, entraide Guyane, réseau social Guyane, forum guyanais, communauté française outre-mer, échanges locaux, conseils Guyane, expériences Guyane, vie en Guyane, culture guyanaise',
+  publicites: 'publicité Guyane, promotion entreprise Guyane, marketing local Guyane, communication Guyane, annonceurs Guyane, visibilité Guyane, business Guyane, référencement local Guyane'
 };
 
 // Mots-clés pour types de contenu spécifiques
 const CONTENT_TYPE_KEYWORDS = {
-  article: 'article, blog, information, guide',
-  question: 'question, aide, conseil, réponse, forum, discussion',
-  service: 'service, prestataire, professionnel, artisan, expert',
-  product: 'produit, vente, achat, marketplace',
-  announcement: 'annonce, petite annonce, offre, demande',
-  discussion: 'discussion, échange, communauté, forum, conversation'
+  article: 'article Guyane, blog Guyane, information locale, guide pratique Guyane, actualités Guyane, conseils Guyane',
+  question: 'question Guyane, aide locale, conseil habitants, réponse communauté, forum discussion, entraide guyanaise, questions pratiques Guyane, vie quotidienne Guyane',
+  service: 'service professionnel, prestataire qualifié, artisan local, expert Guyane, professionnel compétent, dépannage rapide, intervention Guyane, maintenance locale, réparation Guyane',
+  product: 'produit local, vente Guyane, achat marketplace, article occasion, produit neuf, commerce guyanais, boutique locale',
+  announcement: 'annonce gratuite, petite annonce locale, offre Guyane, demande locale, annonce classée, vente particulier, achat direct',
+  discussion: 'discussion communauté, échange habitants, forum guyanais, conversation locale, débat Guyane, partage expérience, réseau social local, communauté active'
 };
 
+// Mots-clés sectoriels spécifiques à la Guyane
+const SECTOR_KEYWORDS = {
+  // Services techniques
+  technique: 'électricien Guyane, plombier Guyane, climatisation Guyane, dépannage électrique, réparation électroménager, installation sanitaire, maintenance climatisation, technicien Guyane',
+  // Construction et rénovation
+  construction: 'maçon Guyane, charpentier Guyane, peintre bâtiment, rénovation maison, travaux construction, artisan bâtiment, menuisier Guyane, carreleur Guyane, étanchéité toiture',
+  // Transport et logistique
+  transport: 'transport Guyane, déménagement Guyane, livraison locale, fret Guyane, transport marchandises, logistique Guyane, coursier Guyane, transport personnes',
+  // Services à la personne
+  services_personne: 'aide ménagère, garde enfants, soutien scolaire, cours particuliers, jardinage Guyane, nettoyage maison, assistance personnes âgées, baby-sitting Guyane',
+  // Santé et bien-être
+  sante: 'kinésithérapeute Guyane, massage Guyane, soins esthétiques, coiffeur Guyane, bien-être Guyane, relaxation, thérapie alternative, soins corporels',
+  // Informatique et multimédia
+  informatique: 'dépannage ordinateur, réparation smartphone, installation réseau, formation informatique, développement web Guyane, maintenance PC, assistance technique IT',
+  // Automobile et mécanique
+  automobile: 'garage Guyane, mécanicien auto, réparation véhicule, entretien voiture, pneus Guyane, carrosserie Guyane, dépannage auto, contrôle technique',
+  // Immobilier
+  immobilier: 'agent immobilier Guyane, location appartement Cayenne, vente maison Guyane, location meublée, colocation Guyane, estimation immobilière, gestion locative',
+  // Emploi et formation
+  emploi: 'emploi Guyane, recrutement local, offre travail, formation professionnelle, stage Guyane, mission intérim, conseil carrière, orientation professionnelle',
+  // Loisirs et culture
+  loisirs: 'activités loisirs Guyane, sorties culturelles, sport Guyane, randonnée forêt, pêche Guyane, pirogue, excursions nature, animations événements',
+  // Artisanat et art local
+  artisanat: 'artisanat guyanais, art local, bijoux créoles, sculpture bois, vannerie, poterie traditionnelle, objets décoratifs, souvenirs Guyane',
+  // Gastronomie locale
+  gastronomie: 'restaurant créole, cuisine guyanaise, traiteur local, produits terroir, épices Guyane, rhum local, spécialités culinaires, chef cuisinier'
+};
+
+// Fonction pour obtenir les mots-clés sectoriels
+function getSectorKeywords(tags: string[]): string {
+  const sectors: string[] = [];
+  
+  tags.forEach(tag => {
+    const tagLower = tag.toLowerCase();
+    if (tagLower.includes('électric') || tagLower.includes('plomb') || tagLower.includes('climat')) sectors.push(SECTOR_KEYWORDS.technique);
+    if (tagLower.includes('construction') || tagLower.includes('maçon') || tagLower.includes('rénov')) sectors.push(SECTOR_KEYWORDS.construction);
+    if (tagLower.includes('transport') || tagLower.includes('livraison') || tagLower.includes('déménag')) sectors.push(SECTOR_KEYWORDS.transport);
+    if (tagLower.includes('ménage') || tagLower.includes('garde') || tagLower.includes('jardin')) sectors.push(SECTOR_KEYWORDS.services_personne);
+    if (tagLower.includes('santé') || tagLower.includes('massage') || tagLower.includes('coiff')) sectors.push(SECTOR_KEYWORDS.sante);
+    if (tagLower.includes('informatique') || tagLower.includes('ordinateur') || tagLower.includes('web')) sectors.push(SECTOR_KEYWORDS.informatique);
+    if (tagLower.includes('auto') || tagLower.includes('voiture') || tagLower.includes('mécanique')) sectors.push(SECTOR_KEYWORDS.automobile);
+    if (tagLower.includes('immobilier') || tagLower.includes('location') || tagLower.includes('appartement')) sectors.push(SECTOR_KEYWORDS.immobilier);
+    if (tagLower.includes('emploi') || tagLower.includes('travail') || tagLower.includes('formation')) sectors.push(SECTOR_KEYWORDS.emploi);
+    if (tagLower.includes('loisir') || tagLower.includes('sport') || tagLower.includes('culture')) sectors.push(SECTOR_KEYWORDS.loisirs);
+    if (tagLower.includes('artisan') || tagLower.includes('art') || tagLower.includes('créole')) sectors.push(SECTOR_KEYWORDS.artisanat);
+    if (tagLower.includes('restaurant') || tagLower.includes('cuisine') || tagLower.includes('traiteur')) sectors.push(SECTOR_KEYWORDS.gastronomie);
+  });
+  
+  return [...new Set(sectors)].join(', ');
+}
+
+// Fonction utilitaire pour générer des mots-clés contextuels
+export function generateContextualKeywords(context: {
+  isHomePage?: boolean;
+  isServiceListing?: boolean;
+  isAnnouncementListing?: boolean;
+  isCommunityPage?: boolean;
+  location?: string;
+}): string {
+  const keywords: string[] = [];
+  
+  if (context.isHomePage) {
+    keywords.push('accueil marketplace Guyane', 'plateforme locale guyanaise', 'commerce en ligne Guyane', 'site petites annonces Guyane', 'forum communauté Guyane');
+  }
+  
+  if (context.isServiceListing) {
+    keywords.push('annuaire services Guyane', 'prestataires professionnels', 'artisans qualifiés Guyane', 'services à domicile', 'dépannage rapide Guyane');
+  }
+  
+  if (context.isAnnouncementListing) {
+    keywords.push('toutes annonces Guyane', 'vente achat occasion', 'marketplace gratuite', 'annonces particuliers professionnels', 'bons plans Guyane');
+  }
+  
+  if (context.isCommunityPage) {
+    keywords.push('forum discussion Guyane', 'questions réponses habitants', 'entraide communautaire', 'conseils vie pratique', 'échanges expériences Guyane');
+  }
+  
+  if (context.location) {
+    keywords.push(`services ${context.location}`, `annonces ${context.location}`, `commerce local ${context.location}`, `habitants ${context.location}`);
+  }
+  
+  return keywords.join(', ');
+}
+
 // Mots-clés généraux pour la Guyane
-const BASE_KEYWORDS = 'Guyane française, DOM-TOM, outre-mer, Amérique Sud, territoire français, Cayenne, Kourou, Saint-Laurent-du-Maroni, commerce local, marketplace guyanaise, petites annonces, services locaux';
+const BASE_KEYWORDS = 'Guyane française, DOM-TOM, outre-mer, Amérique Sud, territoire français, Cayenne, Kourou, Saint-Laurent-du-Maroni, commerce local, marketplace guyanaise, petites annonces Guyane, services locaux, forum Guyane, communauté guyanaise, prestations services Guyane, artisans Guyane, professionnels Guyane, vente achat local, économie locale Guyane, réseau guyanais, plateforme échanges Guyane, vie pratique Guyane, habitants Guyane, résidents Guyane, expatriés Guyane, guyanais, culture créole, amazonie, forêt amazonienne, biodiversité Guyane';
 
 /**
  * Génère des métadonnées SEO optimisées pour la Guyane française
@@ -69,7 +153,6 @@ export function generateGuyaneSEO({
   price,
   availability = 'InStock',
   isProduct = false,
-  isService = false,
   canonicalUrl,
   // Nouvelles propriétés
   author,
@@ -88,8 +171,9 @@ export function generateGuyaneSEO({
   const categoryKeywords = category ? CATEGORY_KEYWORDS[category] : '';
   const contentTypeKeywords = contentType ? CONTENT_TYPE_KEYWORDS[contentType] : '';
   const tagsKeywords = tags.join(', ');
+  const sectorKeywords = getSectorKeywords(tags);
   
-  const combinedKeywords = [BASE_KEYWORDS, locationKeywords, categoryKeywords, contentTypeKeywords, tagsKeywords, keywords]
+  const combinedKeywords = [BASE_KEYWORDS, locationKeywords, categoryKeywords, contentTypeKeywords, sectorKeywords, tagsKeywords, keywords]
     .filter(Boolean)
     .join(', ');
 
@@ -620,4 +704,54 @@ export function generateJSONLD(config: SEOConfig & {
     default:
       return baseOrganization;
   }
+}
+
+// Configurations SEO prédéfinies pour les pages principales
+export const PAGE_SEO_CONFIGS = {
+  home: {
+    title: "Guyane Marketplace - Commerce Local, Petites Annonces & Forum",
+    description: "La première plateforme de commerce local en Guyane française. Petites annonces gratuites, services professionnels, forum communautaire. Cayenne, Kourou, Saint-Laurent et toute la Guyane.",
+    keywords: generateContextualKeywords({ isHomePage: true }),
+    category: 'marketplace' as const
+  },
+  
+  services: {
+    title: "Services Professionnels en Guyane - Artisans & Prestataires",
+    description: "Trouvez tous les services professionnels en Guyane française : artisans, dépannage, maintenance, cours, transport. Prestataires qualifiés à Cayenne, Kourou et dans toute la Guyane.",
+    keywords: generateContextualKeywords({ isServiceListing: true }),
+    category: 'services' as const
+  },
+  
+  annonces: {
+    title: "Petites Annonces Gratuites Guyane - Vente & Achat Local",
+    description: "Petites annonces gratuites en Guyane française : vente, achat, location, emploi. Annonces de particuliers et professionnels à Cayenne, Kourou, Saint-Laurent et toute la Guyane.",
+    keywords: generateContextualKeywords({ isAnnouncementListing: true }),
+    category: 'annonces' as const
+  },
+  
+  communaute: {
+    title: "Forum Communauté Guyane - Questions, Conseils & Échanges",
+    description: "Forum de discussion et d'entraide pour les habitants de Guyane française. Questions-réponses, conseils pratiques, échanges d'expériences entre guyanais. Communauté active et bienveillante.",
+    keywords: generateContextualKeywords({ isCommunityPage: true }),
+    category: 'communaute' as const
+  },
+  
+  marketplace: {
+    title: "Marketplace Guyane - Boutique en Ligne Locale",
+    description: "Marketplace locale de Guyane française : achetez et vendez facilement en ligne. Produits locaux, articles neufs et d'occasion, commerce équitable et responsable. Livraison en Guyane.",
+    keywords: generateContextualKeywords({ isHomePage: true }),
+    category: 'marketplace' as const
+  }
+};
+
+// Fonction pour obtenir la configuration SEO d'une page
+export function getPageSEOConfig(pageName: keyof typeof PAGE_SEO_CONFIGS, location?: string) {
+  const baseConfig = PAGE_SEO_CONFIGS[pageName];
+  const locationKeywords = location ? generateContextualKeywords({ location }) : '';
+  
+  return {
+    ...baseConfig,
+    keywords: [baseConfig.keywords, locationKeywords].filter(Boolean).join(', '),
+    location: location as any
+  };
 }
