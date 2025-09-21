@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
+  }
   public: {
     Tables: {
       advertisement_clicks: {
@@ -48,7 +53,101 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "advertisement_clicks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advertisement_impressions: {
+        Row: {
+          advertisement_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          advertisement_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          advertisement_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advertisement_impressions_advertisement_id_fkey"
+            columns: ["advertisement_id"]
+            isOneToOne: false
+            referencedRelation: "advertisements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advertisement_impressions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advertisement_impressions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advertisement_stats: {
+        Row: {
+          advertisement_id: string | null
+          clicks: number | null
+          cost_per_click: number | null
+          created_at: string | null
+          date: string | null
+          id: string
+          impressions: number | null
+        }
+        Insert: {
+          advertisement_id?: string | null
+          clicks?: number | null
+          cost_per_click?: number | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          impressions?: number | null
+        }
+        Update: {
+          advertisement_id?: string | null
+          clicks?: number | null
+          cost_per_click?: number | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          impressions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advertisement_stats_advertisement_id_fkey"
+            columns: ["advertisement_id"]
+            isOneToOne: false
+            referencedRelation: "advertisements"
+            referencedColumns: ["id"]
+          },
         ]
       }
       advertisements: {
@@ -178,13 +277,107 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "announcements_hidden_by_fkey"
+            columns: ["hidden_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "announcements_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "announcements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      banned_users: {
+        Row: {
+          banned_at: string | null
+          banned_until: string | null
+          created_at: string | null
+          id: string
+          is_permanent: boolean | null
+          moderator_id: string | null
+          reason: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          banned_at?: string | null
+          banned_until?: string | null
+          created_at?: string | null
+          id?: string
+          is_permanent?: boolean | null
+          moderator_id?: string | null
+          reason: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          banned_at?: string | null
+          banned_until?: string | null
+          created_at?: string | null
+          id?: string
+          is_permanent?: boolean | null
+          moderator_id?: string | null
+          reason?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banned_users_banned_by_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banned_users_banned_by_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banned_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banned_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
       comments: {
         Row: {
@@ -229,6 +422,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_hidden_by_fkey"
+            columns: ["hidden_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
@@ -241,8 +441,128 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      contact_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          product_id: string | null
+          product_title: string | null
+          receiver_id: string | null
+          sender_email: string
+          sender_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          product_id?: string | null
+          product_title?: string | null
+          receiver_id?: string | null
+          sender_email: string
+          sender_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          product_id?: string | null
+          product_title?: string | null
+          receiver_id?: string | null
+          sender_email?: string
+          sender_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_messages_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
       }
       favorites: {
         Row: {
@@ -270,7 +590,78 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "announcements"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      feedback: {
+        Row: {
+          admin_id: string | null
+          admin_response: string | null
+          created_at: string | null
+          description: string
+          id: string
+          priority: string | null
+          status: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          admin_response?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          admin_response?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
       likes: {
@@ -303,8 +694,162 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_actions: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          duration_hours: number | null
+          id: string
+          moderator_id: string | null
+          notes: string | null
+          reason: string
+          target_content_id: string
+          target_content_type: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          duration_hours?: number | null
+          id?: string
+          moderator_id?: string | null
+          notes?: string | null
+          reason: string
+          target_content_id: string
+          target_content_type: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          duration_hours?: number | null
+          id?: string
+          moderator_id?: string | null
+          notes?: string | null
+          reason?: string
+          target_content_id?: string
+          target_content_type?: string
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read: boolean | null
+          reference_id: string | null
+          reference_type: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          reference_id?: string | null
+          reference_type?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          reference_id?: string | null
+          reference_type?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       posts: {
         Row: {
@@ -352,12 +897,55 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "posts_hidden_by_fkey"
+            columns: ["hidden_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "posts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_likes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
         ]
       }
       products: {
@@ -511,10 +1099,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reports_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reports_reported_user_id_fkey"
             columns: ["reported_user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
             referencedColumns: ["id"]
           },
           {
@@ -523,7 +1125,14 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
       reviews: {
@@ -571,7 +1180,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "services"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       service_views: {
@@ -612,7 +1221,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "services"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       services: {
@@ -703,12 +1312,201 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "services_hidden_by_fkey"
+            columns: ["hidden_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "services_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "services_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan_id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan_id: string
+          status: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan_id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_moderation_actions: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          details: string | null
+          expires_at: string | null
+          id: string
+          moderator_id: string
+          reason: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          details?: string | null
+          expires_at?: string | null
+          id?: string
+          moderator_id: string
+          reason: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          details?: string | null
+          expires_at?: string | null
+          id?: string
+          moderator_id?: string
+          reason?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_moderation_actions_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_moderation_actions_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_moderation_actions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_moderation_actions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_warnings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          moderator_id: string
+          user_id: string
+          warning_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          moderator_id: string
+          user_id: string
+          warning_type?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          moderator_id?: string
+          user_id?: string
+          warning_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_warnings_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -732,29 +1530,129 @@ export type Database = {
           status: string | null
           updated_at: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reports_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_moderator_id_fkey"
+            columns: ["moderator_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_moderation_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users_with_moderation_info: {
         Row: {
           avatar_url: string | null
-          bio: string | null
+          ban_reason: string | null
+          banned_until: string | null
           created_at: string | null
-          description: string | null
           full_name: string | null
           id: string | null
+          is_banned: boolean | null
+          is_permanent_ban: boolean | null
           location: string | null
+          moderation_action_count: number | null
           phone: string | null
           role: string | null
-          skills: string[] | null
           updated_at: string | null
           username: string | null
-          website: string | null
+          warning_count: number | null
         }
         Relationships: []
       }
     }
     Functions: {
-      [_ in never]: never
+      ban_user: {
+        Args: {
+          p_duration_hours?: number
+          p_moderator_id: string
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      generate_username_from_fullname: {
+        Args: { full_name_input: string; user_id: string }
+        Returns: string
+      }
+      get_moderation_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_service_view_stats: {
+        Args: { p_service_id: string }
+        Returns: Json
+      }
+      increment_advertisement_clicks: {
+        Args: { advertisement_id: string }
+        Returns: undefined
+      }
+      increment_advertisement_views: {
+        Args: { advertisement_id: string }
+        Returns: undefined
+      }
+      increment_product_views: {
+        Args: { product_id: string }
+        Returns: undefined
+      }
+      increment_service_views: {
+        Args: {
+          p_ip_address?: unknown
+          p_service_id: string
+          p_session_id?: string
+          p_user_agent?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      send_warning: {
+        Args: {
+          p_message: string
+          p_moderator_id: string
+          p_user_id: string
+          p_warning_type: string
+        }
+        Returns: boolean
+      }
+      unban_user: {
+        Args: { p_moderator_id: string; p_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
@@ -765,27 +1663,33 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[keyof Database]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -793,22 +1697,24 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends {
-    schema: keyof Database
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -816,22 +1722,24 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends {
-    schema: keyof Database
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -839,16 +1747,41 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends {
-    schema: keyof Database
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

@@ -293,26 +293,27 @@ export default function SponsoredBanner({
           onClick={() => handleAdClick(currentAd)}
           className="absolute inset-0 flex items-center justify-center text-center text-white hover:bg-black/10 transition-colors"
         >
-          <div className="max-w-2xl px-6">
-            <h2 className="text-3xl font-bold mb-3 drop-shadow-lg">
+          <div className="max-w-2xl px-3 sm:px-6">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 drop-shadow-lg leading-tight">
               {currentAd.title || "Titre non disponible"}
             </h2>
-            <p className="text-lg mb-4 drop-shadow-md opacity-90">
+            <p className="text-sm sm:text-base lg:text-lg mb-3 sm:mb-4 drop-shadow-md opacity-90 leading-relaxed">
               {currentAd.description || "Description non disponible"}
             </p>
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
-              <ExternalLink className="w-4 h-4" />
-              Cliquez pour découvrir
+            <div className="inline-flex items-center gap-1 sm:gap-2 bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
+              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Cliquez pour découvrir</span>
+              <span className="sm:hidden">Découvrir</span>
             </div>
           </div>
         </Link>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center text-center text-white">
-          <div className="max-w-2xl px-6">
-            <h2 className="text-3xl font-bold mb-3 drop-shadow-lg">
+          <div className="max-w-2xl px-3 sm:px-6">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 drop-shadow-lg leading-tight">
               {currentAd.title || "Titre non disponible"}
             </h2>
-            <p className="text-lg mb-4 drop-shadow-md opacity-90">
+            <p className="text-sm sm:text-base lg:text-lg mb-3 sm:mb-4 drop-shadow-md opacity-90 leading-relaxed">
               {currentAd.description || "Description non disponible"}
             </p>
           </div>
@@ -324,25 +325,25 @@ export default function SponsoredBanner({
         <>
           <button
             onClick={prevAd}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 touch-manipulation"
             aria-label="Publicité précédente"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6" />
           </button>
 
           <button
             onClick={nextAd}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 touch-manipulation"
             aria-label="Publicité suivante"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
           </button>
         </>
       )}
 
       {/* Indicateurs de pagination */}
       {weightedAds.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2">
           {Array.from(new Set(weightedAds.map((ad) => ad.id))).map(
             (adId, index) => {
               const isActive = weightedAds[currentIndex]?.id === adId;
@@ -357,7 +358,7 @@ export default function SponsoredBanner({
                       setCurrentIndex(targetIndex);
                     }
                   }}
-                  className={`h-2 w-8 rounded-full transition-all ${
+                  className={`h-1.5 sm:h-2 w-6 sm:w-8 rounded-full transition-all touch-manipulation ${
                     isActive ? "bg-white" : "bg-white/50 hover:bg-white/70"
                   }`}
                   aria-label={`Aller à la publicité ${index + 1}`}
@@ -369,9 +370,10 @@ export default function SponsoredBanner({
       )}
 
       {/* Badge "Sponsorisé" */}
-      <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/70 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
         <Eye className="h-3 w-3" />
-        Sponsorisé
+        <span className="hidden sm:inline">Sponsorisé</span>
+        <span className="sm:hidden">Pub</span>
       </div>
 
       {/* Indicateur de pause */}

@@ -1,18 +1,21 @@
 ﻿"use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/AvatarComponent';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { RatingStars } from '@/components/ui/RatingStars';
-import { useReviews } from '@/hooks/useReviews';
-import { useAuth } from '@/hooks/useAuth';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Star, User, MessageSquare, Plus } from 'lucide-react';
-import { ServiceReviewForm } from './ServiceReviewForm';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/AvatarComponent";
+import { Separator } from "@/components/ui/separator";
+import { RatingStars } from "@/components/ui/RatingStars";
+import { useReviews } from "@/hooks/useReviews";
+import { useAuth } from "@/hooks/useAuth";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Star, User, MessageSquare, Plus } from "lucide-react";
+import { ServiceReviewForm } from "./ServiceReviewForm";
 
 interface ServiceReviewsProps {
   serviceId: string;
@@ -22,11 +25,14 @@ interface ServiceReviewsProps {
 /**
  * Composant pour afficher et gérer les avis d'un service
  */
-export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProps) {
+export function ServiceReviews({
+  serviceId,
+  serviceOwnerId,
+}: ServiceReviewsProps) {
   const { user } = useAuth();
   const [showReviewForm, setShowReviewForm] = useState(false);
-  
-  // Utiliser le hook useReviews pour récupérer les avis du propriétaire du service
+
+  // Utiliser le hook useReviews pour récupérer les avis du service spécifique
   const {
     reviews,
     stats,
@@ -34,10 +40,21 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
     loading,
     error,
     addReview,
-    updateReview,
     deleteReview,
-    refreshReviews
-  } = useReviews({ targetUserId: serviceOwnerId, serviceId: serviceId });
+    refreshReviews,
+  } = useReviews({ serviceId: serviceId });
+
+  // Effectuer le chargement automatique des avis (une seule fois)
+  React.useEffect(() => {
+    console.log("ServiceReviews - Initialisation pour serviceId:", serviceId);
+  }, [serviceId]);
+
+  // Log de debug simplifié
+  React.useEffect(() => {
+    if (!loading && !error) {
+      console.log("ServiceReviews - Avis chargés:", reviews?.length || 0);
+    }
+  }, [loading, error, reviews]);
 
   /**
    * Gère l'ajout ou la modification d'un avis
@@ -48,15 +65,15 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
         targetUserId: serviceOwnerId,
         serviceId: serviceId,
         rating,
-        comment: comment.trim() || null
+        comment: comment.trim() || null,
       });
-      
+
       if (result) {
         setShowReviewForm(false);
         await refreshReviews();
       }
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'avis:', error);
+      console.error("Erreur lors de l'ajout de l'avis:", error);
     }
   };
 
@@ -64,18 +81,21 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
    * Gère la suppression d'un avis
    */
   const handleDeleteReview = async (reviewId: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet avis ?")) {
       try {
         const result = await deleteReview(reviewId);
         if (result.success) {
           await refreshReviews();
         } else {
-          console.error('Erreur lors de la suppression de l\'avis:', result.error);
-          alert('Erreur lors de la suppression de l\'avis: ' + result.error);
+          console.error(
+            "Erreur lors de la suppression de l'avis:",
+            result.error
+          );
+          alert("Erreur lors de la suppression de l'avis: " + result.error);
         }
       } catch (error) {
-        console.error('Erreur lors de la suppression de l\'avis:', error);
-        alert('Erreur lors de la suppression de l\'avis');
+        console.error("Erreur lors de la suppression de l'avis:", error);
+        alert("Erreur lors de la suppression de l'avis");
       }
     }
   };
@@ -114,9 +134,11 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-red-500">Erreur lors du chargement des avis: {error}</p>
-            <Button 
-              onClick={() => refreshReviews()} 
+            <p className="text-red-500">
+              Erreur lors du chargement des avis: {error}
+            </p>
+            <Button
+              onClick={() => refreshReviews()}
               className="mt-4"
               variant="outline"
             >
@@ -136,7 +158,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
             <Star className="h-5 w-5" />
             Avis clients
           </CardTitle>
-          
+
           {/* Bouton pour ajouter un avis */}
           {canReview && !userReview && !showReviewForm && (
             <Button
@@ -148,7 +170,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
             </Button>
           )}
         </div>
-        
+
         {/* Statistiques des avis */}
         {stats && (
           <div className="flex items-center gap-6 mt-4">
@@ -156,14 +178,12 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
               <div className="flex items-center gap-1">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 <span className="text-xl font-bold">
-                  {stats.averageRating ? stats.averageRating.toFixed(1) : '0.0'}
+                  {stats.averageRating ? stats.averageRating.toFixed(1) : "0.0"}
                 </span>
               </div>
-              <span className="text-gray-500">
-                ({stats.totalReviews} avis)
-              </span>
+              <span className="text-gray-500">({stats.totalReviews} avis)</span>
             </div>
-            
+
             {/* Distribution des notes */}
             {stats.ratingDistribution && (
               <div className="flex gap-1">
@@ -181,7 +201,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent>
         {/* Formulaire d'ajout d'avis */}
         {showReviewForm && canReview && (
@@ -190,7 +210,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
               onSubmit={handleReviewSubmit}
               onCancel={() => setShowReviewForm(false)}
               initialRating={userReview?.rating}
-              initialComment={userReview?.comment || ''}
+              initialComment={userReview?.comment || ""}
               isEditing={!!userReview}
             />
           </div>
@@ -224,7 +244,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
                 <span className="text-sm text-gray-600">
                   {formatDistanceToNow(new Date(userReview.created_at), {
                     addSuffix: true,
-                    locale: fr
+                    locale: fr,
                   })}
                 </span>
               </div>
@@ -240,31 +260,31 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
         {hasReviews ? (
           <div className="space-y-6">
             {reviews
-              .filter(review => review.id !== userReview?.id) // Exclure l'avis de l'utilisateur connecté
+              .filter((review) => review.id !== userReview?.id) // Exclure l'avis de l'utilisateur connecté
               .map((review) => (
                 <div key={review.id} className="space-y-3">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={review.profiles?.avatar_url || ''} />
+                      <AvatarImage src={review.profiles?.avatar_url || ""} />
                       <AvatarFallback>
                         <User className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-medium">
-                          {review.profiles?.username || 'Utilisateur anonyme'}
+                          {review.profiles?.username || "Utilisateur anonyme"}
                         </h4>
                         <RatingStars rating={review.rating} size="sm" />
                         <span className="text-sm text-gray-500">
                           {formatDistanceToNow(new Date(review.created_at), {
                             addSuffix: true,
-                            locale: fr
+                            locale: fr,
                           })}
                         </span>
                       </div>
-                      
+
                       {review.comment && (
                         <p className="text-gray-700 leading-relaxed">
                           {review.comment}
@@ -272,7 +292,7 @@ export function ServiceReviews({ serviceId, serviceOwnerId }: ServiceReviewsProp
                       )}
                     </div>
                   </div>
-                  
+
                   <Separator />
                 </div>
               ))}

@@ -530,23 +530,27 @@ export default function CommunityPost({
   return (
     <div
       className="space-y-3"
-      style={{ marginLeft: level > 0 ? `${marginLeft}px` : 0 }}
+      style={{ marginLeft: level > 0 ? `${Math.min(marginLeft, 32)}px` : 0 }}
     >
-      <Card className={`${level > 0 ? "border-l-2 border-l-teal-200" : ""}`}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
+      <Card
+        className={`${
+          level > 0 ? "border-l-2 border-l-teal-200" : ""
+        } hover:shadow-md transition-shadow`}
+      >
+        <CardHeader className="pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+              <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                 {post.profiles && post.profiles.avatar_url ? (
                   <Image
                     src={post.profiles.avatar_url}
                     alt={post.profiles.username || "Utilisateur"}
                     className="h-full w-full object-cover"
                     fill
-                    sizes="40px"
+                    sizes="(max-width: 640px) 32px, 40px"
                   />
                 ) : (
-                  <div className="h-full w-full bg-teal-100 flex items-center justify-center text-teal-600 font-medium">
+                  <div className="h-full w-full bg-teal-100 flex items-center justify-center text-teal-600 font-medium text-xs sm:text-sm">
                     {post.profiles
                       ? (
                           post.profiles.full_name ||
@@ -560,13 +564,13 @@ export default function CommunityPost({
                 )}
               </Avatar>
 
-              <div>
-                <div className="font-medium">
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm sm:text-base truncate">
                   {(post.profiles &&
                     (post.profiles.full_name || post.profiles.username)) ||
                     "Utilisateur"}
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-xs sm:text-sm text-gray-500">
                   {formatDistanceToNow(new Date(post.created_at), {
                     addSuffix: true,
                     locale: fr,
@@ -578,55 +582,57 @@ export default function CommunityPost({
               </div>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {isAuthor && (
-                  <>
-                    <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Modifier
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={deletePost}
-                      className="text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Supprimer
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <ReportButton
-                  contentType="post"
-                  contentId={post.id}
-                  reportedUserId={post.user_id}
-                  variant="ghost"
-                  size="sm"
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex-shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {isAuthor && (
+                    <>
+                      <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Modifier
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={deletePost}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <ReportButton
+                    contentType="post"
+                    contentId={post.id}
+                    reportedUserId={post.user_id}
+                    variant="ghost"
+                    size="sm"
+                  />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
 
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-3 sm:px-6 pb-3 sm:pb-6">
           {isEditing ? (
             <div className="space-y-3">
               <Textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
-                className="resize-none"
+                className="resize-none text-sm sm:text-base"
               />
               <div className="flex gap-2">
                 <Button
                   onClick={submitEdit}
                   disabled={isSubmittingEdit || !editContent.trim()}
                   size="sm"
-                  className="bg-teal-600 hover:bg-teal-700"
+                  className="bg-teal-600 hover:bg-teal-700 text-xs sm:text-sm px-3"
                 >
                   {isSubmittingEdit ? "Modification..." : "Modifier"}
                 </Button>
@@ -637,6 +643,7 @@ export default function CommunityPost({
                     setEditContent(post.content);
                   }}
                   size="sm"
+                  className="text-xs sm:text-sm px-3"
                 >
                   Annuler
                 </Button>
@@ -644,25 +651,29 @@ export default function CommunityPost({
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="whitespace-pre-wrap">{post.content}</p>
+              <p className="whitespace-pre-wrap text-sm sm:text-base text-gray-800 leading-relaxed break-words">
+                {post.content}
+              </p>
 
               {/* Actions */}
-              <div className="flex items-center gap-4 pt-2 border-t">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2 border-t">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleLike}
                   disabled={isProcessingLike}
-                  className={`flex items-center gap-2 ${
+                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 ${
                     isLiked ? "text-red-500" : "text-gray-500"
                   } ${isProcessingLike ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <Heart
-                    className={`h-4 w-4 ${isLiked ? "fill-current" : ""} ${
-                      isProcessingLike ? "animate-pulse" : ""
-                    }`}
+                    className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                      isLiked ? "fill-current" : ""
+                    } ${isProcessingLike ? "animate-pulse" : ""}`}
                   />
-                  {likeCount > 0 && <span>{likeCount}</span>}
+                  {likeCount > 0 && (
+                    <span className="text-xs sm:text-sm">{likeCount}</span>
+                  )}
                 </Button>
 
                 {canReply && (
@@ -670,20 +681,20 @@ export default function CommunityPost({
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowReplyForm(!showReplyForm)}
-                    className="flex items-center gap-2 text-gray-500"
+                    className="flex items-center gap-1 sm:gap-2 text-gray-500 text-xs sm:text-sm px-2 sm:px-3"
                   >
-                    <Reply className="h-4 w-4" />
-                    Répondre
+                    <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Répondre</span>
                   </Button>
                 )}
 
                 {/* Indicateur du nombre de commentaires */}
-                <div className="flex items-center gap-1 px-2">
-                  <Reply className="h-4 w-4 text-gray-500" />
+                <div className="flex items-center gap-1 px-1 sm:px-2">
+                  <Reply className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                   <span
-                    className={`inline-flex items-center justify-center text-sm ${
+                    className={`inline-flex items-center justify-center text-xs sm:text-sm ${
                       commentCount > 0
-                        ? "bg-teal-100 text-teal-700 font-medium px-2 py-0.5 rounded-full"
+                        ? "bg-teal-100 text-teal-700 font-medium px-1 sm:px-2 py-0.5 rounded-full"
                         : "text-gray-500"
                     }`}
                   >
@@ -695,10 +706,10 @@ export default function CommunityPost({
                   variant="ghost"
                   size="sm"
                   onClick={sharePost}
-                  className="flex items-center gap-2 text-gray-500"
+                  className="flex items-center gap-1 sm:gap-2 text-gray-500 text-xs sm:text-sm px-2 sm:px-3"
                 >
-                  <Share2 className="h-4 w-4" />
-                  Partager
+                  <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Partager</span>
                 </Button>
 
                 <Button

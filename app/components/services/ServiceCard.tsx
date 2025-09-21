@@ -320,7 +320,7 @@ export function ServiceCard({
               variant="outline"
               size="sm"
               asChild
-              className="flex-1 border-blue-200 text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-200"
+              className="flex-1 border-blue-200 text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-200 min-h-[36px]"
             >
               <Link href={`/services/${service.id}`}>Voir détails</Link>
             </Button>
@@ -329,7 +329,7 @@ export function ServiceCard({
               <Button
                 size="sm"
                 onClick={() => onContact?.(service)}
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-sm hover:shadow-md transition-all duration-200"
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-sm hover:shadow-md transition-all duration-200 min-h-[36px]"
               >
                 <Phone className="h-4 w-4 mr-1" />
                 Contacter
@@ -427,7 +427,12 @@ export function ServiceCardCompact({
 
         <CardFooter className="px-4 py-2 border-t">
           <div className="flex gap-2 w-full">
-            <Button variant="outline" size="sm" asChild className="flex-1">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="flex-1 min-h-[36px]"
+            >
               <Link href={`/services/${service.id}`}>Voir détails</Link>
             </Button>
 
@@ -435,7 +440,7 @@ export function ServiceCardCompact({
               <Button
                 size="sm"
                 onClick={() => onContact(service)}
-                className="flex-1"
+                className="flex-1 min-h-[36px]"
               >
                 <Phone className="h-4 w-4 mr-1" />
                 Contacter

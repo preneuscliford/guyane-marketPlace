@@ -12,11 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Search,
-  Filter,
   Plus,
   MapPin,
   DollarSign,
@@ -193,106 +191,118 @@ export default function ServicesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* En-tête */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Services</h1>
-          <p className="text-gray-600">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Services</h1>
+          <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
             Découvrez les services proposés par la communauté
           </p>
         </div>
 
         {user && (
-          <Button asChild className="mt-4 md:mt-0">
-            <Link href="/services/nouveau">
-              <Plus className="h-4 w-4 mr-2" />
-              Proposer un service
-            </Link>
-          </Button>
+          <div className="flex-shrink-0">
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/services/nouveau">
+                <Plus className="h-4 w-4 mr-2" />
+                <span className="whitespace-nowrap">Proposer un service</span>
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
 
       {/* Statistiques */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">
                 {stats.total_services}
               </div>
-              <div className="text-sm text-gray-600">Services total</div>
+              <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                Services total
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">
                 {stats.active_services}
               </div>
-              <div className="text-sm text-gray-600">Services actifs</div>
+              <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                Services actifs
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                 {stats.total_views}
               </div>
-              <div className="text-sm text-gray-600">Vues totales</div>
+              <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                Vues totales
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-600">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-600">
                 {stats.average_rating.toFixed(1)}
               </div>
-              <div className="text-sm text-gray-600">Note moyenne</div>
+              <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                Note moyenne
+              </div>
             </CardContent>
           </Card>
         </div>
       )}
 
       {/* Barre de recherche et filtres */}
-      <Card className="mb-8">
-        <CardContent className="p-6">
+      <Card className="mb-6 sm:mb-8">
+        <CardContent className="p-4 sm:p-6">
           {/* Recherche principale */}
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Rechercher un service..."
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-11"
               />
             </div>
 
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filtres
-            </Button>
+            <div className="flex gap-2 sm:gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 flex-1 sm:flex-initial"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filtres
+              </Button>
 
-            <div className="flex border rounded-lg">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="rounded-l-none"
-              >
-                <List className="h-4 w-4" />
-              </Button>
+              <div className="flex border rounded-lg">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="rounded-r-none px-2 sm:px-3"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="rounded-l-none px-2 sm:px-3"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 

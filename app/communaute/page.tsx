@@ -30,8 +30,6 @@ import {
   Share2,
   HelpCircle,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
 
 interface Profile {
   id: string;
@@ -457,59 +455,72 @@ export default function CommunautePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header de la communauté */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Users className="h-8 w-8 text-teal-600" />
+        <div className="container mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-teal-600 flex-shrink-0" />
                 Communauté
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 leading-relaxed">
                 Partagez, discutez et connectez-vous avec la communauté
                 guyanaise
               </p>
             </div>
 
-            <FeedbackModal>
-              <Button variant="outline" className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
-                Aide & Feedback
-              </Button>
-            </FeedbackModal>
+            <div className="flex-shrink-0">
+              <FeedbackModal>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  <span className="whitespace-nowrap">Aide & Feedback</span>
+                </Button>
+              </FeedbackModal>
+            </div>
           </div>
 
           {/* Statistiques */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                   {stats.total_posts}
                 </div>
-                <div className="text-sm text-gray-600">Posts totaux</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                  Posts totaux
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                   {stats.posts_today}
                 </div>
-                <div className="text-sm text-gray-600">Posts aujourd'hui</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                  Aujourd'hui
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                   {stats.total_users}
                 </div>
-                <div className="text-sm text-gray-600">Membres</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                  Membres
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                   {stats.active_users}
                 </div>
-                <div className="text-sm text-gray-600">Actifs (7j)</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">
+                  Actifs (7j)
+                </div>
               </CardContent>
             </Card>
           </div>

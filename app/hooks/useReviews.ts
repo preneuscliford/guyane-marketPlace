@@ -41,10 +41,17 @@ export function useReviews(params: UseReviewsParams = {}) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Créer des valeurs stables pour les paramètres
+  const { targetUserId, announcementId, serviceId } = params;
+  const userId = user?.id; // Référence stable pour user.id
+
   // Fetch reviews based on target user or announcement
   const fetchReviews = useCallback(async () => {
     try {
+      console.log('useReviews - fetchReviews appelé avec:', { targetUserId, announcementId, serviceId });
       setLoading(true);
+      setError(null);
+
       let query = supabase
         .from("reviews")
         .select(`
@@ -52,47 +59,70 @@ export function useReviews(params: UseReviewsParams = {}) {
         `)
         .order("created_at", { ascending: false });
 
-      if (params.targetUserId) {
-        query = query.eq("target_user_id", params.targetUserId);
+      if (targetUserId) {
+        query = query.eq("target_user_id", targetUserId);
       }
 
-      if (params.announcementId) {
-        query = query.eq("announcement_id", params.announcementId);
+      if (announcementId) {
+        query = query.eq("announcement_id", announcementId);
       }
 
-      if (params.serviceId) {
-        query = query.eq("service_id", params.serviceId);
+      if (serviceId) {
+        query = query.eq("service_id", serviceId);
       }
 
+      console.log('useReviews - Exécution de la requête...');
       const { data, error } = await query;
 
-      if (error) throw error;
+      console.log('useReviews - Résultat requête:', { data: data?.length || 0, error });
+
+      if (error) {
+        console.error('useReviews - Erreur Supabase:', error);
+        throw error;
+      }
 
       if (data) {
-        // Récupérer les profils utilisateurs pour chaque review
-        const userIds = [...new Set(data.map(review => review.user_id))];
-        const { data: profilesData } = await supabase
-          .from('profiles')
-          .select('id, username, avatar_url')
-          .in('id', userIds);
+        // Si pas d'avis, définir un tableau vide
+        if (data.length === 0) {
+          setReviews([]);
+          setUserReview(null);
+        } else {
+          // Récupérer les profils utilisateurs pour chaque review
+          const userIds = [...new Set(data.map(review => review.user_id))];
+          
+          let profilesData: Array<{id: string; username: string | null; avatar_url: string | null}> = [];
+          if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('id, username, avatar_url')
+              .in('id', userIds);
+            profilesData = profiles || [];
+          }
 
-        // Associer les profils aux reviews
-        const reviewsWithProfiles = data.map(review => ({
-          ...review,
-          profiles: profilesData?.find(profile => profile.id === review.user_id) || null
-        }));
+          // Associer les profils aux reviews
+          const reviewsWithProfiles = data.map(review => ({
+            ...review,
+            profiles: profilesData.find(profile => profile.id === review.user_id) || null
+          }));
 
-        setReviews(reviewsWithProfiles.map(review => ({
-          ...review,
-          service_id: (review as any).service_id || null // Type assertion to handle missing property
-        })) as unknown as Review[]);
+          setReviews(reviewsWithProfiles.map(review => ({
+            ...review,
+            service_id: (review as any).service_id || null
+          })) as unknown as Review[]);
 
-        
-        // If user is logged in, find their review
-        if (user) {
-          const userReview = reviewsWithProfiles.find(review => review.user_id === user.id);
-          setUserReview(userReview ? (userReview as unknown as Review) : null);
+          // If user is logged in, find their review
+          const currentUser = user; // Capturer user dans une variable stable
+          if (currentUser) {
+            const userReview = reviewsWithProfiles.find(review => review.user_id === currentUser.id);
+            setUserReview(userReview ? (userReview as unknown as Review) : null);
+          } else {
+            setUserReview(null);
+          }
         }
+      } else {
+        // Si data est null/undefined, définir un tableau vide
+        setReviews([]);
+        setUserReview(null);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -106,7 +136,7 @@ export function useReviews(params: UseReviewsParams = {}) {
     } finally {
       setLoading(false);
     }
-  }, [params, user]);
+  }, [targetUserId, announcementId, serviceId, userId]); // Utiliser userId au lieu de user?.id
 
   // Add a new review
   const addReview = async (reviewData: {
@@ -237,10 +267,17 @@ export function useReviews(params: UseReviewsParams = {}) {
     }
   };
 
-  // Fetch reviews when parameters change
+    // Fetch reviews when parameters change
   useEffect(() => {
     fetchReviews();
-  }, [fetchReviews]);
+  }, [fetchReviews, targetUserId, announcementId, serviceId]);
+
+  // Log de debug (à supprimer en production)
+  useEffect(() => {
+    if (loading === false) {
+      console.log('useReviews - Chargement terminé:', { reviewsCount: reviews.length, error });
+    }
+  }, [loading, error, reviews]);
 
   return {
     reviews,

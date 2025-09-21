@@ -1,24 +1,34 @@
-﻿'use client';
+﻿"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Clock } from 'lucide-react';
-import { useWeightedCarousel, useAdvertisementStats } from '@/hooks/useAdvertisements';
-import { Advertisement } from '@/types/advertisements';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  MapPin,
+  Clock,
+} from "lucide-react";
+import {
+  useWeightedCarousel,
+  useAdvertisementStats,
+} from "@/hooks/useAdvertisements";
+import { Advertisement } from "@/types/advertisements";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
 
 /**
  * Carrousel publicitaire pour la section hero de la page d'accueil
  */
 export default function HeroAdvertisementCarousel() {
-  const { advertisements, loading, selectNext, currentIndex } = useWeightedCarousel({
-    limit: 5,
-    autoRotate: true,
-    rotationInterval: 8000
-  });
-  
+  const { advertisements, loading, selectNext, currentIndex } =
+    useWeightedCarousel({
+      limit: 5,
+      autoRotate: true,
+      rotationInterval: 8000,
+    });
+
   const { recordImpression, recordClick } = useAdvertisementStats();
   const [currentAd, setCurrentAd] = useState<Advertisement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -27,7 +37,7 @@ export default function HeroAdvertisementCarousel() {
     if (advertisements.length > 0) {
       setCurrentAd(advertisements[currentIndex]);
       setIsVisible(true);
-      
+
       // Enregistrer l'impression
       if (advertisements[currentIndex]) {
         recordImpression(advertisements[currentIndex].id);
@@ -38,7 +48,7 @@ export default function HeroAdvertisementCarousel() {
   const handleAdClick = (ad: Advertisement) => {
     recordClick(ad.id);
     if (ad.target_url) {
-      window.open(ad.target_url, '_blank', 'noopener,noreferrer');
+      window.open(ad.target_url, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -47,7 +57,8 @@ export default function HeroAdvertisementCarousel() {
   };
 
   const prevSlide = () => {
-    const prevIndex = currentIndex === 0 ? advertisements.length - 1 : currentIndex - 1;
+    const prevIndex =
+      currentIndex === 0 ? advertisements.length - 1 : currentIndex - 1;
     setCurrentAd(advertisements[prevIndex]);
   };
 
@@ -105,7 +116,7 @@ export default function HeroAdvertisementCarousel() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-4xl lg:text-5xl font-bold leading-tight"
+                  className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight"
                 >
                   {currentAd.title}
                 </motion.h1>
@@ -115,7 +126,7 @@ export default function HeroAdvertisementCarousel() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="text-xl text-gray-200 leading-relaxed max-w-lg"
+                  className="text-sm sm:text-base lg:text-xl text-gray-200 leading-relaxed max-w-lg"
                 >
                   {currentAd.description}
                 </motion.p>
@@ -125,22 +136,27 @@ export default function HeroAdvertisementCarousel() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="flex flex-wrap items-center gap-4 text-gray-300"
+                  className="flex flex-wrap items-center gap-2 sm:gap-4 text-gray-300"
                 >
                   {currentAd.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{currentAd.location}</span>
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="text-xs sm:text-sm">
+                        {currentAd.location}
+                      </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">
-                      Publié {new Date(currentAd.created_at).toLocaleDateString('fr-FR')}
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs sm:text-sm">
+                      Publié{" "}
+                      {new Date(currentAd.created_at).toLocaleDateString(
+                        "fr-FR"
+                      )}
                     </span>
                   </div>
                   {currentAd.budget && (
-                    <div className="text-sm font-medium">
+                    <div className="text-xs sm:text-sm font-medium">
                       Budget: {formatCurrency(currentAd.budget)}
                     </div>
                   )}
@@ -155,10 +171,10 @@ export default function HeroAdvertisementCarousel() {
                   <Button
                     onClick={() => handleAdClick(currentAd)}
                     size="lg"
-                    className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="bg-primary-500 hover:bg-primary-600 text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
                     Découvrir
-                    <ExternalLink className="w-5 h-5 ml-2" />
+                    <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   </Button>
                 </motion.div>
               </motion.div>
@@ -175,7 +191,7 @@ export default function HeroAdvertisementCarousel() {
                 {/* Decorative circles */}
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary-500/20 rounded-full animate-pulse"></div>
                 <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full animate-pulse delay-1000"></div>
-                
+
                 {/* Main visual */}
                 <div className="w-64 h-64 bg-gradient-to-br from-primary-400 to-primary-600 rounded-3xl shadow-2xl flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-500">
                   <div className="text-6xl">🛍️</div>
@@ -192,31 +208,31 @@ export default function HeroAdvertisementCarousel() {
           {/* Previous Button */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 group"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 group touch-manipulation"
             aria-label="Publicité précédente"
           >
-            <ChevronLeft className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
           </button>
 
           {/* Next Button */}
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 group"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 group touch-manipulation"
             aria-label="Publicité suivante"
           >
-            <ChevronRight className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
           </button>
 
           {/* Dots Indicator */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
             {advertisements.map((ad, index) => (
               <button
                 key={`ad-dot-${ad.id}`}
                 onClick={() => setCurrentAd(advertisements[index])}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 touch-manipulation ${
                   index === currentIndex
-                    ? 'bg-white scale-125'
-                    : 'bg-white/50 hover:bg-white/75'
+                    ? "bg-white scale-125"
+                    : "bg-white/50 hover:bg-white/75"
                 }`}
                 aria-label={`Aller à la publicité ${index + 1}`}
               />
@@ -226,9 +242,10 @@ export default function HeroAdvertisementCarousel() {
       )}
 
       {/* Sponsored Label */}
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
         <Badge className="bg-black/50 text-white text-xs px-2 py-1 backdrop-blur-sm">
-          Sponsorisé
+          <span className="hidden sm:inline">Sponsorisé</span>
+          <span className="sm:hidden">Pub</span>
         </Badge>
       </div>
 
@@ -236,9 +253,9 @@ export default function HeroAdvertisementCarousel() {
       <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
         <motion.div
           className="h-full bg-primary-400"
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 8, ease: 'linear', repeat: Infinity }}
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 8, ease: "linear", repeat: Infinity }}
           key={currentIndex}
         />
       </div>
@@ -250,12 +267,13 @@ export default function HeroAdvertisementCarousel() {
  * Version compacte du carrousel pour d'autres sections
  */
 export function CompactAdvertisementCarousel() {
-  const { advertisements, loading, selectNext, currentIndex } = useWeightedCarousel({
-    limit: 3,
-    autoRotate: true,
-    rotationInterval: 6000
-  });
-  
+  const { advertisements, loading, selectNext, currentIndex } =
+    useWeightedCarousel({
+      limit: 3,
+      autoRotate: true,
+      rotationInterval: 6000,
+    });
+
   const { recordImpression, recordClick } = useAdvertisementStats();
 
   useEffect(() => {
@@ -267,7 +285,7 @@ export function CompactAdvertisementCarousel() {
   const handleAdClick = (ad: Advertisement) => {
     recordClick(ad.id);
     if (ad.target_url) {
-      window.open(ad.target_url, '_blank', 'noopener,noreferrer');
+      window.open(ad.target_url, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -282,8 +300,10 @@ export function CompactAdvertisementCarousel() {
   const currentAd = advertisements[currentIndex];
 
   return (
-    <div className="relative h-32 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg overflow-hidden cursor-pointer group"
-         onClick={() => handleAdClick(currentAd)}>
+    <div
+      className="relative h-32 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg overflow-hidden cursor-pointer group"
+      onClick={() => handleAdClick(currentAd)}
+    >
       {/* Background */}
       {currentAd.image_url && (
         <div className="absolute inset-0">
@@ -299,8 +319,12 @@ export function CompactAdvertisementCarousel() {
       {/* Content */}
       <div className="relative h-full flex items-center px-6">
         <div className="text-white">
-          <h3 className="font-bold text-lg mb-1 line-clamp-1">{currentAd.title}</h3>
-          <p className="text-sm text-gray-200 line-clamp-2 mb-2">{currentAd.description}</p>
+          <h3 className="font-bold text-lg mb-1 line-clamp-1">
+            {currentAd.title}
+          </h3>
+          <p className="text-sm text-gray-200 line-clamp-2 mb-2">
+            {currentAd.description}
+          </p>
           <Badge className="bg-white/20 text-white text-xs">
             {currentAd.category}
           </Badge>
@@ -309,9 +333,7 @@ export function CompactAdvertisementCarousel() {
 
       {/* Sponsored Label */}
       <div className="absolute top-2 right-2">
-        <Badge className="bg-black/50 text-white text-xs px-2 py-1">
-          Pub
-        </Badge>
+        <Badge className="bg-black/50 text-white text-xs px-2 py-1">Pub</Badge>
       </div>
 
       {/* Dots */}
@@ -321,7 +343,7 @@ export function CompactAdvertisementCarousel() {
             <div
               key={`ad-indicator-${ad.id}`}
               className={`w-1.5 h-1.5 rounded-full transition-all ${
-                index === currentIndex ? 'bg-white' : 'bg-white/50'
+                index === currentIndex ? "bg-white" : "bg-white/50"
               }`}
             />
           ))}

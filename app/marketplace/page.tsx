@@ -170,22 +170,21 @@ export default function MarketplacePage() {
                 avec la Guyane dès aujourd&apos;hui.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
+                <Button
                   size="lg"
                   className="px-6 sm:px-8 bg-white text-purple-600 font-semibold rounded-full hover:shadow-lg transition-shadow text-sm sm:text-base hover:bg-gray-50"
                   asChild
                 >
-                  <Link href="/services/nouveau">
-                    Proposer un service
-                  </Link>
+                  <Link href="/services/nouveau">Proposer un service</Link>
                 </Button>
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   size="lg"
                   className="px-6 sm:px-8 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/30 transition-colors text-sm sm:text-base border-0"
                   onClick={() => {
-                    const howItWorksSection = document.getElementById('how-it-works');
-                    howItWorksSection?.scrollIntoView({ behavior: 'smooth' });
+                    const howItWorksSection =
+                      document.getElementById("how-it-works");
+                    howItWorksSection?.scrollIntoView({ behavior: "smooth" });
                   }}
                 >
                   Découvrir comment ça marche

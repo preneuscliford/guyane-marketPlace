@@ -21,38 +21,46 @@ const testimonials: Testimonial[] = [
     id: "t1",
     name: "Jean-Marc Dupont",
     role: "Entrepreneur, Cayenne",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-    content: "J'ai engagé un designer sur mcGuyane pour créer le logo de ma nouvelle entreprise. Le résultat a dépassé mes attentes et a été livré en avance. Je recommande vivement cette plateforme à tous les entrepreneurs guyanais.",
+    avatar:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    content:
+      "J'ai engagé un designer sur mcGuyane pour créer le logo de ma nouvelle entreprise. Le résultat a dépassé mes attentes et a été livré en avance. Je recommande vivement cette plateforme à tous les entrepreneurs guyanais.",
     rating: 5.0,
-    service: "Design Graphique"
+    service: "Design Graphique",
   },
   {
     id: "t2",
     name: "Sophia Williams",
     role: "Blogueuse, Kourou",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    content: "mcGuyane m'a permis de trouver un développeur local pour mon blog. Le processus a été simple, transparent et j'ai pu collaborer facilement. Un vrai plus pour notre économie locale!",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+    content:
+      "mcGuyane m'a permis de trouver un développeur local pour mon blog. Le processus a été simple, transparent et j'ai pu collaborer facilement. Un vrai plus pour notre économie locale!",
     rating: 4.5,
-    service: "Développement Web"
+    service: "Développement Web",
   },
   {
     id: "t3",
     name: "Michel Lambert",
     role: "Artisan, Saint-Laurent",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    content: "Grâce à un expert marketing trouvé sur mcGuyane, j'ai pu augmenter significativement mes ventes en ligne. Sa connaissance du marché guyanais a fait toute la différence dans ma stratégie.",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    content:
+      "Grâce à un expert marketing trouvé sur mcGuyane, j'ai pu augmenter significativement mes ventes en ligne. Sa connaissance du marché guyanais a fait toute la différence dans ma stratégie.",
     rating: 5.0,
-    service: "Marketing Digital"
+    service: "Marketing Digital",
   },
   {
     id: "t4",
     name: "Amandine Rousseau",
     role: "Enseignante, Rémire-Montjoly",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-    content: "J'ai demandé une traduction de documents pédagogiques en créole. Le service était rapide et précis. Parfait pour mes besoins éducatifs spécifiques à notre région.",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    content:
+      "J'ai demandé une traduction de documents pédagogiques en créole. Le service était rapide et précis. Parfait pour mes besoins éducatifs spécifiques à notre région.",
     rating: 4.8,
-    service: "Traduction & Langues"
-  }
+    service: "Traduction & Langues",
+  },
 ];
 
 export function Testimonials() {
@@ -64,17 +72,19 @@ export function Testimonials() {
   };
 
   const prev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length
+    );
   };
 
   // Autoplay functionality
   useEffect(() => {
     if (!autoplay) return;
-    
+
     const interval = setInterval(() => {
       next();
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [autoplay, currentIndex]);
 
@@ -83,19 +93,22 @@ export function Testimonials() {
   const handleMouseLeave = () => setAutoplay(true);
 
   return (
-    <section 
+    <section
       className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-purple-700 to-fuchsia-700"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ce que disent nos utilisateurs</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Ce que disent nos utilisateurs
+          </h2>
           <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base">
-            Découvrez les expériences de ceux qui ont trouvé le service idéal sur mcGuyane
+            Découvrez les expériences de ceux qui ont trouvé le service idéal
+            sur mcGuyane
           </p>
         </div>
-        
+
         <div className="max-w-4xl mx-auto relative">
           {/* Testimonial Carousel */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
@@ -103,7 +116,7 @@ export function Testimonials() {
               <div className="absolute top-4 sm:top-6 md:top-8 right-4 sm:right-6 md:right-8 text-purple-500 opacity-20">
                 <Quote className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20" />
               </div>
-              
+
               <motion.div
                 key={testimonials[currentIndex].id}
                 initial={{ opacity: 0, y: 20 }}
@@ -122,21 +135,30 @@ export function Testimonials() {
                     />
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800">{testimonials[currentIndex].name}</h3>
-                    <p className="text-gray-600 text-sm sm:text-base">{testimonials[currentIndex].role}</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                      {testimonials[currentIndex].name}
+                    </h3>
+                    <p className="text-gray-600 text-sm sm:text-base">
+                      {testimonials[currentIndex].role}
+                    </p>
                   </div>
                 </div>
-                
+
                 <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6 italic">
                   &ldquo;{testimonials[currentIndex].content}&rdquo;
                 </p>
-                
+
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-0">
                   <div className="flex items-center mb-2 sm:mb-0">
-                    <RatingStars rating={testimonials[currentIndex].rating} size="md" />
-                    <span className="ml-2 text-gray-700 text-sm sm:text-base">{testimonials[currentIndex].rating.toFixed(1)}</span>
+                    <RatingStars
+                      rating={testimonials[currentIndex].rating}
+                      size="md"
+                    />
+                    <span className="ml-2 text-gray-700 text-sm sm:text-base">
+                      {testimonials[currentIndex].rating.toFixed(1)}
+                    </span>
                   </div>
-                  
+
                   <div className="text-xs sm:text-sm text-purple-600 font-medium">
                     Service utilisé: {testimonials[currentIndex].service}
                   </div>
@@ -144,7 +166,7 @@ export function Testimonials() {
               </motion.div>
             </div>
           </div>
-          
+
           {/* Navigation */}
           <div className="flex justify-center mt-6 sm:mt-8 space-x-3 sm:space-x-4">
             <button
@@ -154,7 +176,7 @@ export function Testimonials() {
             >
               <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
-            
+
             {/* Indicators */}
             <div className="flex items-center space-x-2">
               {testimonials.map((_, index) => (
@@ -162,15 +184,15 @@ export function Testimonials() {
                   key={index}
                   onClick={() => setCurrentIndex(index)}
                   className={`h-2.5 w-2.5 rounded-full transition-all ${
-                    index === currentIndex 
-                      ? "bg-white w-8" 
+                    index === currentIndex
+                      ? "bg-white w-8"
                       : "bg-white/50 hover:bg-white/70"
                   }`}
                   aria-label={`Témoignage ${index + 1}`}
                 />
               ))}
             </div>
-            
+
             <button
               onClick={next}
               className="p-2 sm:p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
