@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Star, Quote, MapPin, Award, ThumbsUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { getFallbackImage } from "../../lib/utils";
 
 interface TestimonialProps {
   name: string;
@@ -163,8 +164,7 @@ export function Testimonials() {
       name: "Marie Dubois",
       role: "Artisane d'art",
       text: "Cette plateforme m'a permis de développer mon activité de création de bijoux traditionnels. Je reçois maintenant des commandes de toute la Guyane grâce à ma visibilité sur mcGuyane !",
-      avatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
+      avatar: getFallbackImage("sarah-kintambo", 100, 100),
       rating: 5,
       location: "Cayenne",
     },
@@ -172,8 +172,7 @@ export function Testimonials() {
       name: "Paul Terieur",
       role: "Utilisateur",
       text: "J'ai trouvé un excellent service de réparation pour mon ordinateur en moins d'une heure. Le prestataire était très professionnel et les tarifs transparents. Je recommande vivement !",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+      avatar: getFallbackImage("paul-terieur", 100, 100),
       rating: 4,
       location: "Kourou",
     },
@@ -181,8 +180,7 @@ export function Testimonials() {
       name: "Sarah Kintambo",
       role: "Commerçante",
       text: "Une vraie bouffée d'air frais pour l'économie locale. Grâce à cette plateforme, j'ai pu étendre mon réseau de distribution et toucher une clientèle que je n'aurais jamais atteinte autrement.",
-      avatar:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
+      avatar: getFallbackImage("sarah-kintambo", 100, 100),
       rating: 5,
       location: "St-Laurent",
     },

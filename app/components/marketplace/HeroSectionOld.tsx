@@ -5,6 +5,7 @@ import Image from "next/image";
 import { SearchIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
+import { getFallbackImage } from "../../lib/utils";
 
 interface HeroSectionProps {
   onSearch: (query: string) => void;
@@ -31,7 +32,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
       {/* Background with gradient overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=800&fit=crop&crop=center"
+          src={getFallbackImage("hero-background", 1200, 800)}
           alt="mcGuyane Hero"
           fill
           className="object-cover"

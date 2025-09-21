@@ -1,29 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { supabase } from "../../../lib/supabase";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Filter, Grid, List } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowLeft, Grid, List } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import ProductGrid from "../../../../components/marketplace/ProductGrid";
 import { Button } from "@/components/ui/button";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  location: string;
-  images: string[];
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  view_count: number;
-  featured: boolean;
-  status: string;
-}
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { fetchProducts } from "../../../lib/queries/products";
+import { getFallbackImage } from "../../../lib/utils";
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Heart, MapPin, Eye, Calendar } from "lucide-react";
 
 // Mapping des slugs vers les noms de catégories
 const categoryMapping: { [key: string]: string } = {
@@ -51,9 +47,6 @@ const displayNames: { [key: string]: string } = {
  */
 export default function CategoryPage() {
   const { category } = useParams();
-  const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("recent");
 
@@ -65,65 +58,19 @@ export default function CategoryPage() {
     ? displayNames[categorySlug] || categorySlug
     : "";
 
-  /**
-   * Récupère les produits de la catégorie depuis Supabase
-   */
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
+  // Query pour récupérer les produits
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["products", { selectedCategory: categoryName }],
+    queryFn: () => fetchProducts({ selectedCategory: categoryName }),
+    staleTime: 5 * 60 * 1000,
+  });
 
-      let query = supabase
-        .from("products")
-        .select(
-          `
-          *,
-          profiles (
-            username,
-            avatar_url
-          )
-        `
-        )
-        .eq("category", categoryName)
-        .eq("status", "active");
-
-      // Appliquer le tri
-      switch (sortBy) {
-        case "price-asc":
-          query = query.order("price", { ascending: true });
-          break;
-        case "price-desc":
-          query = query.order("price", { ascending: false });
-          break;
-        case "title":
-          query = query.order("title", { ascending: true });
-          break;
-        default:
-          query = query.order("created_at", { ascending: false });
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error("Erreur lors du chargement des produits:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (categorySlug) {
-      fetchProducts();
-    }
-  }, [categorySlug, sortBy]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-      </div>
-    );
+  if (!categorySlug) {
+    return <div>Catégorie non trouvée</div>;
   }
 
   return (
@@ -131,64 +78,65 @@ export default function CategoryPage() {
       {/* En-tête */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" asChild>
-                <Link href="/marketplace">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <Button variant="outline" className="w-fit" asChild>
+                <Link href="/marketplace" className="flex items-center gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm sm:text-base">Retour</span>
                 </Link>
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+              <div className="flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
                   {displayName}
                 </h1>
-                <p className="text-gray-600 mt-1">
-                  {products.length} produit{products.length > 1 ? "s" : ""}{" "}
-                  trouvé{products.length > 1 ? "s" : ""}
-                </p>
               </div>
             </div>
 
             {/* Contrôles de vue et tri */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
                   Trier par:
                 </label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="recent">Plus récent</option>
-                  <option value="price-asc">Prix croissant</option>
-                  <option value="price-desc">Prix décroissant</option>
-                  <option value="title">Nom A-Z</option>
-                </select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full sm:w-[140px] h-8 text-xs sm:text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Plus récent</SelectItem>
+                    <SelectItem value="price-asc">Prix croissant</SelectItem>
+                    <SelectItem value="price-desc">Prix décroissant</SelectItem>
+                    <SelectItem value="title">Nom A-Z</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="flex items-center border border-gray-300 rounded-md">
-                <button
+              <div className="flex items-center border border-gray-300 rounded-md bg-white">
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 ${
+                  className={`rounded-r-none h-8 px-2 sm:px-3 ${
                     viewMode === "grid"
-                      ? "bg-purple-100 text-purple-600"
-                      : "text-gray-600"
+                      ? "bg-purple-100 text-purple-600 hover:bg-purple-100"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
+                  <Grid className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setViewMode("list")}
-                  className={`p-2 ${
+                  className={`rounded-l-none h-8 px-2 sm:px-3 ${
                     viewMode === "list"
-                      ? "bg-purple-100 text-purple-600"
-                      : "text-gray-600"
+                      ? "bg-purple-100 text-purple-600 hover:bg-purple-100"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
-                  <List className="w-4 h-4" />
-                </button>
+                  <List className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
               </div>
             </div>
           </div>
@@ -197,35 +145,184 @@ export default function CategoryPage() {
 
       {/* Contenu principal */}
       <div className="container mx-auto px-4 py-8">
-        {products.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
+        {isLoading ? (
+          <div
+            className={
+              viewMode === "list"
+                ? "space-y-4"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            }
           >
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="overflow-hidden animate-pulse">
+                <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200" />
+                <CardContent className="p-4 space-y-3">
+                  <div className="h-6 bg-gray-200 rounded" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-8 bg-gray-200 rounded w-1/2" />
+                  <div className="flex justify-between">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-4 bg-gray-200 rounded w-1/4" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">❌</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Erreur de chargement
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {error.message ||
+                "Une erreur est survenue lors du chargement des produits."}
+            </p>
+            <Button onClick={() => window.location.reload()}>Réessayer</Button>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-16">
             <div className="text-6xl mb-4">🔍</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Aucun produit trouvé
             </h2>
             <p className="text-gray-600 mb-6">
-              Il n'y a pas encore de produits dans la catégorie "{displayName}".
+              Aucun produit dans cette catégorie pour le moment.
             </p>
-            <Button asChild>
-              <Link href="/marketplace">Retour à la marketplace</Link>
-            </Button>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            className={
+              viewMode === "list"
+                ? "space-y-4"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            }
           >
-            <ProductGrid
-              searchQuery=""
-              selectedCategory={categoryName}
-              selectedLocation=""
-            />
-          </motion.div>
+            {products.map((product, index) => {
+              const profile = product.profiles?.[0];
+              return (
+                <Card
+                  key={product.id}
+                  className={`overflow-hidden hover:shadow-xl transition-all duration-300 group border-0 shadow-md hover:shadow-purple-100/50 ${
+                    viewMode === "list" ? "flex gap-4 p-4" : "flex flex-col"
+                  }`}
+                >
+                  <div
+                    className={`relative bg-gray-100 ${
+                      viewMode === "list"
+                        ? "w-32 h-24 sm:w-48 sm:h-32 flex-shrink-0 rounded-lg"
+                        : "aspect-[4/3] w-full"
+                    }`}
+                  >
+                    {product.images?.[0] &&
+                    !product.images[0].includes("example.com") ? (
+                      <Image
+                        src={product.images[0]}
+                        alt={product.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <Image
+                        src={`https://picsum.photos/seed/${encodeURIComponent(
+                          product.title.replace(/\s+/g, "-").toLowerCase()
+                        )}-guyane/400/300`}
+                        alt={`${product.category} - ${product.title}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
+                  </div>
+
+                  <div
+                    className={`flex-1 ${
+                      viewMode === "list"
+                        ? "flex flex-col justify-between"
+                        : "p-4"
+                    }`}
+                  >
+                    <Link href={`/marketplace/${product.id}`} className="block">
+                      <h3
+                        className={`font-bold mb-2 group-hover:text-purple-600 transition-colors duration-300 line-clamp-2 leading-tight ${
+                          viewMode === "list" ? "text-lg sm:text-xl" : "text-lg"
+                        }`}
+                      >
+                        {product.title}
+                      </h3>
+                      <p
+                        className={`text-gray-600 mb-4 line-clamp-2 leading-relaxed ${
+                          viewMode === "list"
+                            ? "text-sm sm:text-base"
+                            : "text-sm"
+                        }`}
+                      >
+                        {product.description}
+                      </p>
+
+                      <div
+                        className={`flex items-center justify-between mb-4 ${
+                          viewMode === "list"
+                            ? "flex-col sm:flex-row gap-2 sm:gap-0"
+                            : ""
+                        }`}
+                      >
+                        <span
+                          className={`font-bold text-purple-600 ${
+                            viewMode === "list"
+                              ? "text-xl sm:text-2xl"
+                              : "text-2xl"
+                          }`}
+                        >
+                          {product.price}€
+                        </span>
+                        <div className="flex items-center text-gray-500 text-sm bg-gray-50 px-2 py-1 rounded-full">
+                          <Eye className="w-4 h-4 mr-1" />
+                          <span className="font-medium">
+                            {product.view_count || product.views || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      {viewMode !== "list" && (
+                        <div
+                          className={`grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-500 mb-4`}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="w-4 h-4 mr-1 text-purple-500" />
+                            <span className="truncate">{product.location}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1 text-purple-500" />
+                            <span>
+                              {new Date(product.created_at).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {viewMode === "list" && (
+                        <div className="flex items-center justify-between text-sm text-gray-500 mt-2">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4 text-purple-500" />
+                            <span>{product.location}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4 text-purple-500" />
+                            <span>
+                              {new Date(product.created_at).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </Link>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

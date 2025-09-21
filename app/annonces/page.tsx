@@ -287,7 +287,7 @@ export default function AnnouncementsPage() {
                 key={announcement.id}
                 className={`group relative bg-white border rounded-xl shadow-sm transition-all hover:shadow-lg hover:border-primary/50 ${
                   viewMode === "list"
-                    ? "flex gap-4 p-4"
+                    ? "flex gap-2 sm:gap-4 p-3 sm:p-4"
                     : "flex flex-col overflow-hidden"
                 }`}
               >
@@ -295,7 +295,7 @@ export default function AnnouncementsPage() {
                 <div
                   className={`relative bg-gray-100 ${
                     viewMode === "list"
-                      ? "w-48 h-32 flex-shrink-0 rounded-lg"
+                      ? "w-32 h-24 sm:w-48 sm:h-32 flex-shrink-0 rounded-lg"
                       : "aspect-[4/3] w-full"
                   }`}
                 >
@@ -335,14 +335,14 @@ export default function AnnouncementsPage() {
 
                 {/* Contenu */}
                 <div
-                  className={`flex flex-1 flex-col ${
+                  className={`flex flex-1 flex-col min-w-0 ${
                     viewMode === "list" ? "justify-between" : "p-4"
                   }`}
                 >
                   <div>
                     {/* En-tête avec catégorie et utilisateur */}
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                    <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                      <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary self-start sm:self-auto">
                         {announcement.category}
                       </span>
                       {announcement.profiles && (
@@ -357,7 +357,7 @@ export default function AnnouncementsPage() {
                       <h3
                         className={`font-semibold text-foreground group-hover:text-primary transition-colors ${
                           viewMode === "list"
-                            ? "text-xl mb-2"
+                            ? "text-lg sm:text-xl mb-2 line-clamp-2 sm:line-clamp-1"
                             : "text-lg mb-2 line-clamp-1"
                         }`}
                       >
@@ -368,7 +368,7 @@ export default function AnnouncementsPage() {
                     <p
                       className={`text-sm text-muted-foreground ${
                         viewMode === "list"
-                          ? "line-clamp-3 mb-4"
+                          ? "line-clamp-1 sm:line-clamp-2 md:line-clamp-3 mb-4"
                           : "line-clamp-2 mb-4 flex-1"
                       }`}
                     >
@@ -382,10 +382,10 @@ export default function AnnouncementsPage() {
                       viewMode === "list" ? "" : "mt-auto"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                       <span
                         className={`font-bold text-primary ${
-                          viewMode === "list" ? "text-xl" : "text-lg"
+                          viewMode === "list" ? "text-lg sm:text-xl" : "text-lg"
                         }`}
                       >
                         {announcement.price
@@ -397,10 +397,12 @@ export default function AnnouncementsPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
-                        {announcement.location}
+                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">
+                          {announcement.location}
+                        </span>
                       </div>
 
                       {viewMode === "list" && (

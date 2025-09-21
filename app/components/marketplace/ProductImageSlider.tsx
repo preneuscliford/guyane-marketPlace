@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { getFallbackImage } from "../../lib/utils";
 
 interface ProductImageSliderProps {
   images: string[];
@@ -25,7 +26,7 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
     return (
       <div className="relative aspect-square rounded-lg bg-gray-100">
         <Image
-          src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center"
+          src={getFallbackImage(title, 400, 400)}
           alt={title}
           fill
           className="object-cover rounded-lg"
@@ -44,7 +45,7 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
           className="object-cover transition-transform duration-300 ease-in-out hover:scale-105"
           priority
         />
-        
+
         {images.length > 1 && (
           <>
             <button
@@ -54,7 +55,7 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
             >
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            
+
             <button
               onClick={nextImage}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-accent transition-all duration-300 shadow-sm hover:shadow-md border border-border"
@@ -90,7 +91,7 @@ export function ProductImageSlider({ images, title }: ProductImageSliderProps) {
               onClick={() => setCurrentImage(index)}
               className={cn(
                 "relative aspect-square rounded-lg overflow-hidden transition-all duration-200",
-                currentImage === index 
+                currentImage === index
                   ? "ring-2 ring-primary ring-offset-2"
                   : "hover:ring-1 hover:ring-primary/30"
               )}

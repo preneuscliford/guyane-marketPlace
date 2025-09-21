@@ -31,6 +31,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+  // Entrée example.com supprimée car non utilisée
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
       // Domaines Google pour l'authentification
       {
         protocol: 'https',

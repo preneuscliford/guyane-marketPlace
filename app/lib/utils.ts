@@ -199,3 +199,29 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+/**
+ * Génère une URL d'image de fallback basée sur une seed
+ * Utilise Picsum Photos qui est plus fiable que Unsplash
+ */
+export function getFallbackImage(seed: string, width: number = 400, height: number = 300): string {
+  return `https://picsum.photos/seed/${seed}/${width}/${height}`;
+}
+
+/**
+ * Génère une URL d'image de fallback pour les catégories
+ */
+export function getCategoryFallbackImage(category: string, width: number = 400, height: number = 300): string {
+  const categorySeeds = {
+    "developpement-web": "web-dev",
+    "design-graphique": "graphic-design",
+    "marketing-digital": "digital-marketing",
+    redaction: "writing",
+    traduction: "translation",
+    autre: "other",
+    "default": "placeholder"
+  };
+
+  const seed = categorySeeds[category as keyof typeof categorySeeds] || categorySeeds.default;
+  return getFallbackImage(seed, width, height);
+}
