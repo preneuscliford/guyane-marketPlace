@@ -32,7 +32,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
       <div className="absolute inset-0 z-0">
         <Image
           src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=800&fit=crop&crop=center"
-          alt="Blada Market Hero"
+          alt="mcGuyane Hero"
           fill
           className="object-cover"
           priority

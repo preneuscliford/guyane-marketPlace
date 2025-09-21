@@ -31,7 +31,7 @@ export function HowItWorks() {
     <section className="py-12 sm:py-16 lg:py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Comment fonctionne Blada Market</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Comment fonctionne mcGuyane</h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
             Notre marketplace met en relation les talents guyanais avec ceux qui ont besoin de leurs services, en toute simplicité
           </p>

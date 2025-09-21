@@ -116,7 +116,7 @@ export function HowItWorks() {
   const steps: StepProps[] = [
     {
       title: "Inscription facile",
-      description: "Créez votre compte en moins de 2 minutes. Il vous suffit d'une adresse email valide pour commencer votre expérience sur Blada Market.",
+      description: "Créez votre compte en moins de 2 minutes. Il vous suffit d'une adresse email valide pour commencer votre expérience sur mcGuyane.",
       icon: <UserPlus className="h-10 w-10" />
     },
     {

@@ -19,7 +19,7 @@ export function Footer() {
             <Link href="/" className="flex items-center mb-4">
               <ShoppingBag className="h-8 w-8 text-purple-400" />
               <span className="ml-2 text-2xl font-bold bg-gradient-to-r from-purple-400 via-fuchsia-300 to-teal-300 bg-clip-text text-transparent">
-                Blada Market
+                mcGuyane
               </span>
             </Link>
             <p className="text-gray-400 mb-4">

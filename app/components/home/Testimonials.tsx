@@ -151,7 +151,7 @@ export function Testimonials() {
     {
       name: "Marie Dubois",
       role: "Artisane d'art",
-      text: "Cette plateforme m'a permis de développer mon activité de création de bijoux traditionnels. Je reçois maintenant des commandes de toute la Guyane grâce à ma visibilité sur Blada Market !",
+      text: "Cette plateforme m'a permis de développer mon activité de création de bijoux traditionnels. Je reçois maintenant des commandes de toute la Guyane grâce à ma visibilité sur mcGuyane !",
       avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
       rating: 5,
       location: "Cayenne"
@@ -248,7 +248,7 @@ export function Testimonials() {
               Rejoignez notre communauté satisfaite
             </h3>
             <p className="text-gray-600 mb-6">
-              Découvrez pourquoi des milliers d&apos;utilisateurs font confiance à Blada Market pour leurs achats et ventes en Guyane.
+              Découvrez pourquoi des milliers d&apos;utilisateurs font confiance à mcGuyane pour leurs achats et ventes en Guyane.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}

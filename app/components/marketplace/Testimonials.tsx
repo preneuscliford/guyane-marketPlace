@@ -22,7 +22,7 @@ const testimonials: Testimonial[] = [
     name: "Jean-Marc Dupont",
     role: "Entrepreneur, Cayenne",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-    content: "J'ai engagé un designer sur Blada Market pour créer le logo de ma nouvelle entreprise. Le résultat a dépassé mes attentes et a été livré en avance. Je recommande vivement cette plateforme à tous les entrepreneurs guyanais.",
+    content: "J'ai engagé un designer sur mcGuyane pour créer le logo de ma nouvelle entreprise. Le résultat a dépassé mes attentes et a été livré en avance. Je recommande vivement cette plateforme à tous les entrepreneurs guyanais.",
     rating: 5.0,
     service: "Design Graphique"
   },
@@ -31,7 +31,7 @@ const testimonials: Testimonial[] = [
     name: "Sophia Williams",
     role: "Blogueuse, Kourou",
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    content: "Blada Market m'a permis de trouver un développeur local pour mon blog. Le processus a été simple, transparent et j'ai pu collaborer facilement. Un vrai plus pour notre économie locale!",
+    content: "mcGuyane m'a permis de trouver un développeur local pour mon blog. Le processus a été simple, transparent et j'ai pu collaborer facilement. Un vrai plus pour notre économie locale!",
     rating: 4.5,
     service: "Développement Web"
   },
@@ -40,7 +40,7 @@ const testimonials: Testimonial[] = [
     name: "Michel Lambert",
     role: "Artisan, Saint-Laurent",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    content: "Grâce à un expert marketing trouvé sur Blada Market, j'ai pu augmenter significativement mes ventes en ligne. Sa connaissance du marché guyanais a fait toute la différence dans ma stratégie.",
+    content: "Grâce à un expert marketing trouvé sur mcGuyane, j'ai pu augmenter significativement mes ventes en ligne. Sa connaissance du marché guyanais a fait toute la différence dans ma stratégie.",
     rating: 5.0,
     service: "Marketing Digital"
   },
@@ -92,7 +92,7 @@ export function Testimonials() {
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ce que disent nos utilisateurs</h2>
           <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base">
-            Découvrez les expériences de ceux qui ont trouvé le service idéal sur Blada Market
+            Découvrez les expériences de ceux qui ont trouvé le service idéal sur mcGuyane
           </p>
         </div>
         
