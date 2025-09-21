@@ -9,6 +9,7 @@ import {
   Heart,
 } from "lucide-react";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface CategoryProps {
   icon: React.ReactNode;
@@ -26,25 +27,28 @@ const CategoryCard: React.FC<CategoryProps> = ({
   href,
 }) => {
   return (
-    <Link
-      href={href}
-      className="group relative overflow-hidden bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-    >
-      <div
-        className={`absolute inset-0 ${color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}
-      ></div>
-      <div className="flex flex-col items-center justify-center p-4 sm:p-6 text-center h-40 xs:h-44 sm:h-48">
+    <Link href={href} className="group block">
+      <Card className="relative overflow-hidden border-0 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
         <div
-          className={`p-2 sm:p-3 rounded-full ${color} bg-opacity-10 mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}
-        >
-          {icon}
-        </div>
-        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-1 leading-tight">
-          {title}
-        </h3>
-        {/* Nombres masqués temporairement */}
-        {false && <p className="text-gray-500 text-sm">{count} annonces</p>}
-      </div>
+          className={`absolute inset-0 ${color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}
+        />
+        <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center h-32 xs:h-36 sm:h-40 md:h-44">
+          <div
+            className={`p-2 sm:p-2.5 md:p-3 rounded-full ${color} bg-opacity-10 mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform duration-300`}
+          >
+            <div className="[&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6 md:[&>svg]:h-7 md:[&>svg]:w-7">
+              {icon}
+            </div>
+          </div>
+          <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 mb-1 leading-tight px-1">
+            {title}
+          </h3>
+          {/* Nombres masqués temporairement */}
+          {false && (
+            <p className="text-gray-500 text-xs sm:text-sm">{count} annonces</p>
+          )}
+        </CardContent>
+      </Card>
     </Link>
   );
 };
@@ -122,7 +126,7 @@ export function Categories() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 xs:gap-3 sm:gap-4 md:gap-6">
           {categories.map((category, index) => (
             <CategoryCard key={index} {...category} />
           ))}
