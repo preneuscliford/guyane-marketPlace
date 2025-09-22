@@ -8,11 +8,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 interface ReportButtonProps {
-  contentType: 'post' | 'comment' | 'announcement' | 'service' | 'user';
+  contentType: "post" | "comment" | "announcement" | "service" | "user";
   contentId: string;
   reportedUserId?: string;
-  variant?: 'default' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "default" | "ghost" | "outline";
+  size?: "sm" | "default" | "lg" | "md";
   className?: string;
   showText?: boolean;
 }
@@ -24,10 +24,10 @@ export default function ReportButton({
   contentType,
   contentId,
   reportedUserId,
-  variant = 'ghost',
-  size = 'sm',
-  className = '',
-  showText = false
+  variant = "ghost",
+  size = "sm",
+  className = "",
+  showText = false,
 }: ReportButtonProps) {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function ReportButton({
     <>
       <Button
         variant={variant}
-        size={size}
+        size={size === "md" ? "default" : size}
         onClick={handleReport}
         className={`text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors ${className}`}
         title="Signaler ce contenu"

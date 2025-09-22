@@ -234,101 +234,47 @@ export default function CommunityPost({
       toast.error("Vous devez être connecté pour aimer un post");
       return;
     }
-
-    // Éviter les clics multiples pendant le traitement
     if (isProcessingLike) return;
-
     setIsProcessingLike(true);
-
     try {
-      if (isLiked) {
+      if (!isLiked) {
+        // Ajouter le like
+        const { error } = await supabase.from("likes").insert({
+          post_id: post.id,
+          user_id: user.id,
+        });
+        if (error) {
+          if (error.code === "23505" || error.message?.includes("duplicate")) {
+            // Déjà liké, on ignore
+            setIsLiked(true);
+            return;
+          }
+          toast.error(
+            `Erreur: ${error.message || "Impossible d'ajouter le like"}`
+          );
+          return;
+        }
+        setIsLiked(true);
+        setLikeCount((prev) => prev + 1);
+        toast.success("Post aimé");
+      } else {
         // Retirer le like
-        console.log("Suppression du like pour le post", post.id);
-
         const { error } = await supabase
           .from("likes")
           .delete()
           .eq("post_id", post.id)
           .eq("user_id", user.id);
-
         if (error) {
-          console.error("Erreur lors de la suppression du like:", {
-            message: error.message,
-            details: error.details,
-            code: error.code,
-          });
           toast.error(
             `Erreur: ${error.message || "Impossible de retirer le like"}`
           );
           return;
         }
-
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
         toast.success("Like retiré");
-      } else {
-        // Ajouter le like
-        console.log(
-          "Ajout du like pour le post",
-          post.id,
-          "par l'utilisateur",
-          user.id
-        );
-
-        const { error } = await supabase.from("likes").insert({
-          post_id: post.id,
-          user_id: user.id,
-        });
-
-        if (error) {
-          console.error("Erreur lors de l'ajout du like:", {
-            message: error.message,
-            details: error.details,
-            code: error.code,
-          });
-
-          // Afficher un message plus convivial selon le type d'erreur
-          if (error.code === "23505") {
-            // Si le like existe déjà, essayons de le supprimer au lieu d'afficher une erreur
-            console.log("Like déjà existant, tentative de suppression...");
-            const { error: deleteError } = await supabase
-              .from("likes")
-              .delete()
-              .eq("post_id", post.id)
-              .eq("user_id", user.id);
-
-            if (deleteError) {
-              console.error(
-                "Erreur lors de la suppression du like:",
-                deleteError
-              );
-              toast.error("Impossible de modifier le statut du like");
-              return;
-            }
-
-            // Si la suppression réussit, mettre à jour l'interface
-            setIsLiked(false);
-            setLikeCount((prev) => prev - 1);
-            toast.success("Like retiré");
-            return;
-          } else if (error.code === "23503") {
-            toast.error(
-              "Référence invalide, le post ou l'utilisateur n'existe pas"
-            );
-          } else {
-            toast.error(
-              `Erreur: ${error.message || "Impossible d'ajouter le like"}`
-            );
-          }
-          return;
-        }
-
-        setIsLiked(true);
-        setLikeCount((prev) => prev + 1);
-        toast.success("Post aimé");
       }
     } catch (error) {
-      console.error("Erreur lors du like:", error);
       toast.error("Une erreur est survenue, veuillez réessayer");
     } finally {
       setIsProcessingLike(false);
@@ -582,38 +528,45 @@ export default function CommunityPost({
               </div>
             </div>
 
-            <div className="flex-shrink-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {isAuthor && (
-                    <>
-                      <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Modifier
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={deletePost}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Supprimer
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <ReportButton
-                    contentType="post"
-                    contentId={post.id}
-                    reportedUserId={post.user_id}
-                    variant="ghost"
-                    size="sm"
-                  />
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex-shrink-0 relative z-30 flex items-center gap-1">
+              <ReportButton
+                contentType="post"
+                contentId={post.id}
+                reportedUserId={post.user_id}
+                variant="ghost"
+                size="sm"
+              />
+              {isAuthor && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      aria-label="Options du post"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="z-50"
+                    sideOffset={4}
+                  >
+                    <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Modifier
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={deletePost}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Supprimer
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </CardHeader>

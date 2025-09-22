@@ -6,12 +6,12 @@ import ReportModal from "@/components/moderation/ReportModal";
 import { Flag } from "lucide-react";
 
 interface ReportButtonProps {
-  contentType: 'post' | 'comment' | 'service' | 'announcement';
+  contentType: "post" | "comment" | "service" | "announcement";
   contentId: string;
   reportedUserId?: string;
   className?: string;
-  variant?: 'default' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "default" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg" | "icon";
   showText?: boolean;
 }
 
@@ -22,10 +22,10 @@ export default function ReportButton({
   contentType,
   contentId,
   reportedUserId,
-  className = '',
-  variant = 'ghost',
-  size = 'sm',
-  showText = false
+  className = "",
+  variant = "ghost",
+  size,
+  showText = false,
 }: ReportButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -33,7 +33,9 @@ export default function ReportButton({
     <>
       <Button
         variant={variant}
-        size={size}
+        size={
+          size && ["default", "sm", "lg", "icon"].includes(size) ? size : "sm"
+        }
         onClick={() => setIsModalOpen(true)}
         className={`text-gray-500 hover:text-red-600 ${className}`}
       >
