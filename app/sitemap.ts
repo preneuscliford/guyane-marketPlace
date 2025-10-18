@@ -3,6 +3,15 @@ import { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mcguyane.com';
 
+  // Helper to escape XML entities in strings used inside sitemap XML
+  const xmlEscape = (str: string) =>
+    str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+
   // Pages statiques principales
   const staticUrls: MetadataRoute.Sitemap = [
     {
@@ -107,7 +116,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   marketplaceCategories.forEach(category => {
     staticUrls.push({
-      url: `${baseUrl}/marketplace/categories/${category}`,
+      url: xmlEscape(`${baseUrl}/marketplace/categories/${category}`),
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
@@ -123,7 +132,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   serviceCategories.forEach(category => {
     staticUrls.push({
-      url: `${baseUrl}/services?category=${encodeURIComponent(category)}`,
+      url: xmlEscape(`${baseUrl}/services?category=${encodeURIComponent(category)}`),
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.7,
@@ -141,7 +150,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   guyaneLocations.forEach(location => {
     ['services', 'marketplace', 'annonces', 'communaute'].forEach(section => {
       staticUrls.push({
-        url: `${baseUrl}/${section}?location=${encodeURIComponent(location)}`,
+        url: xmlEscape(`${baseUrl}/${section}?location=${encodeURIComponent(location)}`),
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 0.6,
@@ -162,7 +171,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   importantCombinations.forEach(({ location, category }) => {
     ['services', 'marketplace', 'annonces'].forEach(section => {
       staticUrls.push({
-        url: `${baseUrl}/${section}?location=${encodeURIComponent(location)}&category=${encodeURIComponent(category)}`,
+        url: xmlEscape(`${baseUrl}/${section}?location=${encodeURIComponent(location)}&category=${encodeURIComponent(category)}`),
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.5,
