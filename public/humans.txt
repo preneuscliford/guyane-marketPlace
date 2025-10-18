@@ -1,0 +1,38 @@
+/* TEAM */
+Developer: Preneus Cliford
+Site: https://www.linkedin.com/in/preneus-cliford/
+GitHub: https://github.com/preneuscliford
+Location: Guyane française
+Education: Graduate Développeur Full Stack - Studi
+Phone: 07 58 08 05 70
+
+/* SITE */
+Last update: 2025/01/18
+Language: Français
+Standards: HTML5, CSS3, JavaScript, TypeScript
+Components: Next.js 15, React, Tailwind CSS, shadcn/ui
+Backend: Supabase
+Email Service: Resend
+Analytics: Google Analytics, Google Tag Manager
+Hosting: Netlify
+Domain: https://www.mcguyane.com
+
+/* THANKS */
+Merci à la communauté guyanaise qui fait vivre cette plateforme !
+Un grand merci à tous les utilisateurs, vendeurs et prestataires de services.
+Ensemble, nous dynamisons l'économie locale de la Guyane française.
+
+/* SITE FEATURES */
+- Marketplace locale
+- Services professionnels
+- Petites annonces
+- Communauté active
+- Système de messagerie
+- Gestion des favoris
+- Notifications PWA
+
+/* CONTACT */
+Email: contact@mcguyane.com
+Website: https://www.mcguyane.com
+Support: https://www.mcguyane.com/contact
+FAQ: https://www.mcguyane.com/faq

@@ -12,7 +12,8 @@ const MVPBannerContext = createContext<MVPBannerContextType | undefined>(
 );
 
 export function MVPBannerProvider({ children }: { children: ReactNode }) {
-  const [isBannerVisible, setBannerVisible] = useState(true);
+  // Bannière MVP désactivée - Information déplacée vers la page /about
+  const [isBannerVisible, setBannerVisible] = useState(false);
 
   return (
     <MVPBannerContext.Provider value={{ isBannerVisible, setBannerVisible }}>

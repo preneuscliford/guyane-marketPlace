@@ -18,6 +18,7 @@ export default function robots(): MetadataRoute.Robots {
           '/profile/edit',   // Édition profil
           '/*?preview=*',    // Paramètres de preview
           '/private/',       // Dossiers privés
+          '/about-mvp',      // Page MVP ancienne version
         ],
       },
       // Optimisations spéciales pour Google
@@ -25,10 +26,17 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: 'Googlebot',
         allow: [
           '/',
+          '/about',          // Page à propos
+          '/contact',        // Page contact
+          '/faq',            // FAQ
+          '/privacy',        // Politique de confidentialité
+          '/terms',          // Conditions d'utilisation
+          '/cookies',        // Politique cookies
           '/services/',
           '/services/*',      // Toutes les pages de services
           '/marketplace/',
           '/marketplace/*',   // Tous les produits
+          '/marketplace/categories/*', // Catégories marketplace
           '/annonces/',
           '/annonces/*',      // Toutes les annonces
           '/communaute/',
@@ -41,6 +49,7 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/auth/callback',
           '/private/',
+          '/about-mvp',
         ],
         // Délai recommandé pour éviter la surcharge serveur
         crawlDelay: 1,

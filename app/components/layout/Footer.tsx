@@ -1,13 +1,5 @@
 import Link from "next/link";
-import {
-  ShoppingBag,
-  Facebook,
-  Twitter,
-  Instagram,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 export function Footer() {
   return (
@@ -27,26 +19,6 @@ export function Footer() {
               Rejoignez notre communauté et découvrez tout ce que la Guyane a à
               offrir.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-purple-400 transition-colors duration-200"
-              >
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-purple-400 transition-colors duration-200"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-purple-400 transition-colors duration-200"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-            </div>
           </div>
 
           {/* Navigation */}
@@ -109,7 +81,7 @@ export function Footer() {
                     href="/communaute"
                     className="text-gray-400 hover:text-purple-300 transition-colors duration-200"
                   >
-                    Actualités
+                    Communauté
                   </Link>
                 </li>
               </ul>
@@ -153,28 +125,6 @@ export function Footer() {
                   </Link>
                 </li>
               </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Contact */}
-        <div className="border-t border-gray-800 pt-8 pb-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
-              <div className="flex items-center">
-                <Mail className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">
-                  contact@guyane-marketplace.com
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Phone className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">+594 594 123 456</span>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-gray-400">Cayenne, Guyane Française</span>
-              </div>
             </div>
           </div>
         </div>

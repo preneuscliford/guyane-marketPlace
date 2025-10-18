@@ -64,11 +64,19 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Optimisations SEO et performance
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 60,
     // Permettre les fichiers SVG locaux
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  // Compression et optimisations
+  compress: true,
+  poweredByHeader: false, // Retire le header X-Powered-By pour la sécurité
   // Configuration PWA
   async headers() {
     return [

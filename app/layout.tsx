@@ -57,6 +57,58 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#667eea" />
+
+        {/* Schema.org structured data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "MCGuyane",
+              alternateName: "Marketplace Guyane",
+              url: "https://www.mcguyane.com",
+              logo: "https://www.mcguyane.com/icon.svg",
+              description:
+                "Première plateforme de services, produits et annonces en Guyane française",
+              address: {
+                "@type": "PostalAddress",
+                addressRegion: "Guyane française",
+                addressCountry: "GF",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+33-7-58-08-05-70",
+                contactType: "customer service",
+                availableLanguage: ["French"],
+              },
+              sameAs: [
+                "https://github.com/preneuscliford",
+                "https://www.linkedin.com/in/preneus-cliford/",
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "MCGuyane",
+              url: "https://www.mcguyane.com",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate:
+                    "https://www.mcguyane.com/services?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
       </head>
       <body
         className={`${inter.className} min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col pt-28 sm:pt-32`}

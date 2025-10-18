@@ -11,6 +11,44 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1,
     },
+    // Pages légales et informatives (importantes pour SEO et confiance)
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/faq`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/cookies`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    // Pages principales de contenu
     {
       url: `${baseUrl}/services`,
       lastModified: new Date(),
@@ -60,6 +98,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
   ];
+
+  // Ajout des catégories marketplace (nouvelles routes corrigées)
+  const marketplaceCategories = [
+    'artisanat', 'agriculture', 'tourisme', 'produits', 
+    'restauration', 'evenements', 'bien-etre'
+  ];
+  
+  marketplaceCategories.forEach(category => {
+    staticUrls.push({
+      url: `${baseUrl}/marketplace/categories/${category}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    });
+  });
 
   // Ajout des pages de catégories pour services
   const serviceCategories = [
