@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Search, Star, Users, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -98,13 +98,11 @@ export function Hero() {
                 asChild
               >
                 <Link
-                  href="/marketplace"
+                  href="/annonces/nouvelle"
                   className="flex items-center justify-center gap-2"
                 >
                   <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="whitespace-nowrap">
-                    Explorer la marketplace
-                  </span>
+                  <span className="whitespace-nowrap">Publier une annonce</span>
                 </Link>
               </Button>
               <Button
@@ -114,13 +112,11 @@ export function Hero() {
                 asChild
               >
                 <Link
-                  href="/auth"
+                  href="/annonces"
                   className="flex items-center justify-center gap-2"
                 >
                   <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="whitespace-nowrap">
-                    Rejoindre la communauté
-                  </span>
+                  <span className="whitespace-nowrap">Voir les annonces</span>
                 </Link>
               </Button>
             </motion.div>

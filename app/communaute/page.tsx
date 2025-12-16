@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -187,6 +187,15 @@ export default function CommunautePage() {
       setPosts((prev) => [newPost as Post, ...prev]);
       setNewPostContent("");
       toast.success("Post publié avec succès!");
+      try {
+        // Tracking GA (si disponible)
+        if (typeof window !== "undefined" && window.gtag) {
+          window.gtag("event", "community_post_create", {
+            event_category: "Communauté",
+            event_label: "new_post",
+          });
+        }
+      } catch {}
 
       // Recharger les statistiques
       fetchStats();
@@ -463,21 +472,23 @@ export default function CommunautePage() {
                 Communauté
               </h1>
               <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 leading-relaxed">
-                Partagez, discutez et connectez-vous avec la communauté
-                guyanaise
+                Un espace pour échanger entre Guyanais, poser des questions, partager des opportunités locales.
               </p>
             </div>
 
-            <div className="flex-shrink-0">
-              <FeedbackModal>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 py-2"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                  <span className="whitespace-nowrap">Aide & Feedback</span>
-                </Button>
-              </FeedbackModal>
+            <div className="flex-shrink-0 flex items-center gap-2">
+              <Button
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+                onClick={() => {
+                  const el = document.querySelector("#new-post-form");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Poster un message
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="/auth">Rejoindre la communauté</a>
+              </Button>
             </div>
           </div>
 
@@ -570,6 +581,7 @@ export default function CommunautePage() {
                 <CardContent>
                   <div className="space-y-4">
                     <Textarea
+                      id="new-post-form"
                       placeholder="Quoi de neuf ? Partagez vos pensées avec la communauté..."
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}

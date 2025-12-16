@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { Database } from "@/types/supabase";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 
 const CATEGORIES = [
   "Véhicules",
@@ -36,6 +37,7 @@ export default function AnnouncementForm({
 }: AnnouncementFormProps) {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+  const { trackEvent } = useGoogleAnalytics();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
@@ -81,6 +83,11 @@ export default function AnnouncementForm({
 
       if (error) throw error;
       toast.success("Annonce publiée avec succès!");
+      trackEvent({
+        action: initialData?.id ? "update_announcement" : "publish_announcement",
+        category: "Annonces",
+        label: formData.title,
+      });
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Error:", error);
