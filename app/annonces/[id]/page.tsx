@@ -68,41 +68,60 @@ export default function AnnouncementDetailPage() {
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
         // Compter le nombre d'annonces du vendeur
-        const { data: announcements, error: announcementsError, count } = await supabase
+        const {
+          data: announcements,
+          error: announcementsError,
+          count,
+        } = await supabase
           .from("announcements")
           .select("id", { count: "exact" })
           .eq("user_id", vendorId)
           .eq("is_hidden", false);
 
-        if (announcementsError) throw announcementsError;
-
-        // Récupérer les avis du vendeur (si table reviews existe)
-        const { data: reviews, error: reviewsError } = await supabase
-          .from("reviews")
-          .select("rating")
-          .eq("seller_id", vendorId);
-
-        if (reviewsError && reviewsError.code !== "PGRST116") {
-          // PGRST116 = table doesn't exist, c'est OK
-          throw reviewsError;
+        if (announcementsError) {
+          console.error("Error fetching announcements count:", announcementsError);
+          throw announcementsError;
         }
 
-        let satisfactionRate = 0;
-        if (reviews && reviews.length > 0) {
-          const avgRating =
-            reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
-          satisfactionRate = Math.round((avgRating / 5) * 100);
+        console.log("Announcements count:", count, "vendorId:", vendorId);
+
+        // Récupérer les avis du vendeur - essayer d'abord
+        let satisfactionRate = 95; // valeur par défaut
+        let reviews: any[] = [];
+
+        try {
+          const { data: reviewsData, error: reviewsError } = await supabase
+            .from("reviews")
+            .select("rating")
+            .eq("seller_id", vendorId);
+
+          // Si la table n'existe pas (PGRST116), c'est OK
+          if (reviewsError && reviewsError.code !== "PGRST116") {
+            console.warn("Reviews fetch error:", reviewsError);
+          } else if (reviewsData && reviewsData.length > 0) {
+            reviews = reviewsData;
+            const avgRating =
+              reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+            satisfactionRate = Math.round((avgRating / 5) * 100);
+            console.log("Reviews found:", reviews.length, "Avg rating:", satisfactionRate + "%");
+          }
+        } catch (err) {
+          console.warn("Exception fetching reviews (non-blocking):", err);
         }
 
         setVendorStats({
           announcementsCount: count || announcements?.length || 0,
-          satisfactionRate: satisfactionRate || 95,
+          satisfactionRate: satisfactionRate,
           responseTime: "< 2h",
         });
+        console.log("VendorStats updated successfully");
         return; // Succès
       } catch (error) {
         lastError = error;
-        console.error(`Attempt ${attempt + 1}/${retries} - Error fetching vendor stats:`, error);
+        console.error(
+          `Attempt ${attempt + 1}/${retries} - Error fetching vendor stats:`,
+          error
+        );
 
         // Attendre avant de retenter (délai exponentiel)
         if (attempt < retries - 1) {
@@ -146,20 +165,30 @@ export default function AnnouncementDetailPage() {
           .eq("id", id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching announcement:", error);
+          throw error;
+        }
         if (!data) throw new Error("No announcement found");
 
+        console.log("Announcement fetched successfully:", data);
         setAnnouncement(data as any);
 
         // Récupérer les stats du vendeur
         if (data?.user_id) {
+          console.log("Fetching vendor stats for user_id:", data.user_id);
           await fetchVendorStats(data.user_id);
+        } else {
+          console.warn("No user_id found in announcement data");
         }
         setLoading(false);
         return; // Succès
       } catch (error) {
         lastError = error;
-        console.error(`Attempt ${attempt + 1}/${retries} - Error fetching announcement:`, error);
+        console.error(
+          `Attempt ${attempt + 1}/${retries} - Error fetching announcement:`,
+          error
+        );
 
         // Attendre avant de retenter (délai exponentiel)
         if (attempt < retries - 1) {

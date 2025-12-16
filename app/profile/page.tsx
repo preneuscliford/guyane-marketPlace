@@ -14,7 +14,10 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -55,7 +58,7 @@ export default function ProfilePage() {
         alert("L'image ne doit pas dépasser 2 Mo");
         return;
       }
-      
+
       setAvatarFile(file);
       setAvatarUrl(URL.createObjectURL(file));
     }
@@ -70,22 +73,22 @@ export default function ProfilePage() {
     if (!user || !avatarFile) return null;
 
     try {
-      const fileExt = avatarFile.name.split('.').pop();
+      const fileExt = avatarFile.name.split(".").pop();
       const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-      
+
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(filePath, avatarFile);
-        
+
       if (uploadError) {
-        console.error('Erreur upload:', uploadError);
+        console.error("Erreur upload:", uploadError);
         throw uploadError;
       }
-      
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+
+      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
       return data.publicUrl;
     } catch (error) {
-      console.error('Erreur lors du téléchargement de l\'avatar:', error);
+      console.error("Erreur lors du téléchargement de l'avatar:", error);
       return null;
     }
   };
@@ -95,20 +98,26 @@ export default function ProfilePage() {
    */
   const validateForm = () => {
     if (!formData.username.trim()) {
-      setMessage({ type: 'error', text: 'Le nom d\'utilisateur est requis.' });
+      setMessage({ type: "error", text: "Le nom d'utilisateur est requis." });
       return false;
     }
-    
+
     if (formData.username.length < 3) {
-      setMessage({ type: 'error', text: 'Le nom d\'utilisateur doit contenir au moins 3 caractères.' });
+      setMessage({
+        type: "error",
+        text: "Le nom d'utilisateur doit contenir au moins 3 caractères.",
+      });
       return false;
     }
-    
+
     if (formData.website && !formData.website.match(/^https?:\/\/.+/)) {
-      setMessage({ type: 'error', text: 'L\'URL du site web doit commencer par http:// ou https://' });
+      setMessage({
+        type: "error",
+        text: "L'URL du site web doit commencer par http:// ou https://",
+      });
       return false;
     }
-    
+
     return true;
   };
 
@@ -128,42 +137,47 @@ export default function ProfilePage() {
     try {
       setLoading(true);
       setMessage(null);
-      
+
       // Télécharger l'avatar si nécessaire
       let newAvatarUrl = user?.profile?.avatar_url;
       if (avatarFile) {
         const uploadResult = await uploadAvatar();
         if (uploadResult === null) {
-          throw new Error('Échec du téléchargement de l\'avatar');
+          throw new Error("Échec du téléchargement de l'avatar");
         }
         newAvatarUrl = uploadResult;
       } else if (avatarUrl === null && user?.profile?.avatar_url) {
         // L'utilisateur a supprimé son avatar
         newAvatarUrl = undefined;
       }
-      
+
       // Préparer les données du profil
       const profileData = {
         username: formData.username,
         full_name: formData.full_name,
         bio: formData.bio,
         location: formData.location,
-        skills: formData.skills ? formData.skills.split(',').map(s => s.trim()) : [],
+        skills: formData.skills
+          ? formData.skills.split(",").map((s) => s.trim())
+          : [],
         phone: formData.phone,
         website: formData.website,
         avatar_url: newAvatarUrl,
       };
-      
+
       const { error } = await updateProfile(profileData);
-      
+
       if (error) throw error;
-      
-      setMessage({ type: 'success', text: 'Profil mis à jour avec succès!' });
+
+      setMessage({ type: "success", text: "Profil mis à jour avec succès!" });
       // Effacer le message après 5 secondes
       setTimeout(() => setMessage(null), 5000);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil:", error);
-      setMessage({ type: 'error', text: 'Une erreur est survenue lors de la mise à jour du profil.' });
+      setMessage({
+        type: "error",
+        text: "Une erreur est survenue lors de la mise à jour du profil.",
+      });
       // Effacer le message après 5 secondes
       setTimeout(() => setMessage(null), 5000);
     } finally {
@@ -175,25 +189,45 @@ export default function ProfilePage() {
     <ProtectedLayout>
       <div className="container max-w-3xl py-8">
         <h1 className="text-3xl font-bold mb-8">Mon Profil</h1>
-        
+
         {/* Message de succès ou d'erreur */}
         {message && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            message.type === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-red-50 border border-red-200 text-red-800'
-          }`}>
+          <div
+            className={`mb-6 p-4 rounded-lg ${
+              message.type === "success"
+                ? "bg-green-50 border border-green-200 text-green-800"
+                : "bg-red-50 border border-red-200 text-red-800"
+            }`}
+          >
             <div className="flex items-center">
-              <div className={`flex-shrink-0 ${
-                message.type === 'success' ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {message.type === 'success' ? (
-                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <div
+                className={`flex-shrink-0 ${
+                  message.type === "success" ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                {message.type === "success" ? (
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 ) : (
-                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 )}
               </div>
@@ -204,9 +238,9 @@ export default function ProfilePage() {
                 <button
                   onClick={() => setMessage(null)}
                   className={`inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    message.type === 'success'
-                      ? 'text-green-500 hover:bg-green-100 focus:ring-green-600'
-                      : 'text-red-500 hover:bg-red-100 focus:ring-red-600'
+                    message.type === "success"
+                      ? "text-green-500 hover:bg-green-100 focus:ring-green-600"
+                      : "text-red-500 hover:bg-red-100 focus:ring-red-600"
                   }`}
                 >
                   <X className="h-4 w-4" />
@@ -215,7 +249,7 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-        
+
         <div className="bg-white rounded-lg shadow-md p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col items-center mb-6">
@@ -240,12 +274,17 @@ export default function ProfilePage() {
                 ) : (
                   <div className="h-32 w-32 rounded-full bg-indigo-100 flex items-center justify-center">
                     <span className="text-indigo-800 font-bold text-4xl">
-                      {formData.username ? formData.username.charAt(0).toUpperCase() : "?"}
+                      {formData.username
+                        ? formData.username.charAt(0).toUpperCase()
+                        : "?"}
                     </span>
                   </div>
                 )}
-                
-                <label htmlFor="avatar" className="absolute bottom-0 right-0 bg-indigo-600 text-white rounded-full p-2 shadow-md hover:bg-indigo-700 transition-colors cursor-pointer">
+
+                <label
+                  htmlFor="avatar"
+                  className="absolute bottom-0 right-0 bg-indigo-600 text-white rounded-full p-2 shadow-md hover:bg-indigo-700 transition-colors cursor-pointer"
+                >
                   <Camera size={20} />
                   <input
                     id="avatar"
@@ -260,10 +299,13 @@ export default function ProfilePage() {
                 JPG, PNG ou GIF. 2 Mo maximum.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Nom d&apos;utilisateur*
                 </label>
                 <input
@@ -276,9 +318,12 @@ export default function ProfilePage() {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="full_name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Nom complet
                 </label>
                 <input
@@ -290,9 +335,12 @@ export default function ProfilePage() {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              
+
               <div className="md:col-span-2">
-                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="bio"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Biographie
                 </label>
                 <textarea
@@ -305,9 +353,12 @@ export default function ProfilePage() {
                   placeholder="Parlez-nous de vous..."
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Localisation
                 </label>
                 <input
@@ -320,9 +371,12 @@ export default function ProfilePage() {
                   placeholder="Cayenne, Guyane"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Téléphone
                 </label>
                 <input
@@ -334,9 +388,12 @@ export default function ProfilePage() {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="skills"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Compétences
                 </label>
                 <input
@@ -349,9 +406,12 @@ export default function ProfilePage() {
                   placeholder="Séparées par des virgules"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="website"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Site web
                 </label>
                 <input
@@ -365,7 +425,7 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end pt-4">
               <Button
                 type="submit"
