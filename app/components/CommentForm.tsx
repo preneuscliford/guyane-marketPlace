@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "../hooks/useAuth";
 
 interface CommentFormProps {
@@ -15,7 +15,7 @@ export default function CommentForm({
 }: CommentFormProps) {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const supabase = createClientComponentClient();
+  const client = supabase;
   const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +33,7 @@ export default function CommentForm({
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("comments").insert([
+      const { error } = await client.from("comments").insert([
         {
           content: content.trim(),
           post_id: postId,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +36,7 @@ export default function AnnouncementForm({
   initialData,
 }: AnnouncementFormProps) {
   const { user } = useAuth();
-  const supabase = createClientComponentClient();
+  const client = supabase;
   const { trackEvent } = useGoogleAnalytics();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -57,7 +57,7 @@ export default function AnnouncementForm({
       let error;
       if (initialData?.id) {
         // Update existing announcement
-        ({ error } = await supabase
+        ({ error } = await client
           .from("announcements")
           .update({
             title: formData.title,
@@ -70,7 +70,7 @@ export default function AnnouncementForm({
           .eq("id", initialData.id));
       } else {
         // Create new announcement
-        ({ error } = await supabase.from("announcements").insert({
+        ({ error } = await client.from("announcements").insert({
           title: formData.title,
           description: formData.description,
           price: formData.price ? Number(formData.price) : null,

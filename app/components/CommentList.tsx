@@ -1,4 +1,4 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
 interface Comment {
@@ -19,11 +19,11 @@ interface CommentListProps {
 export default function CommentList({ postId }: CommentListProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   useEffect(() => {
     const fetchComments = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from("comments")
         .select(
           `
@@ -48,7 +48,7 @@ export default function CommentList({ postId }: CommentListProps) {
     fetchComments();
 
     // Souscription aux changements en temps réel
-    const channel = supabase
+    const channel = client
       .channel("comments-channel")
       .on(
         "postgres_changes",
@@ -73,7 +73,7 @@ export default function CommentList({ postId }: CommentListProps) {
     return () => {
       channel.unsubscribe();
     };
-  }, [postId, supabase]);
+  }, [postId]);
 
   if (loading) {
     return (

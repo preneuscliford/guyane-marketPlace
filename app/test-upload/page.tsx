@@ -1,14 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function TestUploadPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,11 +35,11 @@ export default function TestUploadPage() {
       console.log("Tentative d'upload vers:", filePath);
 
       // Test de connexion Supabase
-      const { data: user } = await supabase.auth.getUser();
+      const { data: user } = await client.auth.getUser();
       console.log("Utilisateur connecté:", user.user?.email || "Non connecté");
 
       // Upload du fichier
-      const { data, error: uploadError } = await supabase.storage
+      const { data, error: uploadError } = await client.storage
         .from("announcements-images")
         .upload(filePath, file, {
           cacheControl: "3600",
@@ -54,7 +54,7 @@ export default function TestUploadPage() {
       console.log("Upload réussi:", data);
 
       // Récupérer l'URL publique
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = client.storage
         .from("announcements-images")
         .getPublicUrl(filePath);
 

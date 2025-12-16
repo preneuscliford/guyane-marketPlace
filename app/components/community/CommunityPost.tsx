@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
@@ -28,43 +28,9 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-
-interface Profile {
-  id: string;
-  username: string;
-  avatar_url?: string;
-  full_name?: string; // Utilise full_name au lieu de business_name
-  bio?: string; // Ajout du champ bio qui existe dans la DB
-}
-
-// Permet d'accepter une Profile ou un objet qui contient au moins les champs requis d'une Profile
-type ProfileLike =
-  | Profile
-  | {
-      id: string;
-      username: string;
-      [key: string]: any;
-    };
-
-interface Post {
-  id: string;
-  content: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  is_hidden: boolean;
-  like_count: number;
-  comment_count: number;
-  profiles: ProfileLike;
-  user_liked?: boolean;
-}
-
-interface CommunityPostProps {
-  post: Post;
-  level?: number;
-  maxLevel?: number;
-  onUpdate?: () => void;
-}
+import type { Post, CommunityPostProps } from "@/types/community";
+import type { Database } from "@/types/supabase";
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 /**
  * Composant pour afficher un post de la communauté avec système de likes,
@@ -78,8 +44,8 @@ export default function CommunityPost({
 }: CommunityPostProps) {
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(post.user_liked || false);
-  const [likeCount, setLikeCount] = useState(post.like_count);
-  const [commentCount, setCommentCount] = useState(post.comment_count);
+  const [likeCount, setLikeCount] = useState<number>(post.like_count);
+  const [commentCount, setCommentCount] = useState<number>(post.comment_count);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
@@ -196,15 +162,19 @@ export default function CommunityPost({
         content: c.content,
         user_id: c.user_id,
         created_at: c.created_at,
-        updated_at: c.created_at, // Les commentaires n'ont pas updated_at, on utilise created_at
+        updated_at: c.created_at,
+        hidden_at: null,
+        hidden_by: null,
+        hidden_reason: null,
+        image_url: null,
         is_hidden: c.is_hidden || false,
-        like_count: 0, // Les commentaires n'ont pas de like_count, on initialise à 0
-        comment_count: 0, // Les commentaires n'ont pas de sous-commentaires
+        like_count: 0,
+        comment_count: 0,
         profiles: profilesMap[c.user_id] || {
           id: c.user_id,
           username: "Utilisateur",
         },
-        user_liked: false, // Par défaut, on suppose que l'utilisateur n'a pas aimé le commentaire
+        user_liked: false,
       }));
 
       // Afficher le nombre de commentaires récupérés pour debug
@@ -274,7 +244,7 @@ export default function CommunityPost({
         setLikeCount((prev) => prev - 1);
         toast.success("Like retiré");
       }
-    } catch (error) {
+    } catch {
       toast.error("Une erreur est survenue, veuillez réessayer");
     } finally {
       setIsProcessingLike(false);
@@ -312,9 +282,20 @@ export default function CommunityPost({
       }
 
       // Étape 2: Récupérer le profil utilisateur pour créer le commentaire dans l'interface
-      let userProfile: ProfileLike = {
+      let userProfile: ProfileRow = {
         id: user.id,
         username: "Utilisateur",
+        avatar_url: null,
+        bio: null,
+        created_at: new Date().toISOString(),
+        description: null,
+        full_name: null,
+        location: null,
+        phone: null,
+        role: null,
+        skills: null,
+        updated_at: new Date().toISOString(),
+        website: null,
       };
 
       try {
@@ -328,8 +309,17 @@ export default function CommunityPost({
           userProfile = {
             id: data.id,
             username: data.username || "Utilisateur",
-            avatar_url: data.avatar_url,
-            full_name: data.full_name,
+            avatar_url: data.avatar_url ?? null,
+            bio: null,
+            created_at: new Date().toISOString(),
+            description: null,
+            full_name: data.full_name ?? null,
+            location: null,
+            phone: null,
+            role: null,
+            skills: null,
+            updated_at: new Date().toISOString(),
+            website: null,
           };
         }
       } catch (err) {
@@ -344,6 +334,10 @@ export default function CommunityPost({
         user_id: user.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        hidden_at: null,
+        hidden_by: null,
+        hidden_reason: null,
+        image_url: null,
         is_hidden: false,
         like_count: 0,
         comment_count: 0,
@@ -352,7 +346,7 @@ export default function CommunityPost({
       };
 
       // Mettre à jour l'interface utilisateur avec le nouveau commentaire
-      setReplies((prev) => [...prev, newReply]);
+      setReplies((prev: Post[]) => [...prev, newReply]);
       setReplyContent("");
       setShowReplyForm(false);
 
@@ -360,7 +354,7 @@ export default function CommunityPost({
       setRepliesVisible(true);
 
       // Mettre à jour le compteur de commentaires dans le post parent (une seule fois)
-      setCommentCount((prev) => (prev || 0) + 1);
+      setCommentCount((prev: number) => (prev || 0) + 1);
 
       // Rafraîchir la liste complète des commentaires pour s'assurer que tout est synchronisé
       console.log("Commentaire ajouté, actualisation dans 1 seconde...");
@@ -532,7 +526,7 @@ export default function CommunityPost({
               <ReportButton
                 contentType="post"
                 contentId={post.id}
-                reportedUserId={post.user_id}
+                reportedUserId={post.user_id ?? undefined}
                 variant="ghost"
                 size="sm"
               />

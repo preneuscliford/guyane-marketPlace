@@ -113,7 +113,6 @@ const nextConfig: NextConfig = {
       ].filter(Boolean),
     },
     optimizePackageImports: [
-      "@supabase/supabase-js",
       "@radix-ui/react-dropdown-menu",
     ],
   },

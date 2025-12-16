@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Button } from "../../app/components/ui/button";
 import { Badge } from "../../app/components/ui/badge";
 import { Card, CardContent } from "../../app/components/ui/card";
@@ -36,7 +36,7 @@ export default function ProductGrid({
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   // Fonction pour générer une image de placeholder basée sur la catégorie
   const getPlaceholderImage = (category: string, productId: string) => {
@@ -122,7 +122,7 @@ export default function ProductGrid({
     try {
       if (isLiked) {
         // Retirer le like
-        await supabase
+        await client
           .from("product_likes")
           .delete()
           .eq("user_id", user.id)
@@ -132,7 +132,7 @@ export default function ProductGrid({
         toast.success("Produit retiré de vos favoris");
       } else {
         // Ajouter le like
-        await supabase
+        await client
           .from("product_likes")
           .insert([{ user_id: user.id, product_id: productId }]);
 

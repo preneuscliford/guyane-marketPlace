@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import CommunityPost from "@/components/community/CommunityPost";
 import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
-import FeedbackModal from "@/components/feedback/FeedbackModal";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -28,42 +28,12 @@ import {
   MessageCircle,
   Heart,
   Share2,
-  HelpCircle,
 } from "lucide-react";
+import type { Post } from "@/types/community";
+import type { Database } from "@/types/supabase";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
-interface Profile {
-  id: string;
-  username: string;
-  avatar_url?: string;
-  full_name?: string; // Utilise full_name au lieu de business_name
-  bio?: string; // Ajout du champ bio qui existe dans la DB
-}
-
-interface Like {
-  user_id: string;
-}
-
-interface Post {
-  id: string;
-  user_id: string; // Changed from author_id to match database
-  content: string;
-  image_url?: string | null; // Added to match database
-  created_at: string;
-  updated_at: string;
-  is_hidden: boolean;
-  hidden_by?: string | null; // Added to match database
-  hidden_at?: string | null; // Added to match database
-  hidden_reason?: string | null; // Added to match database
-
-  // Données des jointures
-  profiles?: Profile; // Made optional since we'll add it manually
-  likes?: Like[]; // Le tableau des likes récupéré par la jointure
-
-  // Custom fields added by our app logic
-  like_count?: number; // Made optional, calculated from likes
-  comment_count?: number; // Made optional, calculated from comments
-  user_liked?: boolean; // Optional
-}
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface CommunityStats {
   total_posts: number;
@@ -78,6 +48,7 @@ interface CommunityStats {
  */
 export default function CommunautePage() {
   const { user } = useAuth();
+  const { trackPostCreated, trackSearch } = useAnalytics();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [newPostContent, setNewPostContent] = useState("");
@@ -177,16 +148,60 @@ export default function CommunautePage() {
         throw error;
       }
 
-      const newPost = {
-        ...data,
-        user_liked: false,
+      // Construction explicite du Post avec typage unifié
+      const profilesData = (data as any)?.profiles;
+      const mappedProfile: ProfileRow | undefined =
+        profilesData &&
+        typeof profilesData === "object" &&
+        !("error" in profilesData)
+          ? {
+              id: profilesData.id ?? "",
+              username: profilesData.username ?? null,
+              avatar_url: profilesData.avatar_url ?? null,
+              full_name: profilesData.full_name ?? null,
+              bio: profilesData.bio ?? null,
+              created_at:
+                (profilesData.created_at as string) ?? new Date().toISOString(),
+              updated_at:
+                (profilesData.updated_at as string) ?? new Date().toISOString(),
+              description: (profilesData.description as string) ?? null,
+              location: (profilesData.location as string) ?? null,
+              phone: (profilesData.phone as string) ?? null,
+              role: (profilesData.role as string) ?? null,
+              skills: (profilesData.skills as string[]) ?? null,
+              website: (profilesData.website as string) ?? null,
+            }
+          : undefined;
+
+      const newPost: Post = {
+        id: data.id,
+        content: data.content,
+        user_id: data.user_id,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        hidden_at: data.hidden_at ?? null,
+        hidden_by: data.hidden_by ?? null,
+        hidden_reason: data.hidden_reason ?? null,
+        image_url: data.image_url ?? null,
+        is_hidden: data.is_hidden ?? false,
+        profiles: mappedProfile,
         like_count: 0,
+        comment_count: 0,
+        user_liked: false,
+        likes: [],
       };
 
-      // Fix for type issues - explicitly cast to Post
-      setPosts((prev) => [newPost as Post, ...prev]);
+      setPosts((prev) => [newPost, ...prev]);
       setNewPostContent("");
       toast.success("Post publié avec succès!");
+
+      // Track: Post créé
+      trackPostCreated({
+        content_length: newPostContent.length,
+        has_image: false,
+        post_type: "community_post",
+      });
+
       try {
         // Tracking GA (si disponible)
         if (typeof window !== "undefined" && window.gtag) {
@@ -212,6 +227,15 @@ export default function CommunautePage() {
    */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Track: Recherche effectuée
+    if (searchQuery.trim()) {
+      trackSearch({
+        search_term: searchQuery,
+        category: "community",
+      });
+    }
+
     fetchPosts();
   };
 
@@ -284,19 +308,20 @@ export default function CommunautePage() {
 
       try {
         // 1. Nettoyer et transformer les données
-        const cleanedPosts: Post[] = data.map((rawPost) => {
+        const rows = (data as any[]) || [];
+        const cleanedPosts: Post[] = rows.map((rawPost: any) => {
           // Créer un nouveau post avec la structure attendue
           const cleanPost: Post = {
-            id: rawPost.id || "",
-            user_id: rawPost.user_id || "",
-            content: rawPost.content || "",
-            image_url: rawPost.image_url,
-            created_at: rawPost.created_at || new Date().toISOString(),
-            updated_at: rawPost.updated_at || new Date().toISOString(),
-            is_hidden: rawPost.is_hidden || false,
-            hidden_by: rawPost.hidden_by,
-            hidden_at: rawPost.hidden_at,
-            hidden_reason: rawPost.hidden_reason,
+            id: rawPost.id ?? "",
+            user_id: rawPost.user_id ?? null,
+            content: rawPost.content ?? "",
+            image_url: rawPost.image_url ?? null,
+            created_at: rawPost.created_at ?? new Date().toISOString(),
+            updated_at: rawPost.updated_at ?? new Date().toISOString(),
+            is_hidden: rawPost.is_hidden ?? false,
+            hidden_by: rawPost.hidden_by ?? null,
+            hidden_at: rawPost.hidden_at ?? null,
+            hidden_reason: rawPost.hidden_reason ?? null,
 
             // Gérer le profil avec une valeur par défaut en cas d'erreur
             profiles:
@@ -304,16 +329,23 @@ export default function CommunautePage() {
               typeof rawPost.profiles === "object" &&
               !("error" in rawPost.profiles)
                 ? {
-                    id: rawPost.profiles.id || "",
-                    username: rawPost.profiles.username || "Utilisateur",
-                    avatar_url: rawPost.profiles.avatar_url,
-                    full_name: rawPost.profiles.full_name,
-                    bio: rawPost.profiles.bio,
+                    id: rawPost.profiles.id ?? "",
+                    username: rawPost.profiles.username ?? null,
+                    avatar_url: rawPost.profiles.avatar_url ?? null,
+                    full_name: rawPost.profiles.full_name ?? null,
+                    bio: rawPost.profiles.bio ?? null,
+                    created_at:
+                      rawPost.profiles.created_at ?? new Date().toISOString(),
+                    updated_at:
+                      rawPost.profiles.updated_at ?? new Date().toISOString(),
+                    description: rawPost.profiles.description ?? null,
+                    location: rawPost.profiles.location ?? null,
+                    phone: rawPost.profiles.phone ?? null,
+                    role: rawPost.profiles.role ?? null,
+                    skills: rawPost.profiles.skills ?? null,
+                    website: rawPost.profiles.website ?? null,
                   }
-                : {
-                    id: "",
-                    username: "Utilisateur inconnu",
-                  },
+                : undefined,
 
             // Transformer les likes en tableau
             likes: Array.isArray(rawPost.likes) ? rawPost.likes : [],
@@ -334,7 +366,9 @@ export default function CommunautePage() {
           // Déterminer si l'utilisateur actuel a liké
           const userLiked =
             post.likes && user
-              ? post.likes.some((like) => like.user_id === user.id)
+              ? post.likes.some(
+                  (like: { user_id: string }) => like.user_id === user.id
+                )
               : false;
 
           return {
@@ -392,24 +426,39 @@ export default function CommunautePage() {
         console.error("Erreur lors du traitement des posts:", processError);
 
         // En cas d'erreur de traitement, utiliser les données brutes
-        const simplePosts: Post[] = data.map((p) => ({
+        const simplePosts: Post[] = ((data as any[]) || []).map((p: any) => ({
           id: p.id,
-          user_id: p.user_id,
+          user_id: p.user_id ?? null,
           content: p.content,
-          image_url: p.image_url,
+          image_url: p.image_url ?? null,
           created_at: p.created_at,
           updated_at: p.updated_at,
-          is_hidden: p.is_hidden,
+          hidden_at: p.hidden_at ?? null,
+          hidden_by: p.hidden_by ?? null,
+          hidden_reason: p.hidden_reason ?? null,
+          is_hidden: p.is_hidden ?? false,
           profiles:
             typeof p.profiles === "object" && p.profiles
               ? {
-                  id: p.profiles.id || "",
-                  username: p.profiles.username || "Utilisateur",
+                  id: p.profiles.id ?? "",
+                  username: p.profiles.username ?? null,
+                  avatar_url: p.profiles.avatar_url ?? null,
+                  full_name: p.profiles.full_name ?? null,
+                  bio: p.profiles.bio ?? null,
+                  created_at: p.profiles.created_at ?? new Date().toISOString(),
+                  updated_at: p.profiles.updated_at ?? new Date().toISOString(),
+                  description: p.profiles.description ?? null,
+                  location: p.profiles.location ?? null,
+                  phone: p.profiles.phone ?? null,
+                  role: p.profiles.role ?? null,
+                  skills: p.profiles.skills ?? null,
+                  website: p.profiles.website ?? null,
                 }
-              : { id: "", username: "Utilisateur inconnu" },
+              : undefined,
           like_count: 0,
           comment_count: 0,
           user_liked: false,
+          likes: [],
         }));
 
         setPosts(simplePosts);
@@ -426,15 +475,29 @@ export default function CommunautePage() {
           user_id: "system",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          hidden_at: null,
+          hidden_by: null,
+          hidden_reason: null,
+          image_url: null,
           is_hidden: false,
           like_count: 0,
           comment_count: 0,
+          user_liked: false,
+          likes: [],
           profiles: {
             id: "system",
             username: "Système",
-            avatar_url: undefined,
-            full_name: undefined,
-            bio: undefined,
+            avatar_url: null,
+            full_name: null,
+            bio: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            description: null,
+            location: null,
+            phone: null,
+            role: null,
+            skills: null,
+            website: null,
           },
         },
       ];
@@ -472,7 +535,8 @@ export default function CommunautePage() {
                 Communauté
               </h1>
               <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 leading-relaxed">
-                Un espace pour échanger entre Guyanais, poser des questions, partager des opportunités locales.
+                Un espace pour échanger entre Guyanais, poser des questions,
+                partager des opportunités locales.
               </p>
             </div>
 
@@ -535,6 +599,45 @@ export default function CommunautePage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Message incitatif de la communauté */}
+          <Card className="bg-gradient-to-r from-purple-50 to-emerald-50 border-purple-200">
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
+                Bienvenue dans la communauté mcGuyane
+              </h3>
+              <p className="text-gray-700 text-sm sm:text-base mb-4">
+                Un espace pour discuter, s'entraider et partager les bons plans
+                locaux en Guyane française.
+              </p>
+              <ul className="text-gray-600 text-sm space-y-2 mb-4">
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
+                  <span>
+                    Posez vos questions et obtenez des réponses d'habitants
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
+                  <span>Partagez des bons plans, offres et opportunités</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
+                  <span>
+                    Connectez-vous avec d'autres résidents et professionnels
+                  </span>
+                </li>
+              </ul>
+              {!user && (
+                <Button
+                  asChild
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                >
+                  <Link href="/auth">S'inscrire pour participer</Link>
+                </Button>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Barre de recherche et filtres */}
           <div className="flex flex-col md:flex-row gap-4">

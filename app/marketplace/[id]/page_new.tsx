@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +34,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   const [currentImage, setCurrentImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -59,7 +59,7 @@ export default function ProductDetailPage() {
     queryKey: ["userLikes", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase
+      const { data } = await client
         .from("product_likes")
         .select("product_id")
         .eq("user_id", user.id);
@@ -80,11 +80,11 @@ export default function ProductDetailPage() {
       if (!user) throw new Error("Utilisateur non connecté");
 
       if (action === "like") {
-        await supabase
+        await client
           .from("product_likes")
           .insert({ product_id: productId, user_id: user.id });
       } else {
-        await supabase
+        await client
           .from("product_likes")
           .delete()
           .eq("product_id", productId)

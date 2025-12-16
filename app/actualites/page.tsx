@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@/hooks/useAuth";
 import { PostImageUpload } from "@/components/ui/PostImageUpload";
 import Link from "next/link";
@@ -92,7 +92,27 @@ export default function ActualitesPage() {
       if (error) throw error;
 
       setHasMore(data.length >= limit);
-      setPosts((prev) => (currentPage === 1 ? data : [...prev, ...data]));
+      const normalized = (data || []).map((p: any) => ({
+        id: p.id,
+        content: p.content,
+        created_at: p.created_at,
+        user_id: p.user_id,
+        profiles: {
+          id: p.user_id,
+          username: p.profiles?.username ?? "",
+          full_name: p.profiles?.full_name,
+          avatar_url: p.profiles?.avatar_url,
+          created_at: "",
+          updated_at: "",
+        } as Profile,
+        image_url: p.image_url,
+        likes: p.likes ?? [],
+        likes_count: Array.isArray(p.likes) ? p.likes.length : 0,
+        comments_count: Array.isArray(p.comments) ? p.comments.length : 0,
+      })) as Post[];
+      setPosts((prev) =>
+        currentPage === 1 ? normalized : [...prev, ...normalized]
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.error("Erreur de chargement:", error.message);
@@ -106,13 +126,6 @@ export default function ActualitesPage() {
       setLoadingMore(false);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      checkAndCreateProfile();
-      fetchPosts(1);
-    }
-  }, [user]);
 
   const checkAndCreateProfile = async () => {
     if (!user) return;
@@ -140,10 +153,16 @@ export default function ActualitesPage() {
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Erreur lors de la vérification du profil:", error);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      checkAndCreateProfile();
+      fetchPosts(1);
+    }
+  }, [user]);
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -220,6 +239,9 @@ export default function ActualitesPage() {
           throw new Error("Service key not configured");
         }
 
+        const { createClient } = await import(
+          "@supabase/supabase-js/dist/module/index.js"
+        );
         const serviceClient = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           serviceKey
@@ -233,7 +255,6 @@ export default function ActualitesPage() {
       }
 
       if (error) {
-        // eslint-disable-next-line no-console
         console.error("Erreur détaillée lors de la création:", error);
         setError(`Erreur lors de la création: ${error.message}`);
         return;
@@ -285,7 +306,6 @@ export default function ActualitesPage() {
 
       await fetchPosts(1);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Erreur lors de la gestion du like:", error);
     }
   };
@@ -318,8 +338,10 @@ export default function ActualitesPage() {
               <div className="mb-4 flex items-center space-x-4">
                 <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
                   {post.profiles.avatar_url && (
-                    <img
+                    <Image
                       src={post.profiles.avatar_url}
+                      width={48}
+                      height={48}
                       className="h-full w-full rounded-full object-cover"
                       alt={post.profiles.username || ""}
                     />
@@ -347,9 +369,11 @@ export default function ActualitesPage() {
 
               {post.image_url && (
                 <div className="mb-6 aspect-square overflow-hidden rounded-xl">
-                  <img
+                  <Image
                     src={post.image_url}
                     alt=""
+                    width={800}
+                    height={800}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -423,7 +447,6 @@ export default function ActualitesPage() {
           <div className="container py-8 pt-8">
             <div className="mx-auto max-w-2xl">
               <h1 className="mb-8 text-3xl font-bold text-slate-800">
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Fil d'actualité
               </h1>
 

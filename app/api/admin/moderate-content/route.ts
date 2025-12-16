@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerAdminClient } from '@/lib/supabase';
 
-// Configuration Supabase avec la clé de service (côté serveur uniquement)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required');
-}
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+// Client administrateur Supabase, généré côté serveur
+const getAdmin = async () => createServerAdminClient()
 
 /**
  * POST - Modère du contenu (masquer ou supprimer)
@@ -56,6 +44,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    const supabaseAdmin = await getAdmin()
     if (action === 'hide') {
       // Masquer le contenu
       const { error } = await supabaseAdmin

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Header } from "@/components/layout/Header";
 import AnnouncementForm from "@/components/announcements/AnnouncementForm";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,12 +26,12 @@ export default function EditAnnouncement({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { user } = useAuth();
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await client
           .from("announcements")
           .select("*")
           .eq("id", params.id)

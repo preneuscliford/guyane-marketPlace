@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 
@@ -15,7 +15,7 @@ interface ImageUploadProps {
 
 export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   const onDrop = useCallback(
     async (acceptedFiles: FileWithPath[]) => {
@@ -40,7 +40,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
             }
           );
 
-          const { error: uploadError } = await supabase.storage
+          const { error: uploadError } = await client.storage
             .from("announcements-images")
             .upload(filePath, file, {
               cacheControl: "3600",
@@ -53,7 +53,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
 
           const {
             data: { publicUrl },
-          } = supabase.storage
+          } = client.storage
             .from("announcements-images")
             .getPublicUrl(filePath);
 

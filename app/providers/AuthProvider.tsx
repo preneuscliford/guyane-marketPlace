@@ -30,101 +30,132 @@ export default function AuthProvider({
 
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('🔄 Starting auth initialization...');
+      console.log("🔄 Starting auth initialization...");
       try {
         // Check active session
         const {
           data: { session },
           error,
         } = await supabase.auth.getSession();
-        console.log('🔍 getSession result:', { session: session?.user?.id, error });
+        console.log("🔍 getSession result:", {
+          session: session?.user?.id,
+          error,
+        });
         if (error) throw error;
 
         if (session) {
-          console.log('🔍 Session found:', session.user.id, session.user.email);
+          console.log("🔍 Session found:", session.user.id, session.user.email);
           setSession(session);
           const { user } = session;
           if (user) {
-            let { data: profile, error: profileError } = await supabase
+            const { data: initialProfile, error: profileError } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", user.id)
               .single();
 
+            let profile = initialProfile;
+
             if (profileError) {
-              console.error('❌ Profile fetch error:', profileError);
-              console.log('🔍 User without profile, creating one...', user.id, user.email);
-              
+              console.error("❌ Profile fetch error:", profileError);
+              console.log(
+                "🔍 User without profile, creating one...",
+                user.id,
+                user.email
+              );
+
               // Créer le profil automatiquement
               const newProfile = {
                 id: user.id,
-                username: user.user_metadata?.full_name || user.email?.split('@')[0] || 'user',
+                username:
+                  user.user_metadata?.full_name ||
+                  user.email?.split("@")[0] ||
+                  "user",
                 full_name: user.user_metadata?.full_name || null,
                 avatar_url: user.user_metadata?.avatar_url || null,
               };
 
-              const { data: createdProfile, error: createError } = await supabase
-                .from("profiles")
-                .insert(newProfile)
-                .select()
-                .single();
+              const { data: createdProfile, error: createError } =
+                await supabase
+                  .from("profiles")
+                  .insert(newProfile)
+                  .select()
+                  .single();
 
               if (createError) {
-                console.error('❌ Failed to create profile:', createError);
+                console.error("❌ Failed to create profile:", createError);
                 // Ne pas authentifier l'utilisateur si on ne peut pas créer le profil
                 setUser(null);
                 return;
               } else {
-                console.log('✅ Profile created successfully:', createdProfile);
+                console.log("✅ Profile created successfully:", createdProfile);
                 profile = createdProfile;
               }
             } else {
-              console.log('✅ Profile found:', profile);
+              console.log("✅ Profile found:", profile);
             }
 
             setUser({ ...user, profile } as AuthUser);
           }
         } else {
-          console.log('❌ No session found');
+          console.log("❌ No session found");
         }
 
         // Listen for auth changes
         const {
           data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
-          console.log('🔄 Auth state change:', event, session?.user?.id);
+          console.log("🔄 Auth state change:", event, session?.user?.id);
           setSession(session);
           if (session?.user) {
-            let { data: profile, error: profileError } = await supabase
+            const { data: initialProfile, error: profileError } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
               .single();
 
+            let profile = initialProfile;
+
             if (profileError) {
-              console.error('❌ Profile fetch error on state change:', profileError);
-              console.log('🔍 User without profile in auth change, creating one...', session.user.id);
-              
+              console.error(
+                "❌ Profile fetch error on state change:",
+                profileError
+              );
+              console.log(
+                "🔍 User without profile in auth change, creating one...",
+                session.user.id
+              );
+
               // Créer le profil automatiquement
               const newProfile = {
                 id: session.user.id,
-                username: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'user',
+                username:
+                  session.user.user_metadata?.full_name ||
+                  session.user.email?.split("@")[0] ||
+                  "user",
                 full_name: session.user.user_metadata?.full_name || null,
                 avatar_url: session.user.user_metadata?.avatar_url || null,
               };
 
-              const { data: createdProfile, error: createError } = await supabase
-                .from("profiles")
-                .insert(newProfile)
-                .select()
-                .single();
+              const { data: createdProfile, error: createError } =
+                await supabase
+                  .from("profiles")
+                  .insert(newProfile)
+                  .select()
+                  .single();
 
               if (createError) {
-                console.error('❌ Failed to create profile on state change:', createError);
+                console.error(
+                  "❌ Failed to create profile on state change:",
+                  createError
+                );
                 setUser(null);
                 return;
               } else {
-                console.log('✅ Profile created on state change:', createdProfile);
+                console.log(
+                  "✅ Profile created on state change:",
+                  createdProfile
+                );
                 profile = createdProfile;
               }
             }

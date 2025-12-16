@@ -1,26 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerAdminClient } from '@/lib/supabase';
 
-// Configuration Supabase avec la clé de service (côté serveur uniquement)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required');
-}
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+const getAdmin = async () => createServerAdminClient()
 
 /**
  * GET - Récupère tous les utilisateurs avec leurs informations de profil
  */
 export async function GET() {
   try {
+    const supabaseAdmin = await getAdmin()
     const { data, error } = await supabaseAdmin
       .from('profiles')
       .select(`
@@ -91,6 +79,7 @@ export async function PUT(request: Request) {
       );
     }
 
+    const supabaseAdmin = await getAdmin()
     const { data, error } = await supabaseAdmin
       .from('profiles')
       .update({

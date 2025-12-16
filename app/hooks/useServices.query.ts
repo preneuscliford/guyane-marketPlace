@@ -491,6 +491,7 @@ export function useDeleteServiceMutation() {
  * Maintient la compatibilité pendant la migration
  */
 export function useServices(params: ServiceSearchParams = {}) {
+  const { user } = useAuth(); // Appel du hook ici, avant les callbacks
   const servicesQuery = useServicesQuery(params);
   const createMutation = useCreateServiceMutation();
   const updateMutation = useUpdateServiceMutation();
@@ -505,6 +506,14 @@ export function useServices(params: ServiceSearchParams = {}) {
       throw error;
     }
   }, []);
+  
+  // Fonction getUserServices utilisant 'user' du hook
+  const getUserServices = useCallback(async () => {
+    if (!user) {
+      throw new Error('Utilisateur non connecté');
+    }
+    return fetchUserServicesAPI(user.id);
+  }, [user]);
 
   return {
     // État des données - compatible avec l'ancien hook
@@ -518,17 +527,7 @@ export function useServices(params: ServiceSearchParams = {}) {
     createService: createMutation.mutateAsync,
     updateService: (id: string, data: UpdateServiceData) => updateMutation.mutateAsync({ id, data }),
     deleteService: deleteMutation.mutateAsync,
-    getUserServices: () => {
-      // Pour cette fonction, on retourne une Promise qui utilise la query
-      return new Promise((resolve, reject) => {
-        const { user } = useAuth();
-        if (!user) {
-          reject(new Error('Utilisateur non connecté'));
-          return;
-        }
-        fetchUserServicesAPI(user.id).then(resolve).catch(reject);
-      });
-    },
+    getUserServices,
     
     // Nouvelles propriétés TanStack Query pour un contrôle avancé
     query: servicesQuery,

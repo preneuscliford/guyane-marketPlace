@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js/dist/module/index.js";
 import { Database } from "@/types/supabase";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -53,7 +53,7 @@ export const createAuthenticatedClient = async () => {
  * Client Supabase administrateur - UNIQUEMENT pour les API routes côté serveur
  * NE PAS utiliser côté client !
  */
-export const createServerAdminClient = () => {
+export const createServerAdminClient = async () => {
   // Accessible uniquement dans les API routes (côté serveur)
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   

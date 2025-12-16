@@ -1,13 +1,13 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
-import { ReportButton } from "@/components/ui/ReportButton";
+import ReportButton from "@/components/ui/ReportButton";
 
 interface AnnouncementCardProps {
   announcement: {
@@ -28,7 +28,7 @@ export default function AnnouncementCard({
 }: AnnouncementCardProps) {
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   const handleDelete = async () => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette annonce ?")) {
@@ -37,7 +37,7 @@ export default function AnnouncementCard({
 
     setIsDeleting(true);
     try {
-      const { error } = await supabase
+      const { error } = await client
         .from("announcements")
         .delete()
         .eq("id", announcement.id);

@@ -201,12 +201,20 @@ export const contextConfigs = {
 
 /**
  * Helper pour obtenir la configuration de cache optimale
+ * Accepte soit (entity, operation, context) soit juste un type générique (string)
  */
 export function getCacheConfig(
-  entity: keyof typeof entityCacheConfig,
-  operation: string,
+  entityOrType: string | (keyof typeof entityCacheConfig),
+  operation?: string,
   context?: keyof typeof contextConfigs
 ): CacheConfig {
+  // Si appelé avec juste un string générique (ex: 'analytics_data')
+  if (!operation) {
+    return cacheStrategies.medium; // Default à medium pour les opérations générique
+  }
+
+  const entity = entityOrType as keyof typeof entityCacheConfig;
+  
   // Priorité 1: Configuration contextuelle spécifique
   if (context && contextConfigs[context]) {
     const contextConfig = contextConfigs[context] as any;

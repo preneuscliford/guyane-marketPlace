@@ -10,7 +10,7 @@ import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { getCacheConfig } from './cacheConfig';
 import { postKeys, PostWithDetails } from './usePosts.query';
-import { Database } from '@/app/types/supabase';
+import { Database } from '@/types/supabase';
 
 // ============================================================================
 // TYPES ET INTERFACES

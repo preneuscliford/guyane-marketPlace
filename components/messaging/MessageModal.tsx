@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import {
@@ -12,7 +12,7 @@ import { Textarea } from "../../app/components/ui/textarea";
 import { Input } from "../../app/components/ui/input";
 import { Label } from "../../app/components/ui/label";
 import { Send, X, MessageCircle } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -42,18 +42,18 @@ export default function MessageModal({
   const [senderEmail, setSenderEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   // Récupérer les informations de l'utilisateur connecté
   useEffect(() => {
     const getUser = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await client.auth.getUser();
       if (user) {
         setUser(user);
         // Récupérer le profil utilisateur
-        const { data: profile } = await supabase
+        const { data: profile } = await client
           .from("profiles")
           .select("username, email")
           .eq("id", user.id)
@@ -76,7 +76,7 @@ export default function MessageModal({
     if (!user) return null;
 
     // Vérifier s'il existe déjà une conversation entre ces deux utilisateurs
-    const { data: existingConversation } = await supabase
+    const { data: existingConversation } = await client
       .from("conversations")
       .select(
         `
@@ -94,7 +94,7 @@ export default function MessageModal({
     }
 
     // Créer une nouvelle conversation
-    const { data: newConversation, error: conversationError } = await supabase
+    const { data: newConversation, error: conversationError } = await client
       .from("conversations")
       .insert({})
       .select("id")
@@ -105,7 +105,7 @@ export default function MessageModal({
     }
 
     // Ajouter les participants
-    const { error: participantsError } = await supabase
+    const { error: participantsError } = await client
       .from("conversation_participants")
       .insert([
         { conversation_id: newConversation.id, user_id: user.id },
@@ -149,7 +149,7 @@ export default function MessageModal({
           ? `Concernant "${productTitle}":\n\n${message}`
           : message;
 
-        const { error: messageError } = await supabase.from("messages").insert({
+        const { error: messageError } = await client.from("messages").insert({
           conversation_id: conversationId,
           user_id: user.id,
           content: messageContent,
@@ -166,7 +166,7 @@ export default function MessageModal({
 
         // Pour les utilisateurs non connectés, on peut créer un message système
         // ou utiliser une table séparée pour les messages de contact
-        const { error: contactError } = await supabase
+        const { error: contactError } = await client
           .from("contact_messages")
           .insert({
             receiver_id: receiverId,

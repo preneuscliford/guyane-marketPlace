@@ -53,11 +53,11 @@ export function Hero() {
             className="max-w-3xl mx-auto"
           >
             <p className="text-lg xs:text-xl sm:text-2xl md:text-3xl text-gray-700 font-light mb-3 sm:mb-4">
-              Marketplace Communautaire Guyane
+              Achetez, vendez et trouvez des services localement
             </p>
             <p className="text-base xs:text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Découvrez des services de qualité, vendez vos produits et
-              connectez-vous avec votre communauté locale
+              La plateforme de confiance pour le commerce local en Guyane
+              française. Annonces, services et communauté en un seul endroit.
             </p>
           </motion.div>
 

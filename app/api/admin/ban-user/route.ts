@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerAdminClient } from '@/lib/supabase';
 
-// Configuration Supabase avec la clé de service (côté serveur uniquement)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required');
-}
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+const getAdmin = async () => createServerAdminClient()
 
 /**
  * POST - Bannit un utilisateur
@@ -35,6 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const supabaseAdmin = await getAdmin()
     // Vérifier si l'utilisateur est déjà banni
     const { data: existingBan } = await supabaseAdmin
       .from('banned_users')
@@ -131,6 +119,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const supabaseAdmin = await getAdmin()
     // Supprimer l'entrée de bannissement
     const { error: deleteError } = await supabaseAdmin
       .from('banned_users')

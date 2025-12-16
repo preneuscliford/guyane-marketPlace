@@ -1,4 +1,4 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 
 export interface Product {
   id: string;
@@ -28,11 +28,11 @@ export interface ProductsFilters {
  * Fonction pour récupérer les produits avec filtres
  */
 export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]> => {
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   try {
     // Récupérer d'abord les produits
-    let query = supabase
+    let query = client
       .from("products")
       .select(`
         id,
@@ -78,7 +78,7 @@ export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]
 
     // Récupérer les profils des utilisateurs
     const userIds = [...new Set(products.map(p => p.user_id))];
-    const { data: profiles, error: profilesError } = await supabase
+    const { data: profiles, error: profilesError } = await client
       .from("profiles")
       .select("id, username, avatar_url")
       .in("id", userIds);
@@ -105,9 +105,9 @@ export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]
  * Fonction pour récupérer les likes d'un utilisateur
  */
 export const fetchUserLikes = async (userId: string): Promise<string[]> => {
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("product_likes")
     .select("product_id")
     .eq("user_id", userId);
@@ -124,11 +124,11 @@ export const fetchUserLikes = async (userId: string): Promise<string[]> => {
  * Fonction pour récupérer un produit spécifique par ID
  */
 export const fetchProductById = async (id: string): Promise<Product | null> => {
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
   try {
     // Récupérer le produit
-    const { data: product, error } = await supabase
+    const { data: product, error } = await client
       .from("products")
       .select(`
         id,
@@ -163,7 +163,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
     }
 
     // Récupérer le profil du vendeur
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await client
       .from("profiles")
       .select("id, username, avatar_url")
       .eq("id", product.user_id)

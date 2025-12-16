@@ -1,4 +1,4 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 
 export interface Product {
   id: string;
@@ -28,9 +28,9 @@ export interface ProductsFilters {
  * Fonction pour récupérer les produits avec filtres
  */
 export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]> => {
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
-  let query = supabase
+  let query = client
     .from("products")
     .select(`
       id,

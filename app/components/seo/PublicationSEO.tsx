@@ -38,20 +38,21 @@ export function generateServiceMetadata(service: Publication): Metadata {
 
       // Signaler à Google que c'est un service local
       "business:type": "Local Service",
-      "business:category": service.category,
-      "business:location": service.location,
-      "business:price_range": service.price ? `€${service.price}` : "Sur devis",
+      "business:category": service.category || "Service",
+      "business:location": service.location || "France",
+      "business:price_range":
+        (service.price ? `€${service.price}` : "Sur devis") || "Sur devis",
       "business:availability": "Available",
 
       // Signaux pour les recherches locales "service près de moi"
       "local:type": "service",
-      "local:category": service.category.toLowerCase(),
-      "local:area": service.location,
+      "local:category": (service.category || "Service").toLowerCase(),
+      "local:area": service.location || "France",
 
       // Métadonnées de qualité
-      "service:rating": service.rating?.toString(),
-      "service:reviews": service.reviewCount?.toString(),
-      "service:views": service.viewCount?.toString(),
+      "service:rating": service.rating?.toString() || "0",
+      "service:reviews": service.reviewCount?.toString() || "0",
+      "service:views": service.viewCount?.toString() || "0",
     },
 
     // OpenGraph optimisé pour les services
