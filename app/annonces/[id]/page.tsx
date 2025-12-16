@@ -84,11 +84,12 @@ export default function AnnouncementDetailPage() {
    * Gère le partage de l'annonce
    */
   const handleShare = async () => {
+    if (!announcement) return;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: announcement.title,
-          text: announcement.description,
+          title: announcement?.title,
+          text: announcement?.description,
           url: window.location.href,
         });
       } catch (error) {
@@ -208,18 +209,6 @@ export default function AnnouncementDetailPage() {
                   ✨ Sponsorisé
                 </span>
               </div>
-
-              {/* Statistiques */}
-              <div className="absolute top-4 right-4 space-y-2">
-                <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm flex items-center">
-                  <Eye className="w-4 h-4 mr-1" />
-                  {viewCount}
-                </div>
-                <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  {impressions}
-                </div>
-              </div>
             </div>
 
             {announcement.images && announcement.images.length > 1 && (
@@ -327,11 +316,11 @@ export default function AnnouncementDetailPage() {
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="grid grid-cols-1 gap-3 mb-4">
                 <Button
-                  onClick={handleMainAction}
+                  onClick={() => setIsMessageModalOpen(true)}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-4 text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
-                  🚀 Voir l'offre maintenant
+                  🚀 Contacter maintenant
                 </Button>
 
                 <Button
