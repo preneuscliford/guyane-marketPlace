@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface DialogProps {
   children: React.ReactNode;
@@ -16,18 +15,22 @@ interface DialogContentProps {
 
 interface DialogHeaderProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface DialogTitleProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface DialogDescriptionProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface DialogFooterProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface DialogTriggerProps {
@@ -68,9 +71,9 @@ export function DialogContent({ children, className = '', onClose }: DialogConte
 /**
  * En-tête du dialog
  */
-export function DialogHeader({ children }: DialogHeaderProps) {
+export function DialogHeader({ children, className = '' }: DialogHeaderProps) {
   return (
-    <div className="p-6 pb-4 border-b">
+    <div className={`p-6 pb-4 border-b ${className}`}>
       {children}
     </div>
   );
@@ -79,9 +82,9 @@ export function DialogHeader({ children }: DialogHeaderProps) {
 /**
  * Titre du dialog
  */
-export function DialogTitle({ children }: DialogTitleProps) {
+export function DialogTitle({ children, className = '' }: DialogTitleProps) {
   return (
-    <h2 className="text-lg font-semibold text-gray-900">
+    <h2 className={`text-lg font-semibold text-gray-900 ${className}`}>
       {children}
     </h2>
   );
@@ -90,9 +93,9 @@ export function DialogTitle({ children }: DialogTitleProps) {
 /**
  * Description du dialog
  */
-export function DialogDescription({ children }: DialogDescriptionProps) {
+export function DialogDescription({ children, className = '' }: DialogDescriptionProps) {
   return (
-    <p className="text-sm text-gray-600 mt-2">
+    <p className={`text-sm text-gray-600 mt-2 ${className}`}>
       {children}
     </p>
   );
@@ -101,9 +104,9 @@ export function DialogDescription({ children }: DialogDescriptionProps) {
 /**
  * Pied de page du dialog
  */
-export function DialogFooter({ children }: DialogFooterProps) {
+export function DialogFooter({ children, className = '' }: DialogFooterProps) {
   return (
-    <div className="p-6 pt-4 border-t bg-gray-50 flex justify-end gap-2">
+    <div className={`p-6 pt-4 border-t bg-gray-50 flex justify-end gap-2 ${className}`}>
       {children}
     </div>
   );

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,24 +52,24 @@ import { fr } from "date-fns/locale";
 
 interface Report {
   id: string;
-  reporter_id: string;
+  reporter_id: string | null;
   reported_content_type: string;
   reported_content_id: string;
-  reported_user_id: string;
+  reported_user_id: string | null;
   reason: string;
-  description: string;
+  description: string | null;
   status: string;
-  moderator_id: string;
-  moderator_notes: string;
-  created_at: string;
-  updated_at: string;
+  moderator_id: string | null;
+  moderator_notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   reporter: {
     username: string;
-    email: string;
+    email?: string;
   };
   reported_user: {
     username: string;
-    email: string;
+    email?: string;
   };
 }
 
@@ -131,7 +131,7 @@ export default function ModerationDashboard() {
   /**
    * Charge la liste des signalements avec gestion d'erreur gracieuse
    */
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       // Requête simple sans jointures pour éviter les erreurs RLS
       let query = supabase
@@ -192,17 +192,22 @@ export default function ModerationDashboard() {
                 : { data: null };
 
               // Récupérer les infos de l'utilisateur signalé
-              const { data: reportedUser } = await supabase
-                .from("profiles")
-                .select("username")
-                .eq("id", report.reported_user_id)
-                .single();
+              const { data: reportedUser } = report.reported_user_id
+                ? await supabase
+                    .from("profiles")
+                    .select("username")
+                    .eq("id", report.reported_user_id)
+                    .single()
+                : { data: null };
 
               return {
                 ...report,
-                reporter: reporter || { username: "Utilisateur inconnu" },
-                reported_user: reportedUser || {
-                  username: "Utilisateur inconnu",
+                status: report.status ?? "pending",
+                reporter: {
+                  username: reporter?.username ?? "Utilisateur inconnu",
+                },
+                reported_user: {
+                  username: reportedUser?.username ?? "Utilisateur inconnu",
                 },
               };
             } catch (err) {
@@ -212,6 +217,7 @@ export default function ModerationDashboard() {
               );
               return {
                 ...report,
+                status: report.status ?? "pending",
                 reporter: { username: "Utilisateur inconnu" },
                 reported_user: { username: "Utilisateur inconnu" },
               };
@@ -227,11 +233,11 @@ export default function ModerationDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus, filterContentType, filterDateRange]);
 
   useEffect(() => {
     fetchReports();
-  }, [filterStatus, filterContentType, filterDateRange]);
+  }, [fetchReports]);
 
   /**
    * Ouvre le modal d'action pour un signalement
@@ -620,10 +626,12 @@ export default function ModerationDashboard() {
                       <CardDescription>
                         Signalé par <strong>{report.reporter.username}</strong>{" "}
                         •{" "}
-                        {formatDistanceToNow(new Date(report.created_at), {
-                          addSuffix: true,
-                          locale: fr,
-                        })}
+                        {report.created_at
+                          ? formatDistanceToNow(new Date(report.created_at), {
+                              addSuffix: true,
+                              locale: fr,
+                            })
+                          : "Date inconnue"}
                       </CardDescription>
                     </div>
                   </div>
@@ -693,15 +701,11 @@ export default function ModerationDashboard() {
 
       {/* Modal d'action de modération */}
       {actionModalOpen && selectedReport && (
-        <Dialog
-          open={true}
-          onOpenChange={(open) => {
-            if (!open) {
-              closeActionModal();
-            }
-          }}
-        >
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <Dialog>
+          <DialogContent
+            className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
+            onClose={closeActionModal}
+          >
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-xl font-semibold text-gray-900">
                 Action de modération
