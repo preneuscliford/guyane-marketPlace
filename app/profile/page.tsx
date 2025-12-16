@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
+import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Button } from "@/components/ui/button";
 import { Loader2, Camera, X } from "lucide-react";

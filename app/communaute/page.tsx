@@ -17,7 +17,7 @@ import CommunityPost from "@/components/community/CommunityPost";
 import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
+import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import {
   Users,
   MessageSquare,
@@ -63,7 +63,7 @@ export default function CommunautePage() {
   });
 
   /**
-   * Charge les statistiques de la communauté
+   * Charge les statistiques de la communauté avec retry automatique
    */
   const fetchStats = async () => {
     try {
@@ -71,45 +71,62 @@ export default function CommunautePage() {
       today.setHours(0, 0, 0, 0);
       const todayISO = today.toISOString();
 
-      // Total des posts
-      const { count: totalPosts } = await supabase
-        .from("posts")
-        .select("*", { count: "exact", head: true })
-        .eq("is_hidden", false);
-
-      // Posts d'aujourd'hui
-      const { count: postsToday } = await supabase
-        .from("posts")
-        .select("*", { count: "exact", head: true })
-        .eq("is_hidden", false)
-        .gte("created_at", todayISO);
-
-      // Total des utilisateurs
-      const { count: totalUsers } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
-
-      // Utilisateurs actifs (ayant posté dans les 7 derniers jours)
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
       const weekAgoISO = weekAgo.toISOString();
 
-      const { data: activeUsersData } = await supabase
-        .from("posts")
-        .select("user_id")
-        .gte("created_at", weekAgoISO)
-        .eq("is_hidden", false);
+      await retryWithExponentialBackoff(
+        async () => {
+          // Total des posts
+          const { count: totalPosts, error: error1 } = await supabase
+            .from("posts")
+            .select("*", { count: "exact", head: true })
+            .eq("is_hidden", false);
 
-      const activeUsers = new Set(activeUsersData?.map((p) => p.user_id)).size;
+          if (error1) throw error1;
 
-      setStats({
-        total_posts: totalPosts || 0,
-        total_users: totalUsers || 0,
-        posts_today: postsToday || 0,
-        active_users: activeUsers,
-      });
+          // Posts d'aujourd'hui
+          const { count: postsToday, error: error2 } = await supabase
+            .from("posts")
+            .select("*", { count: "exact", head: true })
+            .eq("is_hidden", false)
+            .gte("created_at", todayISO);
+
+          if (error2) throw error2;
+
+          // Total des utilisateurs
+          const { count: totalUsers, error: error3 } = await supabase
+            .from("profiles")
+            .select("*", { count: "exact", head: true });
+
+          if (error3) throw error3;
+
+          // Utilisateurs actifs (ayant posté dans les 7 derniers jours)
+          const { data: activeUsersData, error: error4 } = await supabase
+            .from("posts")
+            .select("user_id")
+            .gte("created_at", weekAgoISO)
+            .eq("is_hidden", false);
+
+          if (error4) throw error4;
+
+          const activeUsers = new Set(activeUsersData?.map((p) => p.user_id))
+            .size;
+
+          setStats({
+            total_posts: totalPosts || 0,
+            total_users: totalUsers || 0,
+            posts_today: postsToday || 0,
+            active_users: activeUsers,
+          });
+          return true;
+        },
+        3,
+        500
+      );
     } catch (error) {
-      console.error("Erreur lors du chargement des statistiques:", error);
+      console.error("Failed to load stats after retries:", error);
+      // Les stats gardent leurs valeurs par défaut
     }
   };
 

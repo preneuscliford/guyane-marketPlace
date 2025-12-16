@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/supabase";
+import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import {
   Plus,
   MapPin,
@@ -87,23 +88,32 @@ export default function AnnouncementsPage() {
 
   const fetchAnnouncements = async () => {
     try {
-      const { data, error } = await supabase
-        .from("announcements")
-        .select(
-          `
-          *,
-          profiles:user_id(
-            username,
-            avatar_url
-          )
-        `
-        )
-        .order("created_at", { ascending: false });
+      setLoading(true);
+      const data = await retryWithExponentialBackoff(
+        async () => {
+          const { data: result, error } = await supabase
+            .from("announcements")
+            .select(
+              `
+              *,
+              profiles:user_id(
+                username,
+                avatar_url
+              )
+            `
+            )
+            .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setAnnouncements(data || []);
+          if (error) throw error;
+          return result || [];
+        },
+        3,
+        500
+      );
+      setAnnouncements(data);
     } catch (error) {
-      console.error("Error loading announcements:", error);
+      console.error("Failed to load announcements after retries:", error);
+      setAnnouncements([]);
     } finally {
       setLoading(false);
     }

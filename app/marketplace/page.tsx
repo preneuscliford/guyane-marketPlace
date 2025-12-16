@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -46,48 +47,57 @@ export default function MarketplacePage() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from("products")
-        .select("*")
-        .gte("price", filters.priceRange[0])
-        .lte("price", filters.priceRange[1]);
+      const products = await retryWithExponentialBackoff(
+        async () => {
+          let query = supabase
+            .from("products")
+            .select("*")
+            .gte("price", filters.priceRange[0])
+            .lte("price", filters.priceRange[1]);
 
-      if (searchQuery) {
-        query = query.or(
-          `title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
-        );
-      }
+          if (searchQuery) {
+            query = query.or(
+              `title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+            );
+          }
 
-      if (filters.category && filters.category !== "Tous") {
-        query = query.eq("category", filters.category);
-      }
+          if (filters.category && filters.category !== "Tous") {
+            query = query.eq("category", filters.category);
+          }
 
-      if (filters.location && filters.location !== "Toute la Guyane") {
-        query = query.eq("location", filters.location);
-      }
+          if (filters.location && filters.location !== "Toute la Guyane") {
+            query = query.eq("location", filters.location);
+          }
 
-      switch (filters.sortBy) {
-        case "price-asc":
-          query = query.order("price", { ascending: true });
-          break;
-        case "price-desc":
-          query = query.order("price", { ascending: false });
-          break;
-        default:
-          query = query.order("created_at", { ascending: false });
-      }
+          switch (filters.sortBy) {
+            case "price-asc":
+              query = query.order("price", { ascending: true });
+              break;
+            case "price-desc":
+              query = query.order("price", { ascending: false });
+              break;
+            default:
+              query = query.order("created_at", { ascending: false });
+          }
 
-      const { data, error } = await query;
+          const { data, error } = await query;
 
-      if (error) throw error;
+          if (error) throw error;
+          return data || [];
+        },
+        3,
+        500
+      );
+
       setProducts(
-        (data || []).map((product) => ({
+        (products || []).map((product: any) => ({
           ...product,
           images: product.images || [],
         }))
       );
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Failed to load products after retries:", error);
+      setProducts([]);
     } finally {
       setLoading(false);
     }

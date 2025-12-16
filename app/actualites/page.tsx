@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import { PostImageUpload } from "@/components/ui/PostImageUpload";
 import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
@@ -67,29 +68,35 @@ export default function ActualitesPage() {
 
   const fetchPosts = async (currentPage = 1) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       currentPage === 1 ? setLoading(true) : setLoadingMore(true);
       const limit = 10;
       const from = (currentPage - 1) * limit;
       const to = from + limit - 1;
 
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          `
-          *,
-          profiles:user_id(
-            username,
-            avatar_url
-          ),
-           likes(*),
-           comments(*)
-        `
-        )
-        .order("created_at", { ascending: false })
-        .range(from, to);
+      const data = await retryWithExponentialBackoff(
+        async () => {
+          const { data: result, error } = await supabase
+            .from("posts")
+            .select(
+              `
+              *,
+              profiles:user_id(
+                username,
+                avatar_url
+              ),
+               likes(*),
+               comments(*)
+            `
+            )
+            .order("created_at", { ascending: false })
+            .range(from, to);
 
-      if (error) throw error;
+          if (error) throw error;
+          return result || [];
+        },
+        3,
+        500
+      );
 
       setHasMore(data.length >= limit);
       const normalized = (data || []).map((p: any) => ({
@@ -114,13 +121,7 @@ export default function ActualitesPage() {
         currentPage === 1 ? normalized : [...prev, ...normalized]
       );
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Erreur de chargement:", error.message);
-        setError(error.message);
-      } else {
-        console.error("Erreur inconnue lors du chargement");
-        setError("Erreur lors du chargement des publications");
-      }
+      console.error("Failed to load posts after retries:", error);
     } finally {
       setLoading(false);
       setLoadingMore(false);

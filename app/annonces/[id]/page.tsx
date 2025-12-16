@@ -60,81 +60,119 @@ export default function AnnouncementDetailPage() {
   }, [id]);
 
   /**
-   * Récupère les statistiques du vendeur
+   * Récupère les statistiques du vendeur avec retry automatique
    */
-  const fetchVendorStats = async (vendorId: string) => {
-    try {
-      // Compter le nombre d'annonces du vendeur
-      const { data: announcements, error: announcementsError } = await supabase
-        .from("announcements")
-        .select("id", { count: "exact" })
-        .eq("user_id", vendorId)
-        .eq("is_hidden", false);
+  const fetchVendorStats = async (vendorId: string, retries = 3) => {
+    let lastError: any;
 
-      if (announcementsError) throw announcementsError;
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        // Compter le nombre d'annonces du vendeur
+        const { data: announcements, error: announcementsError, count } = await supabase
+          .from("announcements")
+          .select("id", { count: "exact" })
+          .eq("user_id", vendorId)
+          .eq("is_hidden", false);
 
-      // Récupérer les avis du vendeur (si table reviews existe)
-      const { data: reviews } = await supabase
-        .from("reviews")
-        .select("rating")
-        .eq("seller_id", vendorId);
+        if (announcementsError) throw announcementsError;
 
-      let satisfactionRate = 0;
-      if (reviews && reviews.length > 0) {
-        const avgRating =
-          reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
-        satisfactionRate = Math.round((avgRating / 5) * 100);
+        // Récupérer les avis du vendeur (si table reviews existe)
+        const { data: reviews, error: reviewsError } = await supabase
+          .from("reviews")
+          .select("rating")
+          .eq("seller_id", vendorId);
+
+        if (reviewsError && reviewsError.code !== "PGRST116") {
+          // PGRST116 = table doesn't exist, c'est OK
+          throw reviewsError;
+        }
+
+        let satisfactionRate = 0;
+        if (reviews && reviews.length > 0) {
+          const avgRating =
+            reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+          satisfactionRate = Math.round((avgRating / 5) * 100);
+        }
+
+        setVendorStats({
+          announcementsCount: count || announcements?.length || 0,
+          satisfactionRate: satisfactionRate || 95,
+          responseTime: "< 2h",
+        });
+        return; // Succès
+      } catch (error) {
+        lastError = error;
+        console.error(`Attempt ${attempt + 1}/${retries} - Error fetching vendor stats:`, error);
+
+        // Attendre avant de retenter (délai exponentiel)
+        if (attempt < retries - 1) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, attempt) * 500)
+          );
+        }
       }
-
-      setVendorStats({
-        announcementsCount: announcements?.length || 0,
-        satisfactionRate: satisfactionRate || 95,
-        responseTime: "< 2h",
-      });
-    } catch (error) {
-      console.error("Error fetching vendor stats:", error);
-      // Valeurs par défaut en cas d'erreur
-      setVendorStats({
-        announcementsCount: 0,
-        satisfactionRate: 95,
-        responseTime: "< 2h",
-      });
     }
+
+    // Tous les tentatives échouées
+    console.error("Failed to fetch vendor stats after retries:", lastError);
+    setVendorStats({
+      announcementsCount: 0,
+      satisfactionRate: 95,
+      responseTime: "< 2h",
+    });
   };
 
   /**
-   * Récupère les détails de l'annonce depuis Supabase
+   * Récupère les détails de l'annonce depuis Supabase avec retry automatique
    */
-  const fetchAnnouncement = async () => {
-    try {
-      if (typeof id !== "string") return;
+  const fetchAnnouncement = async (retries = 3) => {
+    let lastError: any;
 
-      const { data, error } = await supabase
-        .from("announcements")
-        .select(
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        if (typeof id !== "string") return;
+
+        const { data, error } = await supabase
+          .from("announcements")
+          .select(
+            `
+            *,
+            profiles!user_id (
+              username,
+              avatar_url
+            )
           `
-          *,
-          profiles!user_id (
-            username,
-            avatar_url
           )
-        `
-        )
-        .eq("id", id)
-        .single();
+          .eq("id", id)
+          .single();
 
-      if (error) throw error;
-      setAnnouncement(data as any);
+        if (error) throw error;
+        if (!data) throw new Error("No announcement found");
 
-      // Récupérer les stats du vendeur
-      if (data?.user_id) {
-        await fetchVendorStats(data.user_id);
+        setAnnouncement(data as any);
+
+        // Récupérer les stats du vendeur
+        if (data?.user_id) {
+          await fetchVendorStats(data.user_id);
+        }
+        setLoading(false);
+        return; // Succès
+      } catch (error) {
+        lastError = error;
+        console.error(`Attempt ${attempt + 1}/${retries} - Error fetching announcement:`, error);
+
+        // Attendre avant de retenter (délai exponentiel)
+        if (attempt < retries - 1) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, attempt) * 500)
+          );
+        }
       }
-    } catch (error) {
-      console.error("Error fetching announcement:", error);
-    } finally {
-      setLoading(false);
     }
+
+    // Tous les tentatives échouées
+    console.error("Failed to fetch announcement after retries:", lastError);
+    setLoading(false);
   };
 
   /**
