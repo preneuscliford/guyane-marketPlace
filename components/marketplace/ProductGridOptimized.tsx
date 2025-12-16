@@ -12,7 +12,7 @@ import ReportButton from "../../app/components/moderation/ReportButton";
 import { Heart, MapPin, Eye, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { fetchProducts, fetchUserLikes } from "@/lib/queries/products";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProductGridProps {
   searchQuery?: string;
@@ -198,7 +198,7 @@ export default function ProductGrid({
                 {/* Boutons d'action */}
                 <div className="absolute top-2 right-2 flex gap-2">
                   <ReportButton
-                    contentType="product"
+                    contentType="announcement"
                     contentId={product.id}
                     reportedUserId={product.user_id}
                   />

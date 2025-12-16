@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useServices } from "@/hooks/useServices";
+import { useServices } from "@/hooks/useServices.query";
 import { ServiceForm } from "@/components/services/ServiceForm";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";

@@ -5,11 +5,11 @@ interface Comment {
   id: string;
   content: string;
   created_at: string;
-  user_id: string;
-  post_id: string;
-  profiles: {
+  user_id: string | null;
+  post_id: string | null;
+  profiles?: {
     username: string;
-  };
+  } | null;
 }
 
 interface CommentListProps {
@@ -25,14 +25,7 @@ export default function CommentList({ postId }: CommentListProps) {
     const fetchComments = async () => {
       const { data, error } = await client
         .from("comments")
-        .select(
-          `
-          *,
-          profiles (
-            username
-          )
-        `
-        )
+        .select(`*`)
         .eq("post_id", postId)
         .order("created_at", { ascending: false });
 
@@ -41,7 +34,7 @@ export default function CommentList({ postId }: CommentListProps) {
         return;
       }
 
-      setComments(data || []);
+      setComments((data as Comment[]) || []);
       setLoading(false);
     };
 

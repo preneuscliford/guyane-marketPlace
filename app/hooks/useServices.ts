@@ -86,17 +86,8 @@ export function useServices() {
         query = query.range(params.offset, params.offset + (params.limit || 10) - 1);
       }
 
-      // Exécuter la requête avec timeout
       console.log('useServices: Exécution de la requête Supabase...');
-      
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout de la requête Supabase')), 10000);
-      });
-      
-      const { data, error } = await Promise.race([
-        query,
-        timeoutPromise
-      ]) as any;
+      const { data, error } = await query;
       
       console.log('useServices: Résultat de la requête:', { data, error });
       

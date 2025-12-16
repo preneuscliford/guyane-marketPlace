@@ -117,7 +117,7 @@ export const fetchUserLikes = async (userId: string): Promise<string[]> => {
     return [];
   }
 
-  return data?.map((like) => like.product_id) || [];
+  return (data?.map((like: { product_id: string | null }) => like.product_id).filter(Boolean) as string[]) || [];
 };
 
 /**

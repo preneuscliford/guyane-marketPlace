@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useFavorites } from "@/hooks/useFavorites";
+import { useFavorites, useFavoritesWithDetailsQuery } from "@/hooks/useFavorites.query";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/lib/supabase";
 import { Header } from "@/components/layout/Header";
 import Link from "next/link";
 import Image from "next/image";
@@ -31,51 +30,42 @@ interface Announcement {
 export default function FavoritesPage() {
   const { isAuthenticated } = useAuth();
   const { favorites } = useFavorites();
+  const favoritesDetailsQuery = useFavoritesWithDetailsQuery();
   const [favoriteAnnouncements, setFavoriteAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch announcements based on favorites IDs
+  // Charger les annonces favorites à partir du hook TanStack Query
   const fetchFavoriteAnnouncements = useCallback(async () => {
     try {
       setLoading(true);
-      if (favorites.length === 0) {
-        setFavoriteAnnouncements([]);
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from("announcements")
-        .select(`
-          *,
-          user:user_id (
-            username:username,
-            avatar_url:avatar_url
-          )
-        `)
-        .in("id", favorites);
-
-      if (error) throw error;
-
-      if (data) {
-        setFavoriteAnnouncements(data as Announcement[]);
-      }
+      const items = favoritesDetailsQuery.data || [];
+      const announcements = items
+        .map((item: any) => item.announcements)
+        .filter(Boolean) as Announcement[];
+      setFavoriteAnnouncements(announcements);
     } catch (error) {
       console.error("Error fetching favorite announcements:", error);
     } finally {
       setLoading(false);
     }
-  }, [favorites]);
+  }, [favoritesDetailsQuery.data]);
 
   useEffect(() => {
-    if (isAuthenticated && favorites.length > 0) {
-      fetchFavoriteAnnouncements();
-    } else if (isAuthenticated && favorites.length === 0) {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+    if (favoritesDetailsQuery.isLoading) {
+      setLoading(true);
+      return;
+    }
+    if (favorites.length === 0) {
       setFavoriteAnnouncements([]);
       setLoading(false);
-    } else if (!isAuthenticated) {
-      setLoading(false);
+      return;
     }
-  }, [isAuthenticated, favorites, fetchFavoriteAnnouncements]);
+    fetchFavoriteAnnouncements();
+  }, [isAuthenticated, favorites, favoritesDetailsQuery.isLoading, fetchFavoriteAnnouncements]);
 
   if (!isAuthenticated) {
     return (

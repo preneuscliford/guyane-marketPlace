@@ -29,9 +29,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useServices } from "@/hooks/useServices";
+import { useServices } from "@/hooks/useServices.query";
 import { useAuth } from "@/hooks/useAuth";
-import { useAutoServiceViews } from "@/hooks/useServiceViews";
+import { useAutoServiceViews } from "@/hooks/useServiceViews.query";
 import { ServiceViewsSimple } from "@/components/services/ServiceViewsDisplay";
 import { ServiceReviews } from "@/components/services/ServiceReviews";
 import { ServiceWithProfile } from "@/types/services";

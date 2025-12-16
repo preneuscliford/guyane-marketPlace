@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, MapPin, Clock, TrendingUp, Heart, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { useServices } from '@/hooks/useServices';
+import { useServicesQuery } from '@/hooks/useServices.query';
 import { useEffect } from 'react';
 import { ServiceWithProfile } from '@/types/services';
 
@@ -188,18 +188,14 @@ const ListingCard: React.FC<ListingProps> = ({
 };
 
 export function FeaturedListings() {
-  const { services, loading, fetchServices } = useServices();
-
-  // Charger les services populaires au montage
-  useEffect(() => {
-    fetchServices({
-      sort_by: 'created_at',
-      sort_order: 'desc',
-      limit: 6
-    });
-  }, [fetchServices]);
+  const { data: servicesData, isLoading } = useServicesQuery({
+    sort_by: 'created_at',
+    sort_order: 'desc',
+    limit: 6
+  });
 
   // Convertir les services en format ListingProps
+  const services = servicesData || [];
   const featuredListings: ListingProps[] = services.map(service => ({
     id: service.id,
     title: service.title,
@@ -215,7 +211,7 @@ export function FeaturedListings() {
 
 
 
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="py-20 md:py-28 bg-gradient-to-br from-white via-purple-50/20 to-emerald-50/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

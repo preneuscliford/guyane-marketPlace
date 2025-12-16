@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/AvatarComponent";
 import { Separator } from "@/components/ui/separator";
 import { RatingStars } from "@/components/ui/RatingStars";
-import { useReviews } from "@/hooks/useReviews";
+import { useReviews } from "@/hooks/useReviews.query";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";

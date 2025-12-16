@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,7 +12,7 @@ import {
 import {
   useWeightedCarousel,
   useAdvertisementStats,
-} from "@/hooks/useAdvertisements";
+} from "@/hooks/useAdvertisements.query";
 import { Advertisement } from "@/types/advertisements";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

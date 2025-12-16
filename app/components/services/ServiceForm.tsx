@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Upload, MapPin, DollarSign, Tag, Loader2 } from 'lucide-react';
-import { useServices } from '@/hooks/useServices';
+import { useServices } from '@/hooks/useServices.query';
 import { useAuth } from '@/hooks/useAuth';
 import {
   CreateServiceData,
@@ -71,7 +71,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
         title: service.title,
         description: service.description,
         category: service.category,
-        price: service.price,
+        price: service.price ?? 0,
         price_type: service.price_type,
         location: service.location,
         images: service.images || [],
@@ -80,7 +80,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
           phone: service.contact_info?.phone || '',
           email: service.contact_info?.email || ''
         },
-        availability: service.availability
+        availability: (typeof service.availability === 'string' ? service.availability : 'available') as any
       });
       setImageUrls(service.images || []);
     }
@@ -101,7 +101,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
     if (!formData.category) {
       newErrors.category = 'La catégorie est requise';
     }
-    if (formData.price < 0) {
+    if ((formData.price ?? 0) < 0) {
       newErrors.price = 'Le prix ne peut pas être négatif';
     }
     if (!formData.location.trim()) {
@@ -162,10 +162,10 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
    * Ajoute un tag
    */
   const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+    if (newTag.trim() && !(formData.tags ?? []).includes(newTag.trim())) {
       setFormData(prev => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...(prev.tags ?? []), newTag.trim()]
       }));
       setNewTag('');
     }
@@ -177,7 +177,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
   const removeTag = (tagToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: (prev.tags ?? []).filter(tag => tag !== tagToRemove)
     }));
   };
 
@@ -260,7 +260,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
                   type="number"
                   min="0"
                   step="0.01"
-                  value={formData.price}
+                  value={formData.price ?? 0}
                   onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                   placeholder="0.00"
                   className={`pl-10 ${errors.price ? 'border-red-500' : ''}`}
@@ -363,7 +363,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag) => (
+              {(formData.tags ?? []).map((tag) => (
                 <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                   {tag}
                   <X

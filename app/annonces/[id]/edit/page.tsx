@@ -6,22 +6,16 @@ import { supabase } from "@/lib/supabase";
 import { Header } from "@/components/layout/Header";
 import AnnouncementForm from "@/components/announcements/AnnouncementForm";
 import { useAuth } from "@/hooks/useAuth";
+import type { Database } from "@/types/supabase";
 
-interface Announcement {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  user_id: string;
-}
+type AnnouncementRow = Database["public"]["Tables"]["announcements"]["Row"];
 
 export default function EditAnnouncement({
   params,
 }: {
   params: { id: string };
 }) {
-  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
+  const [announcement, setAnnouncement] = useState<AnnouncementRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();

@@ -55,13 +55,13 @@ export default function MessageModal({
         // Récupérer le profil utilisateur
         const { data: profile } = await client
           .from("profiles")
-          .select("username, email")
+          .select("username")
           .eq("id", user.id)
           .single();
 
         if (profile) {
           setSenderName(profile.username || user.email?.split("@")[0] || "");
-          setSenderEmail(profile.email || user.email || "");
+          setSenderEmail(user.email || "");
         }
       }
     };
@@ -69,7 +69,7 @@ export default function MessageModal({
     if (isOpen) {
       getUser();
     }
-  }, [isOpen, supabase]);
+  }, [isOpen, client]);
 
   // Fonction pour créer ou récupérer une conversation
   const getOrCreateConversation = async () => {

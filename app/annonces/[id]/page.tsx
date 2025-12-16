@@ -79,7 +79,10 @@ export default function AnnouncementDetailPage() {
           .eq("is_hidden", false);
 
         if (announcementsError) {
-          console.error("Error fetching announcements count:", announcementsError);
+          console.error(
+            "Error fetching announcements count:",
+            announcementsError
+          );
           throw announcementsError;
         }
 
@@ -101,9 +104,15 @@ export default function AnnouncementDetailPage() {
           } else if (reviewsData && reviewsData.length > 0) {
             reviews = reviewsData;
             const avgRating =
-              reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+              reviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+              reviews.length;
             satisfactionRate = Math.round((avgRating / 5) * 100);
-            console.log("Reviews found:", reviews.length, "Avg rating:", satisfactionRate + "%");
+            console.log(
+              "Reviews found:",
+              reviews.length,
+              "Avg rating:",
+              satisfactionRate + "%"
+            );
           }
         } catch (err) {
           console.warn("Exception fetching reviews (non-blocking):", err);

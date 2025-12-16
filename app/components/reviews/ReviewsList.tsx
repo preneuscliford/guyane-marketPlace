@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
-import { useReviews } from "@/hooks/useReviews";
+import { useReviews } from "@/hooks/useReviews.query";
 import { RatingStars } from "@/components/ui/RatingStars";
 import { Button } from "@/components/ui/button";
 import { Loader2, MessageSquare, Flag, Trash2 } from "lucide-react";

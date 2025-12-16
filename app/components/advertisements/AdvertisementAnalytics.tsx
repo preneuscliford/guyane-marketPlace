@@ -12,7 +12,7 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
-import { useAdvertisementStats } from "../../hooks/useAdvertisements";
+import { useAdvertisementAnalyticsQuery } from "@/hooks/useAdvertisements.query";
 import {
   Advertisement,
   AdvertisementAnalytics as AnalyticsType,
@@ -37,27 +37,18 @@ export default function AdvertisementAnalytics({
   advertisement,
   onClose,
 }: AdvertisementAnalyticsProps) {
-  const { calculateAnalytics, fetchAdvertisementStats, loading } =
-    useAdvertisementStats();
-  const [analytics, setAnalytics] = useState<AnalyticsType | null>(null);
+  const analyticsQuery = useAdvertisementAnalyticsQuery(advertisement.id);
+  const analytics = (analyticsQuery.data as AnalyticsType) || null;
+  const loading = analyticsQuery.isLoading;
   const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">(
     "30d"
   );
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Charger les analytics
+  // Optionnel: recharger en fonction du filtre de période (placeholder pour futures API)
   useEffect(() => {
-    const loadAnalytics = async () => {
-      try {
-        const data = await calculateAnalytics(advertisement.id);
-        setAnalytics(data);
-      } catch (err) {
-        console.error("Erreur lors du chargement des analytics:", err);
-      }
-    };
-
-    loadAnalytics();
-  }, [advertisement.id, calculateAnalytics, dateRange]);
+    analyticsQuery.refetch();
+  }, [dateRange]);
 
   /**
    * Calcule le pourcentage de changement

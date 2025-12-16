@@ -9,7 +9,7 @@ import {
   BanknotesIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { useAdvertisements } from "../../hooks/useAdvertisements";
+import { useAdvertisements } from "@/hooks/useAdvertisements.query";
 import {
   Advertisement,
   CreateAdvertisementData,
@@ -131,14 +131,14 @@ export default function AdvertisementForm({
         category: advertisement.category || "",
         location: advertisement.location || "",
         budget: advertisement.budget,
+        daily_budget: advertisement.daily_budget,
         start_date: advertisement.start_date
           ? new Date(advertisement.start_date).toISOString().split("T")[0]
           : "",
         end_date: advertisement.end_date
           ? new Date(advertisement.end_date).toISOString().split("T")[0]
           : "",
-        is_active: advertisement.is_active,
-      });
+      } as CreateAdvertisementData);
       setImagePreview(advertisement.image_url || "");
     }
   }, [advertisement]);

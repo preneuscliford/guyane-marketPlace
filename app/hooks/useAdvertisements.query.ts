@@ -615,6 +615,9 @@ export function useAdvertisementStats() {
   return {
     // Les hooks de stats/analytics sont maintenant séparés et utilisent les queries individuelles
     // useAdvertisementStatsQuery et useAdvertisementAnalyticsQuery
+    calculateAnalytics: async (advertisementId: string) => {
+      return calculateAdvertisementAnalyticsAPI(advertisementId);
+    },
     recordImpression: useCallback(async (advertisementId: string, userId?: string) => {
       // Mode debug pour éviter les erreurs RLS
       console.log('Impression enregistrée (mode debug):', { advertisementId, userId });

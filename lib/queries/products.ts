@@ -43,11 +43,7 @@ export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]
       created_at,
       view_count,
       views,
-      user_id,
-      profiles:user_id (
-        username,
-        avatar_url
-      )
+      user_id
     `)
     .eq("status", "active")
     .order("created_at", { ascending: false });
@@ -81,9 +77,9 @@ export const fetchProducts = async (filters: ProductsFilters): Promise<Product[]
  * Fonction pour récupérer les likes d'un utilisateur
  */
 export const fetchUserLikes = async (userId: string): Promise<string[]> => {
-  const supabase = createClientComponentClient();
+  const client = supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("product_likes")
     .select("product_id")
     .eq("user_id", userId);
@@ -93,5 +89,5 @@ export const fetchUserLikes = async (userId: string): Promise<string[]> => {
     return [];
   }
 
-  return data?.map((like) => like.product_id) || [];
+  return (data?.map((like: { product_id: string | null }) => like.product_id).filter(Boolean) as string[]) || [];
 };

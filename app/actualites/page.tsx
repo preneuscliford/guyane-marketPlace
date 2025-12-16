@@ -3,13 +3,14 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
-import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import { PostImageUpload } from "@/components/ui/PostImageUpload";
 import Link from "next/link";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 import ReportButton from "@/components/moderation/ReportButton";
+import { usePostsQuery, useCreatePostMutation } from "@/hooks/usePosts.query";
+import { useToggleLikeMutation } from "@/hooks/useLikes.query";
+import { supabase } from "@/lib/supabase";
 
 type Profile = {
   id: string;
@@ -33,140 +34,38 @@ type Post = {
 
 export default function ActualitesPage() {
   const { user } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: postsData = [], isLoading: loading, refetch } = usePostsQuery({ sortBy: "recent" });
+  const createPostMutation = useCreatePostMutation();
+  const toggleLikeMutation = useToggleLikeMutation();
   const [newPost, setNewPost] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting) {
+          refetch();
         }
       },
       { threshold: 1.0 }
     );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
+    if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [hasMore, loadingMore]);
+  }, [refetch]);
 
-  useEffect(() => {
-    if (page > 1) {
-      fetchPosts(page);
-    }
-  }, [page]);
-
-  const fetchPosts = async (currentPage = 1) => {
-    try {
-      currentPage === 1 ? setLoading(true) : setLoadingMore(true);
-      const limit = 10;
-      const from = (currentPage - 1) * limit;
-      const to = from + limit - 1;
-
-      const data = await retryWithExponentialBackoff(
-        async () => {
-          const { data: result, error } = await supabase
-            .from("posts")
-            .select(
-              `
-              *,
-              profiles:user_id(
-                username,
-                avatar_url
-              ),
-               likes(*),
-               comments(*)
-            `
-            )
-            .order("created_at", { ascending: false })
-            .range(from, to);
-
-          if (error) throw error;
-          return result || [];
-        },
-        3,
-        500
-      );
-
-      setHasMore(data.length >= limit);
-      const normalized = (data || []).map((p: any) => ({
-        id: p.id,
-        content: p.content,
-        created_at: p.created_at,
-        user_id: p.user_id,
-        profiles: {
-          id: p.user_id,
-          username: p.profiles?.username ?? "",
-          full_name: p.profiles?.full_name,
-          avatar_url: p.profiles?.avatar_url,
-          created_at: "",
-          updated_at: "",
-        } as Profile,
-        image_url: p.image_url,
-        likes: p.likes ?? [],
-        likes_count: Array.isArray(p.likes) ? p.likes.length : 0,
-        comments_count: Array.isArray(p.comments) ? p.comments.length : 0,
-      })) as Post[];
-      setPosts((prev) =>
-        currentPage === 1 ? normalized : [...prev, ...normalized]
-      );
-    } catch (error) {
-      console.error("Failed to load posts after retries:", error);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
-
-  const checkAndCreateProfile = async () => {
-    if (!user) return;
-
-    try {
-      // Vérifier si le profil existe
-      const { data: profile, error: fetchError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
-
-      if (fetchError || !profile) {
-        // Créer le profil s'il n'existe pas
-        const { error: insertError } = await supabase.from("profiles").insert({
-          id: user.id,
-          username: user.email?.split("@")[0],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-
-        if (insertError) {
-          console.error("Erreur lors de la création du profil:", insertError);
-          setError("Erreur lors de la création du profil utilisateur");
-        }
-      }
-    } catch (error) {
-      console.error("Erreur lors de la vérification du profil:", error);
-    }
-  };
+  const posts = postsData as unknown as Post[];
 
   useEffect(() => {
     if (user) {
-      checkAndCreateProfile();
-      fetchPosts(1);
+      refetch();
     }
-  }, [user]);
+  }, [user, refetch]);
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const hasMore = true;
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,17 +83,6 @@ export default function ActualitesPage() {
 
     try {
       setSubmitting(true);
-
-      // Vérifier à nouveau si le profil existe
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError || !profile) {
-        await checkAndCreateProfile();
-      }
 
       // Upload des images
       const imageUrls = await Promise.all(
@@ -219,52 +107,15 @@ export default function ActualitesPage() {
 
       const newPostData = {
         content: newPost.trim(),
-        user_id: user.id,
         image_url: imageUrls[0], // Using first image only since table expects single URL
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
-      // Try with regular client first
-      let { error } = await supabase
-        .from("posts")
-        .insert(newPostData)
-        .select()
-        .single();
-
-      // If RLS error, try with service key
-      if (error?.message.includes("permission denied")) {
-        console.log("RLS blocked, trying with service key");
-        const serviceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
-        if (!serviceKey) {
-          throw new Error("Service key not configured");
-        }
-
-        const { createClient } = await import(
-          "@supabase/supabase-js/dist/module/index.js"
-        );
-        const serviceClient = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          serviceKey
-        );
-
-        ({ error } = await serviceClient
-          .from("posts")
-          .insert(newPostData)
-          .select()
-          .single());
-      }
-
-      if (error) {
-        console.error("Erreur détaillée lors de la création:", error);
-        setError(`Erreur lors de la création: ${error.message}`);
-        return;
-      }
+      await createPostMutation.mutateAsync(newPostData);
 
       setNewPost("");
       setSelectedImages([]);
       setUploadProgress(0);
-      await fetchPosts(1);
+      await refetch();
     } catch (error) {
       console.error("Erreur complète lors de la création:", {
         error,
@@ -283,29 +134,12 @@ export default function ActualitesPage() {
 
   const handleLike = async (postId: string) => {
     if (!user) return;
-
     try {
-      const { data: likes } = await supabase
-        .from("likes")
-        .select("*")
-        .eq("post_id", postId)
-        .eq("user_id", user.id);
-
-      const existingLike = likes && likes.length > 0;
-
-      if (existingLike) {
-        await supabase
-          .from("likes")
-          .delete()
-          .match({ post_id: postId, user_id: user.id });
-      } else {
-        await supabase.from("likes").insert({
-          post_id: postId,
-          user_id: user.id,
-        });
-      }
-
-      await fetchPosts(1);
+      const currentlyLiked =
+        posts.find((p) => p.id === postId)?.likes?.some((like) => like.user_id === user?.id) ??
+        false;
+      toggleLikeMutation.mutate({ postId, currentlyLiked });
+      await refetch();
     } catch (error) {
       console.error("Erreur lors de la gestion du like:", error);
     }
@@ -338,19 +172,19 @@ export default function ActualitesPage() {
             <div className="p-6">
               <div className="mb-4 flex items-center space-x-4">
                 <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100">
-                  {post.profiles.avatar_url && (
+                  {post.profiles?.avatar_url && (
                     <Image
-                      src={post.profiles.avatar_url}
+                      src={post.profiles?.avatar_url}
                       width={48}
                       height={48}
                       className="h-full w-full rounded-full object-cover"
-                      alt={post.profiles.username || ""}
+                      alt={post.profiles?.username || ""}
                     />
                   )}
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-slate-800">
-                    {post.profiles.full_name || post.profiles.username}
+                    {post.profiles?.full_name || post.profiles?.username}
                   </p>
                   <p className="text-sm text-slate-500">
                     {new Date(post.created_at).toLocaleDateString("fr-FR", {

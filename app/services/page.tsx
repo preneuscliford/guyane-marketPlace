@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ import {
   ServiceCard,
   ServiceCardCompact,
 } from "@/components/services/ServiceCard";
-import { useServices, useServiceStats } from "@/hooks/useServices";
+import { useServices, useServiceStats } from "@/hooks/useServices.query";
 import { useAuth } from "@/hooks/useAuth";
 import {
   ServiceSearchParams,

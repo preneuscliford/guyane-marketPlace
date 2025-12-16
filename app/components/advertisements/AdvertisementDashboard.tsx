@@ -13,10 +13,12 @@ import {
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import {
-  useAdvertisements,
-  useAdvertisementStats,
-} from "../../hooks/useAdvertisements";
+import { 
+  useUserAdvertisementsQuery, 
+  useUpdateAdvertisementMutation, 
+  useDeleteAdvertisementMutation,
+  useAdvertisementStats
+} from "@/hooks/useAdvertisements.query";
 import {
   Advertisement,
   AdvertisementAnalytics as AdvertisementAnalyticsType,
@@ -33,15 +35,12 @@ import AdvertisementAnalytics from "./AdvertisementAnalytics";
  * Dashboard principal pour gérer les publicités
  */
 export default function AdvertisementDashboard() {
-  const {
-    advertisements,
-    loading,
-    error,
-    fetchUserAdvertisements,
-    updateAdvertisement,
-    deleteAdvertisement,
-  } = useAdvertisements();
-
+  const userAdsQuery = useUserAdvertisementsQuery();
+  const { data: advertisements = [], isLoading: loading, error, refetch } = userAdsQuery;
+  const updateMutation = useUpdateAdvertisementMutation();
+  const deleteMutation = useDeleteAdvertisementMutation();
+  // Garder les mutations existantes via l'ancien hook si nécessaire
+  // ou migrer ultérieurement vers useUpdateAdvertisementMutation / useDeleteAdvertisementMutation
   const { calculateAnalytics } = useAdvertisementStats();
 
   const [selectedAd, setSelectedAd] = useState<Advertisement | null>(null);
@@ -52,10 +51,7 @@ export default function AdvertisementDashboard() {
   >({});
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Charger les publicités de l'utilisateur
-  useEffect(() => {
-    fetchUserAdvertisements();
-  }, [fetchUserAdvertisements]);
+  // Les publicités de l'utilisateur sont chargées via TanStack Query (cache + refetch intelligent)
 
   // Charger les analytics pour chaque publicité
   useEffect(() => {
@@ -125,7 +121,8 @@ export default function AdvertisementDashboard() {
     newStatus: Advertisement["status"]
   ) => {
     try {
-      await updateAdvertisement(ad.id, { status: newStatus });
+      await updateMutation.mutateAsync({ id: ad.id, data: { status: newStatus } });
+      await refetch();
     } catch (err) {
       console.error("Erreur lors de la mise à jour du statut:", err);
     }
@@ -139,7 +136,8 @@ export default function AdvertisementDashboard() {
       window.confirm("Êtes-vous sûr de vouloir supprimer cette publicité ?")
     ) {
       try {
-        await deleteAdvertisement(ad.id);
+        await deleteMutation.mutateAsync(ad.id);
+        await refetch();
       } catch (err) {
         console.error("Erreur lors de la suppression:", err);
       }
@@ -182,8 +180,10 @@ export default function AdvertisementDashboard() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600 mb-4">{error}</p>
-        <Button onClick={fetchUserAdvertisements}>Réessayer</Button>
+        <p className="text-red-600 mb-4">
+          {typeof error === "string" ? error : (error?.message || "Une erreur est survenue")}
+        </p>
+        <Button onClick={() => refetch()}>Réessayer</Button>
       </div>
     );
   }
@@ -316,7 +316,7 @@ export default function AdvertisementDashboard() {
           onClose={closeModals}
           onSuccess={() => {
             closeModals();
-            fetchUserAdvertisements();
+            refetch();
           }}
         />
       )}

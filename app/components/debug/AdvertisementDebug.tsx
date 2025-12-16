@@ -1,6 +1,6 @@
 "use client";
 
-import { useActiveAdvertisementsForCarousel } from "@/hooks/useAdvertisements";
+import { useActiveAdvertisementsForCarousel } from "@/hooks/useAdvertisements.query";
 
 export function AdvertisementDebug() {
   const { advertisements, loading, error } =

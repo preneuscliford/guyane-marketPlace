@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, MapPin } from "lucide-react";
 import { RatingStars } from "@/components/ui/RatingStars";
-import { useServices } from "@/hooks/useServices";
+import { useServicesQuery } from "@/hooks/useServices.query";
 
 // Interface pour les services affichés
 interface ListingProps {
@@ -63,31 +63,27 @@ const isNewService = (createdAt: string): boolean => {
 };
 
 export function FeaturedServices() {
-  const { services, loading, fetchServices } = useServices();
   const [isMounted, setIsMounted] = useState(false);
+  const { data: servicesData, isLoading, refetch } = useServicesQuery({
+    sort_by: 'created_at',
+    sort_order: 'desc',
+    limit: 6
+  });
 
   // S'assurer que le composant est monté côté client
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Récupérer les services au montage du composant
+  // Optionnel: forcer un refetch une fois monté pour aligner le cycle client
   useEffect(() => {
     if (isMounted) {
-      console.log('FeaturedServices: Récupération des services...');
-      fetchServices({
-        sort_by: 'created_at',
-        sort_order: 'desc',
-        limit: 6
-      }).then(() => {
-        console.log('FeaturedServices: Services récupérés avec succès');
-      }).catch((error) => {
-        console.error('FeaturedServices: Erreur lors de la récupération des services:', error);
-      });
+      refetch();
     }
-  }, [fetchServices, isMounted]);
+  }, [isMounted, refetch]);
 
   // Mapper les services de la base de données vers le format d'affichage
+  const services = servicesData || [];
   console.log('FeaturedServices: Services disponibles:', services.length, services);
   
   let featuredListings: ListingProps[] = [];
@@ -129,7 +125,7 @@ export function FeaturedServices() {
   }
 
   // Afficher un état de chargement pendant le montage et le chargement des données
-  if (!isMounted || loading) {
+  if (!isMounted || isLoading) {
     return (
       <section className="py-12 sm:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
