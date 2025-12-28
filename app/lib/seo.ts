@@ -325,10 +325,10 @@ export const SEO_TEMPLATES = {
   },
 
   annonces: {
-    title: 'Petites Annonces Guyane - Annonces Classées Locales',
-    description: 'Petites annonces gratuites en Guyane française. Immobilier, véhicules, emploi, services. Cayenne, Kourou, Saint-Laurent et toute la Guyane.',
+    title: 'Petites Annonces Guyane - Annonces Classées Locales | Acheter & Vendre',
+    description: 'Petites annonces gratuites en Guyane française. Immobilier, véhicules, emploi, services. Cayenne, Kourou, Saint-Laurent et toute la Guyane. Achetez et vendez localement!',
     category: 'annonces' as const,
-    keywords: 'petites annonces gratuites Guyane, annonces classées, immobilier véhicules emploi',
+    keywords: 'petit annonce guyane, petites annonces guyane française, annonces classées guyane, vendre acheter guyane, petit annonce cayenne, petit annonce kourou, immobilier guyane, emploi guyane, véhicules guyane',
   },
 
   communaute: {

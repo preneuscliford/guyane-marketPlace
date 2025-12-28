@@ -23,6 +23,7 @@ import {
 
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatDate, formatPrice } from "lib/utils";
+import { AnnouncementCollectionStructuredData } from "@/components/seo/AnnouncementStructuredData";
 
 type Announcement = Database["public"]["Tables"]["announcements"]["Row"] & {
   profiles: {
@@ -141,16 +142,24 @@ export default function AnnouncementsPage() {
 
   return (
     <>
+      <AnnouncementCollectionStructuredData
+        title="Petites Annonces Guyane"
+        description="Plateforme de petites annonces gratuites en Guyane française. Achetez, vendez et louez à Cayenne, Kourou, Saint-Laurent et partout en Guyane"
+        announcementCount={filteredAnnouncements.length}
+        url="/annonces"
+      />
       <Header />
       <div className="container py-8 px-8 pt-24">
         {/* En-tête avec titre et bouton */}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-primary">
-              Marché Guyanais
+              Petites Annonces Guyane - Achetez & Vendez Localement
             </h1>
             <p className="mt-2 text-lg text-muted-foreground">
-              Découvrez des offres uniques dans votre région
+              La première plateforme de petites annonces en Guyane française.
+              Découvrez des offres uniques à Cayenne, Kourou, Saint-Laurent et
+              partout en Guyane
             </p>
           </div>
           <Button
@@ -162,6 +171,49 @@ export default function AnnouncementsPage() {
               Déposer une annonce
             </Link>
           </Button>
+        </div>
+
+        {/* Section d'introduction SEO optimisée */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+          <h2 className="text-2xl font-semibold text-blue-900 mb-3">
+            Trouvez les meilleures petites annonces en Guyane
+          </h2>
+          <p className="text-sm text-blue-800 mb-4 leading-relaxed">
+            Bienvenue sur la plateforme leader des petites annonces en Guyane
+            française. Que vous cherchiez à acheter, vendre ou louer, nos
+            petites annonces Guyane vous permettent de trouver facilement ce que
+            vous recherchez. Explorez nos annonces classées dans toutes les
+            catégories : <strong>immobilier</strong>, <strong>véhicules</strong>
+            , <strong>emploi</strong>,<strong> services</strong> et bien
+            d'autres. Disponibles à Cayenne, Kourou, Saint-Laurent-du-Maroni et
+            partout en Guyane française.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Link
+              href="/annonces?category=Véhicules"
+              className="text-sm text-blue-700 hover:text-blue-900 font-medium hover:underline"
+            >
+              → Véhicules en Guyane
+            </Link>
+            <Link
+              href="/annonces?category=Immobilier"
+              className="text-sm text-blue-700 hover:text-blue-900 font-medium hover:underline"
+            >
+              → Immobilier Guyane
+            </Link>
+            <Link
+              href="/annonces?category=Emploi"
+              className="text-sm text-blue-700 hover:text-blue-900 font-medium hover:underline"
+            >
+              → Emploi Guyane
+            </Link>
+            <Link
+              href="/annonces?category=Services"
+              className="text-sm text-blue-700 hover:text-blue-900 font-medium hover:underline"
+            >
+              → Services Guyane
+            </Link>
+          </div>
         </div>
 
         {/* Barre de recherche et filtres */}
