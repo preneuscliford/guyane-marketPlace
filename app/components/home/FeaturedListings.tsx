@@ -6,7 +6,6 @@ import { Star, MapPin, Clock, TrendingUp, Heart, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useServicesQuery } from '@/hooks/useServices.query';
-import { useEffect } from 'react';
 import { ServiceWithProfile } from '@/types/services';
 
 interface ListingProps {

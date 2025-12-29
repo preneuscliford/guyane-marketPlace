@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus, Upload, MapPin, DollarSign, Tag, Loader2 } from 'lucide-react';
+import { X, Plus, MapPin, Tag, DollarSign } from 'lucide-react';
 import { useServices } from '@/hooks/useServices.query';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -179,15 +178,6 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
       ...prev,
       tags: (prev.tags ?? []).filter(tag => tag !== tagToRemove)
     }));
-  };
-
-
-
-  /**
-   * Supprime une URL d'image
-   */
-  const removeImageUrl = (index: number) => {
-    setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   return (

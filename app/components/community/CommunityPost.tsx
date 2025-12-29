@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -25,6 +26,7 @@ import {
   Reply,
   ChevronDown,
   ChevronUp,
+  Briefcase,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -688,6 +690,15 @@ export default function CommunityPost({
                     ? `${commentCount} réponse${commentCount > 1 ? "s" : ""}`
                     : "Voir les réponses"}
                 </Button>
+              </div>
+
+              {/* CTA Marketplace - Lien fort Communauté ↔ Marketplace */}
+              <div className="mt-3 pt-2 border-t border-dashed border-gray-100 flex items-center justify-between bg-purple-50/50 -mx-3 sm:-mx-6 px-3 sm:px-6 py-2 rounded-b-lg">
+                 <span className="text-xs text-gray-500 hidden sm:inline">Une opportunité d'affaires identifiée ?</span>
+                 <Link href="/services/nouveau" className="text-xs font-medium text-purple-700 hover:text-purple-800 hover:underline flex items-center gap-1.5 ml-auto sm:ml-0">
+                    <Briefcase className="w-3.5 h-3.5" />
+                    Vous proposez ce service ? Créez une annonce
+                 </Link>
               </div>
 
               {/* Formulaire de réponse */}

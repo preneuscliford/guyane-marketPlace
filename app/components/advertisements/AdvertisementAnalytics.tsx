@@ -8,7 +8,6 @@ import {
   EyeIcon,
   CursorArrowRaysIcon,
   BanknotesIcon,
-  CalendarIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
@@ -40,15 +39,13 @@ export default function AdvertisementAnalytics({
   const analyticsQuery = useAdvertisementAnalyticsQuery(advertisement.id);
   const analytics = (analyticsQuery.data as AnalyticsType) || null;
   const loading = analyticsQuery.isLoading;
-  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">(
-    "30d"
-  );
   const [activeTab, setActiveTab] = useState("overview");
 
   // Optionnel: recharger en fonction du filtre de période (placeholder pour futures API)
   useEffect(() => {
-    analyticsQuery.refetch();
-  }, [dateRange]);
+    // Si nous avions un sélecteur de date, nous pourrions refetch ici
+    // analyticsQuery.refetch();
+  }, []);
 
   /**
    * Calcule le pourcentage de changement
@@ -430,7 +427,7 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-end justify-between gap-2 p-4 bg-gray-50 rounded-lg">
-            {analytics.daily_stats.slice(-14).map((day, index) => {
+            {analytics.daily_stats.slice(-14).map((day) => {
               const maxClicks = Math.max(
                 ...analytics.daily_stats.map((d) => d.clicks)
               );
@@ -545,7 +542,7 @@ function PerformanceTab({ analytics }: { analytics: AnalyticsType }) {
 /**
  * Onglet Audience
  */
-function AudienceTab({ analytics }: { analytics: AnalyticsType }) {
+function AudienceTab({ }: { analytics: AnalyticsType }) {
   return (
     <div className="space-y-6">
       <Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
@@ -22,28 +22,43 @@ import { formatCurrency } from "@/lib/utils";
  * Carrousel publicitaire pour la section hero de la page d'accueil
  */
 export default function HeroAdvertisementCarousel() {
-  const { advertisements, loading, selectNext, currentIndex } =
-    useWeightedCarousel({
-      limit: 5,
-      autoRotate: true,
-      rotationInterval: 8000,
-    });
+  const { weightedAds, loading } = useWeightedCarousel();
 
   const { recordImpression, recordClick } = useAdvertisementStats();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentAd, setCurrentAd] = useState<Advertisement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % weightedAds.length);
+  }, [weightedAds.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + weightedAds.length) % weightedAds.length);
+  }, [weightedAds.length]);
+
+  // Rotation automatique
+  useEffect(() => {
+    if (weightedAds.length > 0) {
+      const interval = setInterval(() => {
+        nextSlide();
+      }, 8000);
+      return () => clearInterval(interval);
+    }
+  }, [weightedAds.length, nextSlide]);
 
   useEffect(() => {
-    if (advertisements.length > 0) {
-      setCurrentAd(advertisements[currentIndex]);
-      setIsVisible(true);
+    if (weightedAds.length > 0) {
+      // S'assurer que l'index est valide
+      const index = currentIndex % weightedAds.length;
+      const ad = weightedAds[index];
+      setCurrentAd(ad);
 
       // Enregistrer l'impression
-      if (advertisements[currentIndex]) {
-        recordImpression(advertisements[currentIndex].id);
+      if (ad) {
+        recordImpression(ad.id);
       }
     }
-  }, [advertisements, currentIndex, recordImpression]);
+  }, [weightedAds, currentIndex, recordImpression]);
 
   const handleAdClick = (ad: Advertisement) => {
     recordClick(ad.id);
@@ -52,17 +67,7 @@ export default function HeroAdvertisementCarousel() {
     }
   };
 
-  const nextSlide = () => {
-    selectNext();
-  };
-
-  const prevSlide = () => {
-    const prevIndex =
-      currentIndex === 0 ? advertisements.length - 1 : currentIndex - 1;
-    setCurrentAd(advertisements[prevIndex]);
-  };
-
-  if (loading || !currentAd || advertisements.length === 0) {
+  if (loading || !currentAd || weightedAds.length === 0) {
     return (
       <div className="relative h-96 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
@@ -203,7 +208,7 @@ export default function HeroAdvertisementCarousel() {
       </div>
 
       {/* Navigation Controls */}
-      {advertisements.length > 1 && (
+      {weightedAds.length > 1 && (
         <>
           {/* Previous Button */}
           <button
@@ -225,10 +230,10 @@ export default function HeroAdvertisementCarousel() {
 
           {/* Dots Indicator */}
           <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {advertisements.map((ad, index) => (
+            {weightedAds.map((ad, index) => (
               <button
                 key={`ad-dot-${ad.id}`}
-                onClick={() => setCurrentAd(advertisements[index])}
+                onClick={() => setCurrentIndex(index)}
                 className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 touch-manipulation ${
                   index === currentIndex
                     ? "bg-white scale-125"
@@ -267,20 +272,25 @@ export default function HeroAdvertisementCarousel() {
  * Version compacte du carrousel pour d'autres sections
  */
 export function CompactAdvertisementCarousel() {
-  const { advertisements, loading, selectNext, currentIndex } =
-    useWeightedCarousel({
-      limit: 3,
-      autoRotate: true,
-      rotationInterval: 6000,
-    });
+  const { weightedAds, loading } = useWeightedCarousel();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { recordImpression, recordClick } = useAdvertisementStats();
 
   useEffect(() => {
-    if (advertisements.length > 0 && advertisements[currentIndex]) {
-      recordImpression(advertisements[currentIndex].id);
+    if (weightedAds.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % weightedAds.length);
+      }, 6000);
+      return () => clearInterval(interval);
     }
-  }, [advertisements, currentIndex, recordImpression]);
+  }, [weightedAds.length]);
+
+  useEffect(() => {
+    if (weightedAds.length > 0 && weightedAds[currentIndex]) {
+      recordImpression(weightedAds[currentIndex].id);
+    }
+  }, [weightedAds, currentIndex, recordImpression]);
 
   const handleAdClick = (ad: Advertisement) => {
     recordClick(ad.id);
@@ -289,7 +299,7 @@ export function CompactAdvertisementCarousel() {
     }
   };
 
-  if (loading || advertisements.length === 0) {
+  if (loading || weightedAds.length === 0) {
     return (
       <div className="h-32 bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
         <div className="text-gray-400">Chargement des publicités...</div>
@@ -297,7 +307,7 @@ export function CompactAdvertisementCarousel() {
     );
   }
 
-  const currentAd = advertisements[currentIndex];
+  const currentAd = weightedAds[currentIndex];
 
   return (
     <div
@@ -337,9 +347,9 @@ export function CompactAdvertisementCarousel() {
       </div>
 
       {/* Dots */}
-      {advertisements.length > 1 && (
+      {weightedAds.length > 1 && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {advertisements.map((ad, index) => (
+          {weightedAds.map((ad, index) => (
             <div
               key={`ad-indicator-${ad.id}`}
               className={`w-1.5 h-1.5 rounded-full transition-all ${

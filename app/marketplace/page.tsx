@@ -166,6 +166,29 @@ export default function MarketplacePage() {
         <>
           <HeroSection onSearch={handleSearch} />
           <FeaturedCategories />
+
+          {/* CTA Communauté - Lien fort Marketplace ↔ Communauté */}
+          <div className="container mx-auto px-4 py-8">
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Conseil</span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-teal-900">
+                     Besoin d’avis avant d'acheter ?
+                  </h3>
+                </div>
+                <p className="text-teal-700 max-w-2xl">
+                   Ne choisissez pas au hasard. La communauté mcGuyane est là pour vous aider : posez vos questions, comparez les offres et trouvez les meilleurs prestataires.
+                </p>
+              </div>
+              <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white whitespace-nowrap shadow-md transition-all hover:shadow-lg">
+                <Link href="/communaute">
+                   Posez la question à la communauté
+                </Link>
+              </Button>
+            </div>
+          </div>
+
           <FeaturedServices />
           <HowItWorks />
 

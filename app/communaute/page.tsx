@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,10 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import CommunityPost from "@/components/community/CommunityPost";
-import SponsoredBanner from "@/components/advertisements/SponsoredBanner";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/lib/supabase";
-import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import {
   Users,
   MessageSquare,
@@ -28,191 +25,65 @@ import {
   MessageCircle,
   Heart,
   Share2,
+  Award,
+  ShoppingBag
 } from "lucide-react";
-import type { Post } from "@/types/community";
-import type { Database } from "@/types/supabase";
 import { useAnalytics } from "@/hooks/useAnalytics";
-
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-
-interface CommunityStats {
-  total_posts: number;
-  total_users: number;
-  posts_today: number;
-  active_users: number;
-}
+import { 
+  usePostsQuery, 
+  useCreatePostMutation, 
+  useCommunityStatsQuery,
+  type PostFilters
+} from "@/hooks/usePosts.query";
+import { PostWithDetails } from "@/hooks/usePosts.query";
 
 /**
  * Page principale de la communauté avec système de posts imbriqués,
  * affiches publicitaires intégrées et statistiques
+ * Migrée vers TanStack Query pour une meilleure performance et UX
  */
 export default function CommunautePage() {
   const { user } = useAuth();
   const { trackPostCreated, trackSearch } = useAnalytics();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // États locaux pour les filtres et le formulaire
   const [newPostContent, setNewPostContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("recent");
-  const [stats, setStats] = useState<CommunityStats>({
-    total_posts: 0,
-    total_users: 0,
-    posts_today: 0,
-    active_users: 0,
+  // Debounce ou état intermédiaire pour la recherche si nécessaire, 
+  // ici on passera searchQuery directement au hook mais idéalement on debouncerait
+  const [activeSearch, setActiveSearch] = useState(""); 
+  
+  const [sortBy, setSortBy] = useState<PostFilters['sortBy']>("recent");
+
+  // Hooks TanStack Query
+  const { 
+    data: posts = [], 
+    isLoading: postsLoading, 
+    refetch: refetchPosts 
+  } = usePostsQuery({ 
+    searchQuery: activeSearch, 
+    sortBy 
   });
 
-  /**
-   * Charge les statistiques de la communauté avec retry automatique
-   */
-  const fetchStats = async () => {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayISO = today.toISOString();
+  const { data: stats } = useCommunityStatsQuery();
 
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekAgoISO = weekAgo.toISOString();
-
-      await retryWithExponentialBackoff(
-        async () => {
-          // Total des posts
-          const { count: totalPosts, error: error1 } = await supabase
-            .from("posts")
-            .select("*", { count: "exact", head: true })
-            .eq("is_hidden", false);
-
-          if (error1) throw error1;
-
-          // Posts d'aujourd'hui
-          const { count: postsToday, error: error2 } = await supabase
-            .from("posts")
-            .select("*", { count: "exact", head: true })
-            .eq("is_hidden", false)
-            .gte("created_at", todayISO);
-
-          if (error2) throw error2;
-
-          // Total des utilisateurs
-          const { count: totalUsers, error: error3 } = await supabase
-            .from("profiles")
-            .select("*", { count: "exact", head: true });
-
-          if (error3) throw error3;
-
-          // Utilisateurs actifs (ayant posté dans les 7 derniers jours)
-          const { data: activeUsersData, error: error4 } = await supabase
-            .from("posts")
-            .select("user_id")
-            .gte("created_at", weekAgoISO)
-            .eq("is_hidden", false);
-
-          if (error4) throw error4;
-
-          const activeUsers = new Set(activeUsersData?.map((p) => p.user_id))
-            .size;
-
-          setStats({
-            total_posts: totalPosts || 0,
-            total_users: totalUsers || 0,
-            posts_today: postsToday || 0,
-            active_users: activeUsers,
-          });
-          return true;
-        },
-        3,
-        500
-      );
-    } catch (error) {
-      console.error("Failed to load stats after retries:", error);
-      // Les stats gardent leurs valeurs par défaut
-    }
-  };
+  const createPostMutation = useCreatePostMutation();
 
   /**
    * Publie un nouveau post
    */
-  const submitPost = async () => {
+  const handleSubmitPost = async () => {
     if (!user || !newPostContent.trim()) return;
 
-    setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from("posts")
-        .insert({
-          content: newPostContent.trim(),
-          user_id: user.id,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          is_hidden: false,
-        })
-        .select(
-          `
-          *,
-          profiles:user_id(id, username, avatar_url, full_name, bio)
-        `
-        )
-        .single();
+      await createPostMutation.mutateAsync({
+        content: newPostContent.trim(),
+        image_url: undefined // Support image à ajouter plus tard si besoin
+      });
 
-      if (error) {
-        console.error("Error submitting post:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
-        throw error;
-      }
-
-      // Construction explicite du Post avec typage unifié
-      const profilesData = (data as any)?.profiles;
-      const mappedProfile: ProfileRow | undefined =
-        profilesData &&
-        typeof profilesData === "object" &&
-        !("error" in profilesData)
-          ? {
-              id: profilesData.id ?? "",
-              username: profilesData.username ?? null,
-              avatar_url: profilesData.avatar_url ?? null,
-              full_name: profilesData.full_name ?? null,
-              bio: profilesData.bio ?? null,
-              created_at:
-                (profilesData.created_at as string) ?? new Date().toISOString(),
-              updated_at:
-                (profilesData.updated_at as string) ?? new Date().toISOString(),
-              description: (profilesData.description as string) ?? null,
-              location: (profilesData.location as string) ?? null,
-              phone: (profilesData.phone as string) ?? null,
-              role: (profilesData.role as string) ?? null,
-              skills: (profilesData.skills as string[]) ?? null,
-              website: (profilesData.website as string) ?? null,
-            }
-          : undefined;
-
-      const newPost: Post = {
-        id: data.id,
-        content: data.content,
-        user_id: data.user_id,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-        hidden_at: data.hidden_at ?? null,
-        hidden_by: data.hidden_by ?? null,
-        hidden_reason: data.hidden_reason ?? null,
-        image_url: data.image_url ?? null,
-        is_hidden: data.is_hidden ?? false,
-        profiles: mappedProfile,
-        like_count: 0,
-        comment_count: 0,
-        user_liked: false,
-        likes: [],
-      };
-
-      setPosts((prev) => [newPost, ...prev]);
       setNewPostContent("");
-      toast.success("Post publié avec succès!");
-
-      // Track: Post créé
+      
+      // Analytics
       trackPostCreated({
         content_length: newPostContent.length,
         has_image: false,
@@ -220,22 +91,17 @@ export default function CommunautePage() {
       });
 
       try {
-        // Tracking GA (si disponible)
-        if (typeof window !== "undefined" && window.gtag) {
-          window.gtag("event", "community_post_create", {
+        if (typeof window !== "undefined" && (window as any).gtag) {
+          (window as any).gtag("event", "community_post_create", {
             event_category: "Communauté",
             event_label: "new_post",
           });
         }
       } catch {}
 
-      // Recharger les statistiques
-      fetchStats();
     } catch (error) {
+      // L'erreur est déjà gérée par le hook (toast.error)
       console.error("Erreur lors de la publication:", error);
-      toast.error("Erreur lors de la publication");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -244,301 +110,15 @@ export default function CommunautePage() {
    */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setActiveSearch(searchQuery);
 
-    // Track: Recherche effectuée
     if (searchQuery.trim()) {
       trackSearch({
         search_term: searchQuery,
         category: "community",
       });
     }
-
-    fetchPosts();
   };
-
-  /**
-   * Charge les posts de la communauté
-   */
-  const fetchPosts = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching posts with searchQuery:", searchQuery);
-
-      // Query that matches the actual database schema
-      let query = supabase
-        .from("posts")
-        .select(
-          `
-          id,
-          user_id, 
-          content,
-          image_url,
-          created_at,
-          updated_at,
-          is_hidden,
-          hidden_by,
-          hidden_at,
-          hidden_reason,
-          profiles:user_id(id, username, avatar_url, full_name, bio),
-          likes(user_id)
-        `
-        )
-        .eq("is_hidden", false); // Récupérer tous les posts sans filtre parent_id
-
-      // Filtrage par recherche
-      if (searchQuery.trim()) {
-        query = query.ilike("content", `%${searchQuery.trim()}%`);
-      }
-
-      // Tri selon la sélection
-      if (sortBy === "recent") {
-        query = query.order("created_at", { ascending: false });
-      } else {
-        // Par défaut on utilise le tri par date récent
-        query = query.order("created_at", { ascending: false });
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Supabase query error details:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
-        toast.error(
-          `Erreur de chargement: ${
-            error.message || error.details || error.hint || "Inconnue"
-          }`
-        );
-        throw error;
-      }
-
-      console.log(`Posts récupérés: ${data?.length || 0}`);
-
-      if (!data || data.length === 0) {
-        console.log("Aucun post trouvé");
-        setPosts([]);
-        return;
-      }
-
-      try {
-        // 1. Nettoyer et transformer les données
-        const rows = (data as any[]) || [];
-        const cleanedPosts: Post[] = rows.map((rawPost: any) => {
-          // Créer un nouveau post avec la structure attendue
-          const cleanPost: Post = {
-            id: rawPost.id ?? "",
-            user_id: rawPost.user_id ?? null,
-            content: rawPost.content ?? "",
-            image_url: rawPost.image_url ?? null,
-            created_at: rawPost.created_at ?? new Date().toISOString(),
-            updated_at: rawPost.updated_at ?? new Date().toISOString(),
-            is_hidden: rawPost.is_hidden ?? false,
-            hidden_by: rawPost.hidden_by ?? null,
-            hidden_at: rawPost.hidden_at ?? null,
-            hidden_reason: rawPost.hidden_reason ?? null,
-
-            // Gérer le profil avec une valeur par défaut en cas d'erreur
-            profiles:
-              rawPost.profiles &&
-              typeof rawPost.profiles === "object" &&
-              !("error" in rawPost.profiles)
-                ? {
-                    id: rawPost.profiles.id ?? "",
-                    username: rawPost.profiles.username ?? null,
-                    avatar_url: rawPost.profiles.avatar_url ?? null,
-                    full_name: rawPost.profiles.full_name ?? null,
-                    bio: rawPost.profiles.bio ?? null,
-                    created_at:
-                      rawPost.profiles.created_at ?? new Date().toISOString(),
-                    updated_at:
-                      rawPost.profiles.updated_at ?? new Date().toISOString(),
-                    description: rawPost.profiles.description ?? null,
-                    location: rawPost.profiles.location ?? null,
-                    phone: rawPost.profiles.phone ?? null,
-                    role: rawPost.profiles.role ?? null,
-                    skills: rawPost.profiles.skills ?? null,
-                    website: rawPost.profiles.website ?? null,
-                  }
-                : undefined,
-
-            // Transformer les likes en tableau
-            likes: Array.isArray(rawPost.likes) ? rawPost.likes : [],
-
-            // Initialiser les champs calculés
-            like_count: 0,
-            comment_count: 0,
-            user_liked: false,
-          };
-          return cleanPost;
-        });
-
-        // 2. Calculer les métriques pour chaque post
-        const processedPosts = cleanedPosts.map((post) => {
-          // Calculer le nombre de likes
-          const likeCount = post.likes ? post.likes.length : 0;
-
-          // Déterminer si l'utilisateur actuel a liké
-          const userLiked =
-            post.likes && user
-              ? post.likes.some(
-                  (like: { user_id: string }) => like.user_id === user.id
-                )
-              : false;
-
-          return {
-            ...post,
-            like_count: likeCount,
-            user_liked: userLiked,
-          };
-        });
-
-        // Mettre à jour l'état avec les posts traités
-        setPosts(processedPosts);
-
-        // 3. Pour simplifier, nous allons initialiser tous les posts avec un nombre de commentaires à 0
-        if (processedPosts.length > 0) {
-          const fetchComments = async () => {
-            try {
-              // Initialiser tous les posts avec 0 commentaire
-              const commentCounts: Record<string, number> = {};
-              processedPosts.forEach((post) => {
-                commentCounts[post.id] = 0;
-              });
-
-              // Mettre à jour les compteurs de commentaires (tous à zéro pour l'instant)
-              setPosts((currentPosts) =>
-                currentPosts.map((post) => ({
-                  ...post,
-                  comment_count: commentCounts[post.id] || 0,
-                }))
-              );
-
-              // Mettre à jour les compteurs de commentaires
-              setPosts((currentPosts) =>
-                currentPosts.map((post) => ({
-                  ...post,
-                  comment_count: commentCounts[post.id] || 0,
-                }))
-              );
-            } catch (error) {
-              if (error instanceof Error) {
-                console.error(
-                  "Erreur lors du comptage des commentaires:",
-                  error.message
-                );
-              } else {
-                console.error(
-                  "Erreur inconnue lors du comptage des commentaires"
-                );
-              }
-            }
-          };
-
-          fetchComments();
-        }
-      } catch (processError) {
-        console.error("Erreur lors du traitement des posts:", processError);
-
-        // En cas d'erreur de traitement, utiliser les données brutes
-        const simplePosts: Post[] = ((data as any[]) || []).map((p: any) => ({
-          id: p.id,
-          user_id: p.user_id ?? null,
-          content: p.content,
-          image_url: p.image_url ?? null,
-          created_at: p.created_at,
-          updated_at: p.updated_at,
-          hidden_at: p.hidden_at ?? null,
-          hidden_by: p.hidden_by ?? null,
-          hidden_reason: p.hidden_reason ?? null,
-          is_hidden: p.is_hidden ?? false,
-          profiles:
-            typeof p.profiles === "object" && p.profiles
-              ? {
-                  id: p.profiles.id ?? "",
-                  username: p.profiles.username ?? null,
-                  avatar_url: p.profiles.avatar_url ?? null,
-                  full_name: p.profiles.full_name ?? null,
-                  bio: p.profiles.bio ?? null,
-                  created_at: p.profiles.created_at ?? new Date().toISOString(),
-                  updated_at: p.profiles.updated_at ?? new Date().toISOString(),
-                  description: p.profiles.description ?? null,
-                  location: p.profiles.location ?? null,
-                  phone: p.profiles.phone ?? null,
-                  role: p.profiles.role ?? null,
-                  skills: p.profiles.skills ?? null,
-                  website: p.profiles.website ?? null,
-                }
-              : undefined,
-          like_count: 0,
-          comment_count: 0,
-          user_liked: false,
-          likes: [],
-        }));
-
-        setPosts(simplePosts);
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement des posts:", error);
-
-      // Afficher un post d'erreur
-      const dummyPosts: Post[] = [
-        {
-          id: "1",
-          content:
-            "Erreur de chargement des posts. Veuillez réessayer plus tard.",
-          user_id: "system",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          hidden_at: null,
-          hidden_by: null,
-          hidden_reason: null,
-          image_url: null,
-          is_hidden: false,
-          like_count: 0,
-          comment_count: 0,
-          user_liked: false,
-          likes: [],
-          profiles: {
-            id: "system",
-            username: "Système",
-            avatar_url: null,
-            full_name: null,
-            bio: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            description: null,
-            location: null,
-            phone: null,
-            role: null,
-            skills: null,
-            website: null,
-          },
-        },
-      ];
-
-      setPosts(dummyPosts);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchQuery, user, sortBy]);
-
-  const refreshPosts = useCallback(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  useEffect(() => {
-    refreshPosts();
-    fetchStats();
-  }, [refreshPosts]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      refreshPosts();
-    }
-  }, [refreshPosts, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -549,11 +129,10 @@ export default function CommunautePage() {
             <div className="flex-1">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
                 <Users className="h-6 w-6 sm:h-8 sm:w-8 text-teal-600 flex-shrink-0" />
-                Communauté
+                Communauté {"&"} Entraide
               </h1>
               <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 leading-relaxed">
-                Un espace pour échanger entre Guyanais, poser des questions,
-                partager des opportunités locales.
+                Le cœur battant de la Guyane : échangez, recommandez, et trouvez les meilleurs produits et services.
               </p>
             </div>
 
@@ -563,13 +142,20 @@ export default function CommunautePage() {
                 onClick={() => {
                   const el = document.querySelector("#new-post-form");
                   el?.scrollIntoView({ behavior: "smooth" });
+                  // Focus le textarea si possible
+                  setTimeout(() => {
+                    const textarea = document.querySelector("#new-post-form") as HTMLTextAreaElement;
+                    textarea?.focus();
+                  }, 500);
                 }}
               >
                 Poster un message
               </Button>
-              <Button variant="outline" asChild>
-                <a href="/auth">Rejoindre la communauté</a>
-              </Button>
+              {!user && (
+                <Button variant="outline" asChild>
+                  <Link href="/auth">Rejoindre la communauté</Link>
+                </Button>
+              )}
             </div>
           </div>
 
@@ -578,17 +164,17 @@ export default function CommunautePage() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-3 sm:p-4 text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
-                  {stats.total_posts}
+                  {stats?.total_posts || 0}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600 leading-tight">
-                  Posts totaux
+                  Discussions
                 </div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-3 sm:p-4 text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
-                  {stats.posts_today}
+                  {stats?.posts_today || 0}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600 leading-tight">
                   Aujourd'hui
@@ -598,7 +184,7 @@ export default function CommunautePage() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-3 sm:p-4 text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
-                  {stats.total_users}
+                  {stats?.total_users || 0}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600 leading-tight">
                   Membres
@@ -608,56 +194,75 @@ export default function CommunautePage() {
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-3 sm:p-4 text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
-                  {stats.active_users}
+                  {stats?.active_users || 0}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600 leading-tight">
-                  Actifs (7j)
+                  Actifs (24h)
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Message incitatif de la communauté */}
-          <Card className="bg-gradient-to-r from-purple-50 to-emerald-50 border-purple-200">
+          <Card className="bg-gradient-to-r from-purple-50 to-emerald-50 border-purple-200 shadow-sm">
             <CardContent className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
-                Bienvenue dans la communauté mcGuyane
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="bg-purple-100 text-purple-700 p-1 rounded">🎯</span>
+                Ici, la communauté aide à :
               </h3>
-              <p className="text-gray-700 text-sm sm:text-base mb-4">
-                Un espace pour discuter, s'entraider et partager les bons plans
-                locaux en Guyane française.
-              </p>
-              <ul className="text-gray-600 text-sm space-y-2 mb-4">
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
-                  <span>
-                    Posez vos questions et obtenez des réponses d'habitants
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
-                  <span>Partagez des bons plans, offres et opportunités</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-600 font-bold mt-0.5">✓</span>
-                  <span>
-                    Connectez-vous avec d'autres résidents et professionnels
-                  </span>
-                </li>
-              </ul>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 bg-green-100 text-green-700 rounded-full p-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span className="text-gray-700 font-medium">Trouver un service fiable</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 bg-green-100 text-green-700 rounded-full p-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span className="text-gray-700 font-medium">Éviter les arnaques</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 bg-green-100 text-green-700 rounded-full p-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span className="text-gray-700 font-medium">Repérer les bonnes opportunités locales</span>
+                  </li>
+                </ul>
+
+                <div className="flex flex-col justify-center gap-3 border-t md:border-t-0 md:border-l border-purple-100 pt-4 md:pt-0 md:pl-6">
+                   <p className="text-sm text-gray-600 italic mb-1">
+                     "La confiance est notre monnaie d'échange."
+                   </p>
+                   <Link href="/services" className="flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800 hover:underline transition-colors">
+                      <ShoppingBag className="w-4 h-4" />
+                      Découvrir les services recommandés
+                   </Link>
+                   <div className="flex items-center gap-2 text-sm font-medium text-purple-700">
+                      <Award className="w-4 h-4" />
+                      Gagnez des badges (Membre Actif, Ambassadeur...)
+                   </div>
+                </div>
+              </div>
+              
               {!user && (
-                <Button
-                  asChild
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  <Link href="/auth">S'inscrire pour participer</Link>
-                </Button>
+                <div className="mt-6 flex justify-center sm:justify-start">
+                  <Button
+                    asChild
+                    className="bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg transition-all"
+                  >
+                    <Link href="/auth">Rejoindre la communauté</Link>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
 
           {/* Barre de recherche et filtres */}
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4 mt-6">
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -670,7 +275,7 @@ export default function CommunautePage() {
               </div>
             </form>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as PostFilters['sortBy'])}>
               <SelectTrigger className="w-48">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -678,7 +283,7 @@ export default function CommunautePage() {
               <SelectContent>
                 <SelectItem value="recent">Plus récents</SelectItem>
                 <SelectItem value="popular">Plus populaires</SelectItem>
-                <SelectItem value="discussed">Plus commentés</SelectItem>
+                <SelectItem value="trending">Tendances</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -702,7 +307,7 @@ export default function CommunautePage() {
                   <div className="space-y-4">
                     <Textarea
                       id="new-post-form"
-                      placeholder="Quoi de neuf ? Partagez vos pensées avec la communauté..."
+                      placeholder="Quoi de neuf ? Une question, un bon plan, une recommandation ?"
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
                       rows={4}
@@ -713,11 +318,11 @@ export default function CommunautePage() {
                         {newPostContent.length}/1000 caractères
                       </div>
                       <Button
-                        onClick={submitPost}
-                        disabled={isSubmitting || !newPostContent.trim()}
+                        onClick={handleSubmitPost}
+                        disabled={createPostMutation.isPending || !newPostContent.trim()}
                         className="bg-teal-600 hover:bg-teal-700"
                       >
-                        {isSubmitting ? "Publication..." : "Publier"}
+                        {createPostMutation.isPending ? "Publication..." : "Publier"}
                       </Button>
                     </div>
                   </div>
@@ -727,15 +332,16 @@ export default function CommunautePage() {
 
             {/* Affiche publicitaire intégrée */}
             <div className="my-8">
-              <SponsoredBanner
-                className="h-48 md:h-56"
-                autoPlayInterval={8000}
-                showControls={true}
-              />
+              <div className="relative w-full h-48 md:h-56 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl overflow-hidden flex items-center justify-center shadow-md">
+                <div className="text-center text-white p-4">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-2">Marketplace Guyane</h3>
+                  <p className="text-teal-100 text-sm sm:text-base font-medium">Votre plateforme locale de confiance</p>
+                </div>
+              </div>
             </div>
 
             {/* Liste des posts */}
-            {loading ? (
+            {postsLoading ? (
               <div className="flex justify-center py-12">
                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-teal-600"></div>
               </div>
@@ -744,12 +350,12 @@ export default function CommunautePage() {
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <MessageSquare className="h-12 w-12 text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {searchQuery
+                    {activeSearch
                       ? "Aucun résultat trouvé"
                       : "Aucun post pour le moment"}
                   </h3>
                   <p className="text-gray-500 text-center">
-                    {searchQuery
+                    {activeSearch
                       ? "Essayez avec d'autres mots-clés"
                       : "Soyez le premier à partager quelque chose avec la communauté !"}
                   </p>
@@ -757,12 +363,17 @@ export default function CommunautePage() {
               </Card>
             ) : (
               <div className="space-y-6">
-                {posts.map((post, index) => (
+                {posts.map((post: PostWithDetails) => (
                   <div key={post.id}>
-                    <CommunityPost post={post} onUpdate={fetchPosts} />
+                    {/* 
+                       Note: Le composant CommunityPost attend peut-être un type légèrement différent 
+                       mais PostWithDetails est très complet. Si erreur TS, on adaptera.
+                       Ici on passe les props nécessaires.
+                    */}
+                    <CommunityPost post={post} onUpdate={() => refetchPosts()} />
 
-                    {/* Affiche publicitaire tous les 3 posts */}
-                    {(index + 1) % 3 === 0 && index < posts.length - 1 && (
+                    {/* Affiche publicitaire tous les 3 posts - Supprimé pour ne garder que la bannière principale */}
+                    {/* {(index + 1) % 3 === 0 && index < posts.length - 1 && (
                       <div className="my-6">
                         <SponsoredBanner
                           className="h-40 md:h-48"
@@ -770,7 +381,7 @@ export default function CommunautePage() {
                           showControls={false}
                         />
                       </div>
-                    )}
+                    )} */}
                   </div>
                 ))}
               </div>
@@ -789,17 +400,17 @@ export default function CommunautePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">#MarketplaceGuyane</span>
-                    <span className="text-xs text-gray-500">24 posts</span>
+                  <div className="flex items-center justify-between cursor-pointer hover:bg-slate-50 p-2 rounded transition-colors">
+                    <span className="text-sm font-medium text-teal-700">#MarketplaceGuyane</span>
+                    <span className="text-xs text-gray-500">Populaire</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">#ServiceLocal</span>
-                    <span className="text-xs text-gray-500">18 posts</span>
+                  <div className="flex items-center justify-between cursor-pointer hover:bg-slate-50 p-2 rounded transition-colors">
+                    <span className="text-sm font-medium text-teal-700">#ServiceLocal</span>
+                    <span className="text-xs text-gray-500">Top Service</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">#Entreprendre</span>
-                    <span className="text-xs text-gray-500">12 posts</span>
+                  <div className="flex items-center justify-between cursor-pointer hover:bg-slate-50 p-2 rounded transition-colors">
+                    <span className="text-sm font-medium text-teal-700">#Entreprendre</span>
+                    <span className="text-xs text-gray-500">Business</span>
                   </div>
                 </div>
               </CardContent>

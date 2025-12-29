@@ -42,9 +42,6 @@ import { toast } from "react-hot-toast";
  */
 export default function ServicesPage() {
   const { user } = useAuth();
-  const { services, loading, error, fetchServices, deleteService } =
-    useServices();
-  const { stats, fetchStats } = useServiceStats();
   const router = useRouter();
 
   // État des filtres
@@ -60,6 +57,10 @@ export default function ServicesPage() {
     limit: 12,
   });
 
+  const { services, loading, error, fetchServices, deleteService } =
+    useServices(searchParams);
+  const { stats, fetchStats } = useServiceStats();
+
   // État pour l'affichage des filtres (avec "all" pour les valeurs vides)
   const [displayFilters, setDisplayFilters] = useState({
     category: "all",
@@ -72,9 +73,8 @@ export default function ServicesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [localSearch, setLocalSearch] = useState("");
 
-  // Charger les services et statistiques au montage
+  // Charger les statistiques au montage
   useEffect(() => {
-    fetchServices(searchParams);
     fetchStats();
   }, []);
 
@@ -95,7 +95,6 @@ export default function ServicesPage() {
   const handleSearch = async () => {
     const newParams = { ...searchParams, search: localSearch };
     setSearchParams(newParams);
-    await fetchServices(newParams);
   };
 
   /**
@@ -119,7 +118,6 @@ export default function ServicesPage() {
     const processedValue = value === "all" ? "" : value;
     const newParams = { ...searchParams, [key]: processedValue };
     setSearchParams(newParams);
-    await fetchServices(newParams);
   };
 
   /**
@@ -146,7 +144,6 @@ export default function ServicesPage() {
     setSearchParams(defaultParams);
     setDisplayFilters(defaultDisplay);
     setLocalSearch("");
-    await fetchServices(defaultParams);
   };
 
   /**
@@ -181,7 +178,7 @@ export default function ServicesPage() {
       await deleteService(service.id);
       toast.success("Service supprimé avec succès");
       // Rafraîchir la liste
-      await fetchServices(searchParams);
+      await fetchServices();
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
       toast.error("Erreur lors de la suppression du service");
@@ -496,7 +493,7 @@ export default function ServicesPage() {
           <CardContent className="p-8 text-center">
             <p className="text-red-600 mb-4">Erreur: {error}</p>
             <Button
-              onClick={() => fetchServices(searchParams)}
+              onClick={() => fetchServices()}
               variant="outline"
             >
               Réessayer

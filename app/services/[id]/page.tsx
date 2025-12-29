@@ -10,24 +10,19 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/AvatarComponent";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   MapPin,
-  Star,
-  Eye,
   Phone,
   Mail,
-  Clock,
-  DollarSign,
-  User,
   Calendar,
   Tag,
   Share2,
-  Heart,
-  MessageCircle,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  User,
+  MessageCircle,
 } from "lucide-react";
 import { useServices } from "@/hooks/useServices.query";
 import { useAuth } from "@/hooks/useAuth";

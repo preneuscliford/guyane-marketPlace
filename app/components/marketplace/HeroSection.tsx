@@ -10,11 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useActiveAdvertisementsForCarousel } from "@/hooks/useAdvertisements.query";
 import Autoplay from "embla-carousel-autoplay";
 
-interface HeroSectionProps {
-  onSearch?: (query: string) => void;
-}
-
-export function HeroSection({ onSearch }: HeroSectionProps) {
+export function HeroSection() {
   const { advertisements, loading, error } =
     useActiveAdvertisementsForCarousel();
 

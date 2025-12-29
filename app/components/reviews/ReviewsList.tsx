@@ -14,7 +14,6 @@ interface ReviewsListProps {
   targetUserId?: string;
   announcementId?: string;
   showAddReview?: boolean;
-  showTargetName?: boolean;
   className?: string;
 }
 
@@ -22,7 +21,6 @@ export function ReviewsList({
   targetUserId,
   announcementId,
   showAddReview = true,
-  showTargetName = false,
   className
 }: ReviewsListProps) {
   const { user } = useAuth();
@@ -130,8 +128,8 @@ export function ReviewsList({
                   <div className="flex items-start">
                     <div className="h-10 w-10 mr-4 relative rounded-full overflow-hidden">
                       <Image 
-                        src={review.user?.avatar_url || "/default-avatar.svg"} 
-                        alt={review.user?.username || "Utilisateur"}
+                        src={review.profiles?.avatar_url || "/default-avatar.svg"} 
+                        alt={review.profiles?.username || "Utilisateur"}
                         fill
                         className="object-cover"
                       />
@@ -139,7 +137,7 @@ export function ReviewsList({
                     <div>
                       <div className="flex items-center mb-1">
                         <span className="font-medium mr-2">
-                          {review.user?.username || "Utilisateur"}
+                          {review.profiles?.username || "Utilisateur"}
                         </span>
                         <RatingStars rating={review.rating} size="sm" />
                       </div>
