@@ -26,7 +26,7 @@ export const cacheStrategies: Record<UpdateFrequency, CacheConfig> = {
   high: {
     staleTime: 30 * 1000,      // 30 secondes
     gcTime: 2 * 60 * 1000,     // 2 minutes
-    refetchOnMount: true,
+    refetchOnMount: false,     // ✅ Évite les refetch au montage
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     retry: 1
@@ -36,8 +36,8 @@ export const cacheStrategies: Record<UpdateFrequency, CacheConfig> = {
   medium: {
     staleTime: 2 * 60 * 1000,  // 2 minutes
     gcTime: 10 * 60 * 1000,    // 10 minutes
-    refetchOnMount: true,
-    refetchOnWindowFocus: false,
+    refetchOnMount: false,     // ✅ Utilise cache au montage
+    refetchOnWindowFocus: false, // ✅ Pas de refetch au changement d'onglet
     refetchOnReconnect: true,
     retry: 2
   },
