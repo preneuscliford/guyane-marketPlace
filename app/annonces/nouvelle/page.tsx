@@ -14,7 +14,7 @@ import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Header } from "@/components/layout/Header";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, MapPin, Euro, Tag, FileText, Camera, AlertCircle, CheckCircle } from "lucide-react";
+import { ArrowLeft, Upload, MapPin, Euro, Tag, FileText, Camera, AlertCircle, CheckCircle, Phone } from "lucide-react";
 
 const categories = [
   "Véhicules",
@@ -43,6 +43,8 @@ export default function NewAnnouncementPage() {
     category: "",
     location: "",
     images: [] as string[],
+    phone_number: "",
+    contact_email: "",
   });
 
   // Validation du formulaire
@@ -100,6 +102,8 @@ export default function NewAnnouncementPage() {
         location: formData.location.trim(),
         images: formData.images,
         user_id: user.id,
+        phone_number: formData.phone_number.trim() || null,
+        contact_email: formData.contact_email.trim() || null,
       });
 
       if (error) throw error;
@@ -402,6 +406,63 @@ export default function NewAnnouncementPage() {
                     {formErrors.location && (
                       <p className="text-red-500 text-sm mt-1">{formErrors.location}</p>
                     )}
+                  </div>
+                </div>
+
+                {/* Étape 4: Informations de contact */}
+                <div className="space-y-6">
+                  <div className="border-b border-gray-200 pb-4">
+                    <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                      <Phone className="h-5 w-5 mr-2 text-blue-600" />
+                      Informations de contact
+                    </h2>
+                    <p className="text-gray-600 mt-1">Comment les acheteurs peuvent vous contacter (optionnel)</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="phone_number" className="text-sm font-medium text-gray-700">
+                        Numéro de téléphone
+                      </Label>
+                      <Input
+                        type="tel"
+                        id="phone_number"
+                        value={formData.phone_number}
+                        onChange={(e) => {
+                          setFormData({ ...formData, phone_number: e.target.value });
+                        }}
+                        placeholder="Ex: +594 694 00 00 00"
+                        className="mt-1"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">Laissez vide pour utiliser le n° de votre profil</p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contact_email" className="text-sm font-medium text-gray-700">
+                        Adresse email
+                      </Label>
+                      <Input
+                        type="email"
+                        id="contact_email"
+                        value={formData.contact_email}
+                        onChange={(e) => {
+                          setFormData({ ...formData, contact_email: e.target.value });
+                        }}
+                        placeholder="Ex: contact@example.com"
+                        className="mt-1"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">Laissez vide pour utiliser l'email de votre profil</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 text-amber-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="text-sm font-medium text-amber-800">Confidentialité</h4>
+                        <p className="text-sm text-amber-700 mt-1">Vos coordonnées seront masquées jusqu'au premier contact. Vous contrôlez ce qui est affiché.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

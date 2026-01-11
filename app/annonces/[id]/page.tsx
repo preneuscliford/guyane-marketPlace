@@ -44,14 +44,20 @@ export default function AnnouncementDetailPage() {
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [vendorStats, setVendorStats] = useState<{
     announcementsCount: number;
     satisfactionRate: number;
     responseTime: string;
+    reviewsCount: number;
+    averageRating: number;
   }>({
     announcementsCount: 0,
     satisfactionRate: 0,
     responseTime: "N/A",
+    reviewsCount: 0,
+    averageRating: 0,
   });
 
   useEffect(() => {
@@ -92,6 +98,7 @@ export default function AnnouncementDetailPage() {
         // Récupérer les avis du vendeur - essayer d'abord
         let satisfactionRate = 95; // valeur par défaut
         let reviews: any[] = [];
+        let averageRating = 0;
 
         try {
           const { data: reviewsData, error: reviewsError } = await supabase
@@ -107,11 +114,14 @@ export default function AnnouncementDetailPage() {
             const avgRating =
               reviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
               reviews.length;
+            averageRating = Math.round(avgRating * 10) / 10; // Arrondir à 1 décimale
             satisfactionRate = Math.round((avgRating / 5) * 100);
             console.log(
               "Reviews found:",
               reviews.length,
               "Avg rating:",
+              averageRating,
+              "Satisfaction:",
               satisfactionRate + "%"
             );
           }
@@ -123,6 +133,8 @@ export default function AnnouncementDetailPage() {
           announcementsCount: count || announcements?.length || 0,
           satisfactionRate: satisfactionRate,
           responseTime: "< 2h",
+          reviewsCount: reviews.length,
+          averageRating: averageRating,
         });
         console.log("VendorStats updated successfully");
         return; // Succès
@@ -148,6 +160,8 @@ export default function AnnouncementDetailPage() {
       announcementsCount: 0,
       satisfactionRate: 95,
       responseTime: "< 2h",
+      reviewsCount: 0,
+      averageRating: 0,
     });
   };
 
@@ -179,6 +193,28 @@ export default function AnnouncementDetailPage() {
           console.error("Error fetching announcement:", error);
           throw error;
         }
+
+        // Récupérer l'email du vendeur depuis l'annonce d'abord
+        let vendorEmail = data.contact_email;
+        
+        // Si pas d'email fourni dans l'annonce, essayer de le récupérer depuis le profil
+        if (!vendorEmail && data.user_id) {
+          try {
+            const { data: profileData } = await supabase
+              .from("profiles")
+              .select("email")
+              .eq("id", data.user_id)
+              .single();
+            
+            if (profileData?.email) {
+              vendorEmail = profileData.email;
+            }
+          } catch (err) {
+            console.warn("Could not fetch user email from profiles:", err);
+          }
+        }
+        
+        setUserEmail(vendorEmail || null);
         if (!data) throw new Error("No announcement found");
 
         console.log("Announcement fetched successfully:", data);
@@ -449,22 +485,7 @@ export default function AnnouncementDetailPage() {
             {/* Boutons d'action */}
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="grid grid-cols-1 gap-3 mb-4">
-                <Button
-                  onClick={() => setIsMessageModalOpen(true)}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-4 text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  🚀 Contacter maintenant
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => setIsMessageModalOpen(true)}
-                  className="border-2 border-purple-200 hover:border-purple-300 text-purple-700 hover:text-purple-800 font-medium py-4 text-lg transition-all duration-200"
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Contacter l'annonceur
-                </Button>
+                {/* Boutons de contact supprimés - À implémenter ultérieurement */}
               </div>
 
               <div className="flex space-x-3">
@@ -540,15 +561,30 @@ export default function AnnouncementDetailPage() {
                     <div className="flex items-center">
                       <div className="flex text-yellow-400 mr-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
+                          <Star 
+                            key={i} 
+                            className={`w-4 h-4 ${
+                              i < Math.floor(vendorStats.averageRating) 
+                                ? 'fill-current' 
+                                : 'fill-gray-300'
+                            }`} 
+                          />
                         ))}
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
-                        4.9/5
-                      </span>
-                      <span className="text-xs text-gray-500 ml-1">
-                        (127 avis)
-                      </span>
+                      {vendorStats.reviewsCount > 0 ? (
+                        <>
+                          <span className="text-sm font-medium text-gray-700">
+                            {vendorStats.averageRating}/5
+                          </span>
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({vendorStats.reviewsCount} {vendorStats.reviewsCount === 1 ? 'avis' : 'avis'})
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-gray-500 ml-1">
+                          Pas d'avis pour le moment
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -595,62 +631,60 @@ export default function AnnouncementDetailPage() {
                 </h5>
 
                 <div className="space-y-2">
-                  <div className="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
-                    <MessageCircle className="w-5 h-5 text-green-600 mr-3" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-green-800">
-                        Messagerie interne
-                      </p>
-                      <p className="text-xs text-green-600">
-                        Recommandé - Sécurisé et traçable
-                      </p>
+                  {/* Téléphone - si fourni */}
+                  {announcement?.phone_number ? (
+                    <div className="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <Phone className="w-5 h-5 text-blue-600 mr-3" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-800">
+                          Téléphone
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          {phoneRevealed ? announcement.phone_number : "Cliquez pour révéler"}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setPhoneRevealed(!phoneRevealed)}
+                        className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                      >
+                        {phoneRevealed ? "Masquer" : "Révéler"}
+                      </Button>
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={() => setIsMessageModalOpen(true)}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Contacter
-                    </Button>
-                  </div>
+                  ) : null}
 
-                  <div className="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <Phone className="w-5 h-5 text-blue-600 mr-3" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-blue-800">
-                        Téléphone
-                      </p>
-                      <p className="text-xs text-blue-600">
-                        Disponible après premier contact
-                      </p>
+                  {/* Email */}
+                  {userEmail ? (
+                    <div className="flex items-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                      <Mail className="w-5 h-5 text-purple-600 mr-3" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-purple-800">
+                          Email
+                        </p>
+                        <p className="text-xs text-purple-600 break-all">
+                          {userEmail}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        asChild
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        <a href={`mailto:${userEmail}`}>
+                          Envoyer
+                        </a>
+                      </Button>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                    >
-                      Révéler
-                    </Button>
-                  </div>
+                  ) : null}
 
-                  <div className="flex items-center p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <Mail className="w-5 h-5 text-purple-600 mr-3" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-purple-800">
-                        Email
-                      </p>
-                      <p className="text-xs text-purple-600">
-                        Contact direct disponible
+                  {!announcement?.phone_number && !userEmail && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <p className="text-sm text-amber-800">
+                        Aucune information de contact disponible pour cette annonce.
                       </p>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-purple-200 text-purple-700 hover:bg-purple-50"
-                    >
-                      Révéler
-                    </Button>
-                  </div>
+                  )}
                 </div>
               </div>
 
