@@ -18,6 +18,7 @@ import {
   Edit,
   Trash2,
   ShoppingCart,
+  Crown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -469,9 +470,17 @@ export default function ProductDetailPage() {
                   )}
                 </div>
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="font-semibold text-lg text-gray-900">
-                    {product.profiles?.username}
-                  </p>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <p className="font-semibold text-lg text-gray-900">
+                      {product.profiles?.username}
+                    </p>
+                    {product.profiles?.is_admin && (
+                      <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                        <Crown className="h-3 w-3" />
+                        Admin
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600">
                     Membre depuis {formatDate(product.profiles?.created_at)}
                   </p>

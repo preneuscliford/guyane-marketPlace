@@ -24,6 +24,7 @@ import {
   Clock,
   Shield,
   Award,
+  Crown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -512,10 +513,16 @@ export default function AnnouncementDetailPage() {
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-2 mb-2 flex-wrap">
                     <h4 className="font-bold text-xl text-gray-900">
                       {announcement.profiles?.username}
                     </h4>
+                    {announcement.profiles?.is_admin && (
+                      <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold">
+                        <Crown className="h-3 w-3" />
+                        Admin
+                      </span>
+                    )}
                     <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
                       <Shield className="w-3 h-3 mr-1" />
                       Vérifié

@@ -41,7 +41,8 @@ async function fetchServicesAPI(params: ServiceSearchParams = {}) {
         id,
         username,
         full_name,
-        avatar_url
+        avatar_url,
+        is_admin
       ),
       reviews (
         rating
@@ -172,7 +173,8 @@ async function fetchServiceByIdAPI(id: string): Promise<ServiceWithProfile> {
         username,
         full_name,
         avatar_url,
-        location
+        location,
+        is_admin
       ),
       reviews (
         rating

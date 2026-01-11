@@ -27,6 +27,7 @@ import {
   ChevronDown,
   ChevronUp,
   Briefcase,
+  Crown,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -138,7 +139,7 @@ export default function CommunityPost({
       ];
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, username, avatar_url, full_name")
+        .select("id, username, avatar_url, full_name, is_admin")
         .in("id", userIds);
 
       if (profilesError) {
@@ -303,7 +304,7 @@ export default function CommunityPost({
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, username, avatar_url, full_name")
+          .select("id, username, avatar_url, full_name, is_admin")
           .eq("id", user.id)
           .single();
 
@@ -322,6 +323,7 @@ export default function CommunityPost({
             skills: null,
             updated_at: new Date().toISOString(),
             website: null,
+            is_admin: data.is_admin ?? false,
           };
         }
       } catch (err) {
@@ -507,10 +509,16 @@ export default function CommunityPost({
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm sm:text-base truncate">
+                <div className="font-medium text-sm sm:text-base truncate flex items-center gap-2 flex-wrap">
                   {(post.profiles &&
                     (post.profiles.full_name || post.profiles.username)) ||
                     "Utilisateur"}
+                  {post.profiles?.is_admin && (
+                    <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
+                      <Crown className="h-3 w-3" />
+                      Admin
+                    </span>
+                  )}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-500">
                   {formatDistanceToNow(new Date(post.created_at), {
@@ -797,12 +805,20 @@ export default function CommunityPost({
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <h5 className="font-semibold text-sm text-gray-900 truncate">
-                              {(reply.profiles &&
-                                (reply.profiles.full_name ||
-                                  reply.profiles.username)) ||
-                                "Utilisateur"}
-                            </h5>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h5 className="font-semibold text-sm text-gray-900 truncate">
+                                {(reply.profiles &&
+                                  (reply.profiles.full_name ||
+                                    reply.profiles.username)) ||
+                                  "Utilisateur"}
+                              </h5>
+                              {reply.profiles?.is_admin && (
+                                <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
+                                  <Crown className="h-3 w-3" />
+                                  Admin
+                                </span>
+                              )}
+                            </div>
                             <time className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full shadow-sm">
                               {formatDistanceToNow(new Date(reply.created_at), {
                                 addSuffix: true,

@@ -14,7 +14,7 @@ import { useReviews } from "@/hooks/useReviews.query";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Star, User, MessageSquare, Plus } from "lucide-react";
+import { Star, User, MessageSquare, Plus, Crown } from "lucide-react";
 import { ServiceReviewForm } from "./ServiceReviewForm";
 
 interface ServiceReviewsProps {
@@ -272,10 +272,16 @@ export function ServiceReviews({
                     </Avatar>
 
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h4 className="font-medium">
                           {review.profiles?.username || "Utilisateur anonyme"}
                         </h4>
+                        {review.profiles?.is_admin && (
+                          <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                            <Crown className="h-3 w-3" />
+                            Admin
+                          </span>
+                        )}
                         <RatingStars rating={review.rating} size="sm" />
                         <span className="text-sm text-gray-500">
                           {formatDistanceToNow(new Date(review.created_at), {

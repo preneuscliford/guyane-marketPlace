@@ -111,7 +111,25 @@ export const fetchUserConversationsAPI = async (userId: string): Promise<Convers
       .order('updated_at', { ascending: false });
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des conversations: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des conversations:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des conversations: ${errorMsg}`);
     }
 
     if (!conversationsData) {
@@ -174,7 +192,25 @@ export const fetchConversationAPI = async (conversationId: string, userId: strin
       .single();
 
     if (conversationError) {
-      throw new Error(`Conversation non trouvée: ${conversationError.message}`);
+      const errorInfo = {
+        code: conversationError?.code,
+        message: conversationError?.message,
+        details: conversationError?.details,
+        hint: conversationError?.hint,
+        status: conversationError?.status,
+        statusText: (conversationError as any)?.statusText,
+        errorString: conversationError?.toString?.() || String(conversationError),
+        errorKeys: Object.keys(conversationError || {}),
+        fullError: conversationError
+      };
+      console.error('Erreur lors de la récupération de la conversation:', errorInfo);
+      
+      const errorMsg = conversationError?.message || 
+                      (conversationError as any)?.statusText || 
+                      conversationError?.toString?.() || 
+                      JSON.stringify(conversationError) || 
+                      'Erreur inconnue';
+      throw new Error(`Conversation non trouvée: ${errorMsg}`);
     }
 
     // Récupérer les messages de la conversation
@@ -188,7 +224,25 @@ export const fetchConversationAPI = async (conversationId: string, userId: strin
       .order('created_at', { ascending: true });
 
     if (messagesError) {
-      throw new Error(`Erreur lors de la récupération des messages: ${messagesError.message}`);
+      const errorInfo = {
+        code: messagesError?.code,
+        message: messagesError?.message,
+        details: messagesError?.details,
+        hint: messagesError?.hint,
+        status: messagesError?.status,
+        statusText: (messagesError as any)?.statusText,
+        errorString: messagesError?.toString?.() || String(messagesError),
+        errorKeys: Object.keys(messagesError || {}),
+        fullError: messagesError
+      };
+      console.error('Erreur lors de la récupération des messages:', errorInfo);
+      
+      const errorMsg = messagesError?.message || 
+                      (messagesError as any)?.statusText || 
+                      messagesError?.toString?.() || 
+                      JSON.stringify(messagesError) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des messages: ${errorMsg}`);
     }
 
     // Formater les messages
@@ -256,7 +310,25 @@ export const fetchConversationMessagesAPI = async (conversationId: string): Prom
       .order('created_at', { ascending: true });
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des messages: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des messages:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des messages: ${errorMsg}`);
     }
 
     return (messagesData || []).map((msg: any) => ({
@@ -290,7 +362,25 @@ export const fetchUnreadCountAPI = async (userId: string): Promise<number> => {
       .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
 
     if (conversationError) {
-      throw new Error(`Erreur lors de la récupération des conversations: ${conversationError.message}`);
+      const errorInfo = {
+        code: conversationError?.code,
+        message: conversationError?.message,
+        details: conversationError?.details,
+        hint: conversationError?.hint,
+        status: conversationError?.status,
+        statusText: (conversationError as any)?.statusText,
+        errorString: conversationError?.toString?.() || String(conversationError),
+        errorKeys: Object.keys(conversationError || {}),
+        fullError: conversationError
+      };
+      console.error('Erreur lors de la récupération des conversations:', errorInfo);
+      
+      const errorMsg = conversationError?.message || 
+                      (conversationError as any)?.statusText || 
+                      conversationError?.toString?.() || 
+                      JSON.stringify(conversationError) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des conversations: ${errorMsg}`);
     }
 
     if (!conversations || conversations.length === 0) {
@@ -308,7 +398,25 @@ export const fetchUnreadCountAPI = async (userId: string): Promise<number> => {
       .eq('read', false);
 
     if (error) {
-      throw new Error(`Erreur lors du comptage des messages: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors du comptage des messages:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors du comptage des messages: ${errorMsg}`);
     }
 
     return count || 0;
@@ -380,7 +488,25 @@ export const sendMessageAPI = async (messageData: CreateMessageData, senderId: s
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de l'envoi du message: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de l\'envoi du message:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de l'envoi du message: ${errorMsg}`);
     }
 
     // Mettre à jour la date de dernière activité de la conversation
@@ -424,7 +550,25 @@ export const markMessagesAsReadAPI = async (conversationId: string, userId: stri
       .eq('read', false);
 
     if (error) {
-      throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la mise à jour des messages:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la mise à jour: ${errorMsg}`);
     }
   } catch (error) {
     console.error('Erreur dans markMessagesAsReadAPI:', error);
@@ -647,7 +791,8 @@ export const useSendMessageMutation = () => {
       }
 
       console.error('Erreur lors de l\'envoi du message:', error);
-      toast.error(`Erreur lors de l'envoi: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de l'envoi: ${errorMsg}`);
     },
     onSettled: (newMessage, error, variables) => {
       const { conversation_id } = variables;
@@ -708,7 +853,8 @@ export const useGetOrCreateConversationMutation = () => {
     },
     onError: (error) => {
       console.error('Erreur lors de la création/récupération de la conversation:', error);
-      toast.error(`Erreur lors de l'ouverture de la conversation: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de l'ouverture de la conversation: ${errorMsg}`);
     },
   });
 };

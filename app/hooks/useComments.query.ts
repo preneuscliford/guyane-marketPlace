@@ -94,7 +94,25 @@ export const fetchPostCommentsAPI = async (postId: string): Promise<CommentWithD
       .order('created_at', { ascending: true });
 
     if (commentsError) {
-      throw new Error(`Erreur lors de la récupération des commentaires: ${commentsError.message}`);
+      const errorInfo = {
+        code: commentsError?.code,
+        message: commentsError?.message,
+        details: commentsError?.details,
+        hint: commentsError?.hint,
+        status: commentsError?.status,
+        statusText: (commentsError as any)?.statusText,
+        errorString: commentsError?.toString?.() || String(commentsError),
+        errorKeys: Object.keys(commentsError || {}),
+        fullError: commentsError
+      };
+      console.error('Erreur lors de la récupération des commentaires:', errorInfo);
+      
+      const errorMsg = commentsError?.message || 
+                      (commentsError as any)?.statusText || 
+                      commentsError?.toString?.() || 
+                      JSON.stringify(commentsError) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des commentaires: ${errorMsg}`);
     }
 
     if (!commentsData || commentsData.length === 0) {
@@ -160,7 +178,25 @@ export const fetchCommentByIdAPI = async (commentId: string): Promise<CommentWit
       .single();
 
     if (error) {
-      throw new Error(`Commentaire non trouvé: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération du commentaire:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Commentaire non trouvé: ${errorMsg}`);
     }
 
     return {
@@ -188,7 +224,25 @@ export const fetchCommentCountAPI = async (postId: string): Promise<number> => {
       .eq('is_hidden', false);
 
     if (error) {
-      throw new Error(`Erreur lors du comptage: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors du comptage des commentaires:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors du comptage: ${errorMsg}`);
     }
 
     return count || 0;
@@ -270,7 +324,25 @@ export const createCommentAPI = async (commentData: CreateCommentData): Promise<
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la création du commentaire: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la création du commentaire:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la création du commentaire: ${errorMsg}`);
     }
 
     return {
@@ -315,7 +387,25 @@ export const updateCommentAPI = async ({
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la mise à jour du commentaire:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la mise à jour: ${errorMsg}`);
     }
 
     if (!data) {
@@ -358,7 +448,25 @@ export const deleteCommentAPI = async (commentId: string): Promise<void> => {
       .eq('user_id', userData.user.id);
 
     if (error) {
-      throw new Error(`Erreur lors de la suppression: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la suppression du commentaire:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la suppression: ${errorMsg}`);
     }
   } catch (error) {
     console.error('Erreur dans deleteCommentAPI:', error);
@@ -383,7 +491,25 @@ export const fetchUserCommentsAPI = async (userId: string): Promise<CommentWithD
       .limit(50);
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des commentaires: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération du fil de discussion:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des commentaires: ${errorMsg}`);
     }
 
     return (data || []).map(comment => ({
@@ -627,7 +753,8 @@ export const useCreateCommentMutation = () => {
       }
 
       console.error('Erreur lors de la création du commentaire:', error);
-      toast.error(`Erreur lors de la publication: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la publication: ${errorMsg}`);
     },
     onSettled: (newComment, error, variables) => {
       const { post_id } = variables;
@@ -669,7 +796,8 @@ export const useUpdateCommentMutation = () => {
     },
     onError: (error) => {
       console.error('Erreur lors de la modification du commentaire:', error);
-      toast.error(`Erreur lors de la modification: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la modification: ${errorMsg}`);
     },
     onSettled: (updatedComment) => {
       if (updatedComment?.id) {
@@ -780,7 +908,8 @@ export const useDeleteCommentMutation = () => {
       }
 
       console.error('Erreur lors de la suppression du commentaire:', error);
-      toast.error(`Erreur lors de la suppression: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la suppression: ${errorMsg}`);
     },
     onSettled: (_, __, commentId, context) => {
       if (context?.postId) {

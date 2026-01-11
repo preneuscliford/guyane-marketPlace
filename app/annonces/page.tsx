@@ -19,6 +19,7 @@ import {
   List,
   Heart,
   Eye,
+  Crown,
 } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -29,6 +30,7 @@ type Announcement = Database["public"]["Tables"]["announcements"]["Row"] & {
   profiles: {
     username: string;
     avatar_url: string | null;
+    is_admin?: boolean;
   } | null;
   images: string[] | null;
 };
@@ -99,7 +101,8 @@ export default function AnnouncementsPage() {
               *,
               profiles:user_id(
                 username,
-                avatar_url
+                avatar_url,
+                is_admin
               )
             `
             )
@@ -408,9 +411,17 @@ export default function AnnouncementsPage() {
                         {announcement.category}
                       </span>
                       {announcement.profiles && (
-                        <span className="text-sm text-muted-foreground">
-                          {announcement.profiles.username}
-                        </span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm text-muted-foreground">
+                            {announcement.profiles.username}
+                          </span>
+                          {announcement.profiles.is_admin && (
+                            <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                              <Crown className="h-3 w-3" />
+                              Admin
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
 

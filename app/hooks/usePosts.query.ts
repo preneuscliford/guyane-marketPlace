@@ -87,7 +87,7 @@ export const fetchPostsAPI = async (filters: PostFilters = {}): Promise<PostWith
       .from('posts')
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, bio),
+        profiles:user_id(id, username, avatar_url, full_name, bio, is_admin),
         likes(user_id)
       `)
       .eq('is_hidden', isHidden);
@@ -124,8 +124,25 @@ export const fetchPostsAPI = async (filters: PostFilters = {}): Promise<PostWith
     const { data: postsData, error } = await query;
 
     if (error) {
-      console.error('Erreur lors de la récupération des posts:', error);
-      throw new Error(`Erreur lors de la récupération des posts: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des posts:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des posts: ${errorMsg}`);
     }
 
     if (!postsData) {
@@ -180,7 +197,7 @@ export const fetchPostByIdAPI = async (postId: string): Promise<PostWithDetails>
       .from('posts')
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, bio),
+        profiles:user_id(id, username, avatar_url, full_name, bio, is_admin),
         likes(user_id),
         comments(
           id,
@@ -195,7 +212,25 @@ export const fetchPostByIdAPI = async (postId: string): Promise<PostWithDetails>
       .single();
 
     if (error) {
-      throw new Error(`Post non trouvé: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération du post:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Post non trouvé: ${errorMsg}`);
     }
 
     if (!data) {
@@ -241,12 +276,30 @@ export const createPostAPI = async (postData: CreatePostData): Promise<PostWithD
       .insert(newPost)
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, bio)
+        profiles:user_id(id, username, avatar_url, full_name, bio, is_admin)
       `)
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la création du post: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la création du post:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la création du post: ${errorMsg}`);
     }
 
     return {
@@ -293,13 +346,31 @@ export const updatePostAPI = async ({
       .eq('user_id', userData.user.id) // S'assurer que l'utilisateur peut seulement modifier ses propres posts
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, bio),
+        profiles:user_id(id, username, avatar_url, full_name, bio, is_admin),
         likes(user_id)
       `)
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la mise à jour du post:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la mise à jour: ${errorMsg}`);
     }
 
     if (!data) {
@@ -344,7 +415,13 @@ export const deletePostAPI = async (postId: string): Promise<void> => {
       .eq('user_id', userData.user.id); // S'assurer que l'utilisateur peut seulement supprimer ses propres posts
 
     if (error) {
-      throw new Error(`Erreur lors de la suppression: ${error.message}`);
+      console.error('Erreur lors de la suppression du post:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        status: error.status
+      });
+      throw new Error(`Erreur lors de la suppression: ${error?.message || JSON.stringify(error)}`);
     }
   } catch (error) {
     console.error('Erreur dans deletePostAPI:', error);
@@ -537,7 +614,8 @@ export const useCreatePostMutation = () => {
       }
 
       console.error('Erreur lors de la création du post:', error);
-      toast.error(`Erreur lors de la publication: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la publication: ${errorMsg}`);
     },
     onSettled: () => {
       // S'assurer que les données sont à jour
@@ -574,7 +652,8 @@ export const useUpdatePostMutation = () => {
     },
     onError: (error) => {
       console.error('Erreur lors de la modification du post:', error);
-      toast.error(`Erreur lors de la modification: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la modification: ${errorMsg}`);
     },
     onSettled: (updatedPost) => {
       if (updatedPost) {
@@ -623,7 +702,9 @@ export const useDeletePostMutation = () => {
       }
 
       console.error('Erreur lors de la suppression du post:', error);
-      toast.error(`Erreur lors de la suppression: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la suppression: ${errorMsg}`);
+
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });

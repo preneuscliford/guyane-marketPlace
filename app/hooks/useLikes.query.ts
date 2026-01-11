@@ -96,7 +96,25 @@ export const fetchUserLikesAPI = async (userId: string): Promise<UserLikesData> 
       .eq('user_id', userId);
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des likes: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des likes utilisateur:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des likes: ${errorMsg}`);
     }
 
     // Convertir en objet pour une recherche rapide
@@ -127,7 +145,25 @@ export const fetchPostLikeStatusAPI = async (
       .eq('post_id', postId);
 
     if (likesError) {
-      throw new Error(`Erreur lors de la récupération des likes: ${likesError.message}`);
+      const errorInfo = {
+        code: likesError?.code,
+        message: likesError?.message,
+        details: likesError?.details,
+        hint: likesError?.hint,
+        status: likesError?.status,
+        statusText: (likesError as any)?.statusText,
+        errorString: likesError?.toString?.() || String(likesError),
+        errorKeys: Object.keys(likesError || {}),
+        fullError: likesError
+      };
+      console.error('Erreur lors de la récupération des likes du post:', errorInfo);
+      
+      const errorMsg = likesError?.message || 
+                      (likesError as any)?.statusText || 
+                      likesError?.toString?.() || 
+                      JSON.stringify(likesError) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des likes: ${errorMsg}`);
     }
 
     const likeCount = likes?.length || 0;
@@ -168,7 +204,25 @@ export const addLikeAPI = async ({ post_id, user_id }: LikeToggleData): Promise<
       } else if (error.code === '23503') {
         throw new Error('Référence invalide, le post ou l\'utilisateur n\'existe pas');
       } else {
-        throw new Error(`Impossible d'ajouter le like: ${error.message}`);
+        const errorInfo = {
+          code: error?.code,
+          message: error?.message,
+          details: error?.details,
+          hint: error?.hint,
+          status: error?.status,
+          statusText: (error as any)?.statusText,
+          errorString: error?.toString?.() || String(error),
+          errorKeys: Object.keys(error || {}),
+          fullError: error
+        };
+        console.error('Erreur lors de l\'ajout du like:', errorInfo);
+        
+        const errorMsg = error?.message || 
+                        (error as any)?.statusText || 
+                        error?.toString?.() || 
+                        JSON.stringify(error) || 
+                        'Erreur inconnue';
+        throw new Error(`Impossible d'ajouter le like: ${errorMsg}`);
       }
     }
 
@@ -195,7 +249,25 @@ export const removeLikeAPI = async ({ post_id, user_id }: LikeToggleData): Promi
       .eq('user_id', user_id);
 
     if (error) {
-      throw new Error(`Impossible de retirer le like: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la suppression du like:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Impossible de retirer le like: ${errorMsg}`);
     }
   } catch (error) {
     console.error('Erreur dans removeLikeAPI:', error);

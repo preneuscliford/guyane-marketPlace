@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { retryWithExponentialBackoff } from "@/lib/retryWithExponentialBackoff";
 import { ProtectedLayout } from "@/components/layout/protected-layout";
 import { Button } from "@/components/ui/button";
-import { Loader2, Camera, X } from "lucide-react";
+import { Loader2, Camera, X, Crown } from "lucide-react";
 
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
@@ -308,15 +308,23 @@ export default function ProfilePage() {
                 >
                   Nom d&apos;utilisateur*
                 </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {user?.profile?.is_admin && (
+                    <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-semibold whitespace-nowrap">
+                      <Crown className="h-3 w-3" />
+                      Admin
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div>

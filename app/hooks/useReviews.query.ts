@@ -215,10 +215,27 @@ async function createReviewAPI(reviewData: CreateReviewData, userId: string): Pr
     });
 
   if (error) {
-    console.error('TanStack Query: Erreur lors de la création du review:', error);
+    const errorInfo = {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+      status: error?.status,
+      statusText: (error as any)?.statusText,
+      errorString: error?.toString?.() || String(error),
+      errorKeys: Object.keys(error || {}),
+      fullError: error
+    };
+    console.error('TanStack Query: Erreur lors de la création du review:', errorInfo);
+    
+    const errorMsg = error?.message || 
+                    (error as any)?.statusText || 
+                    error?.toString?.() || 
+                    JSON.stringify(error) || 
+                    'Erreur inconnue';
     return { 
       success: false, 
-      error: error.message 
+      error: errorMsg
     };
   }
 
@@ -240,10 +257,27 @@ async function updateReviewAPI(reviewData: UpdateReviewData, userId: string): Pr
     .eq('user_id', userId);
 
   if (error) {
-    console.error('TanStack Query: Erreur lors de la mise à jour du review:', error);
+    const errorInfo = {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+      status: error?.status,
+      statusText: (error as any)?.statusText,
+      errorString: error?.toString?.() || String(error),
+      errorKeys: Object.keys(error || {}),
+      fullError: error
+    };
+    console.error('TanStack Query: Erreur lors de la mise à jour du review:', errorInfo);
+    
+    const errorMsg = error?.message || 
+                    (error as any)?.statusText || 
+                    error?.toString?.() || 
+                    JSON.stringify(error) || 
+                    'Erreur inconnue';
     return { 
       success: false, 
-      error: error.message 
+      error: errorMsg
     };
   }
 
@@ -263,10 +297,27 @@ async function deleteReviewAPI(reviewId: string, userId: string): Promise<Review
     .select();
 
   if (error) {
-    console.error('TanStack Query: Erreur lors de la suppression du review:', error);
+    const errorInfo = {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+      status: error?.status,
+      statusText: (error as any)?.statusText,
+      errorString: error?.toString?.() || String(error),
+      errorKeys: Object.keys(error || {}),
+      fullError: error
+    };
+    console.error('TanStack Query: Erreur lors de la suppression du review:', errorInfo);
+    
+    const errorMsg = error?.message || 
+                    (error as any)?.statusText || 
+                    error?.toString?.() || 
+                    JSON.stringify(error) || 
+                    'Erreur inconnue';
     return { 
       success: false, 
-      error: error.message 
+      error: errorMsg
     };
   }
 

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { Crown } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -9,6 +10,7 @@ interface Comment {
   post_id: string | null;
   profiles?: {
     username: string;
+    is_admin?: boolean;
   } | null;
 }
 
@@ -87,9 +89,17 @@ export default function CommentList({ postId }: CommentListProps) {
             className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-700">
-                {comment.profiles?.username || "Utilisateur anonyme"}
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-medium text-gray-700">
+                  {comment.profiles?.username || "Utilisateur anonyme"}
+                </span>
+                {comment.profiles?.is_admin && (
+                  <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                    <Crown className="h-3 w-3" />
+                    Admin
+                  </span>
+                )}
+              </div>
               <span className="text-sm text-gray-500">
                 {new Date(comment.created_at).toLocaleDateString("fr-FR", {
                   day: "numeric",

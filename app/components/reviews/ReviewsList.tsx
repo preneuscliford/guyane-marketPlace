@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useReviews } from "@/hooks/useReviews.query";
 import { RatingStars } from "@/components/ui/RatingStars";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageSquare, Flag, Trash2 } from "lucide-react";
+import { Loader2, MessageSquare, Flag, Trash2, Crown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/hooks/useAuth";
@@ -135,10 +135,16 @@ export function ReviewsList({
                       />
                     </div>
                     <div>
-                      <div className="flex items-center mb-1">
-                        <span className="font-medium mr-2">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-medium">
                           {review.profiles?.username || "Utilisateur"}
                         </span>
+                        {review.profiles?.is_admin && (
+                          <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                            <Crown className="h-3 w-3" />
+                            Admin
+                          </span>
+                        )}
                         <RatingStars rating={review.rating} size="sm" />
                       </div>
                       <p className="text-sm text-gray-500 mb-2">

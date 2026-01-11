@@ -110,7 +110,7 @@ export const fetchAnnouncementsAPI = async (
       .from('announcements')
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, business_name, phone),
+        profiles:user_id(id, username, avatar_url, full_name, business_name, phone, is_admin),
         favorites(user_id)
       `)
       .eq('is_hidden', isHidden);
@@ -172,7 +172,25 @@ export const fetchAnnouncementsAPI = async (
     const { data: announcementsData, error } = await query;
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des annonces: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des annonces:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des annonces: ${errorMsg}`);
     }
 
     if (!announcementsData) {
@@ -208,14 +226,32 @@ export const fetchAnnouncementByIdAPI = async (announcementId: string): Promise<
       .from('announcements')
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, business_name, phone, address),
+        profiles:user_id(id, username, avatar_url, full_name, business_name, phone, address, is_admin),
         favorites(user_id)
       `)
       .eq('id', announcementId)
       .single();
 
     if (error) {
-      throw new Error(`Annonce non trouvée: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération de l\'annonce:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Annonce non trouvée: ${errorMsg}`);
     }
 
     if (!data) {
@@ -262,12 +298,30 @@ export const createAnnouncementAPI = async (
       .insert(newAnnouncement)
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, business_name, phone)
+        profiles:user_id(id, username, avatar_url, full_name, business_name, phone, is_admin)
       `)
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la création de l'annonce: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la création de l\'annonce:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la création de l'annonce: ${errorMsg}`);
     }
 
     return {
@@ -312,13 +366,31 @@ export const updateAnnouncementAPI = async ({
       .eq('user_id', userData.user.id) // S'assurer que l'utilisateur peut seulement modifier ses propres annonces
       .select(`
         *,
-        profiles:user_id(id, username, avatar_url, full_name, business_name, phone),
+        profiles:user_id(id, username, avatar_url, full_name, business_name, phone, is_admin),
         favorites(user_id)
       `)
       .single();
 
     if (error) {
-      throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la mise à jour de l\'annonce:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la mise à jour: ${errorMsg}`);
     }
 
     if (!data) {
@@ -355,7 +427,25 @@ export const deleteAnnouncementAPI = async (announcementId: string): Promise<voi
       .eq('user_id', userData.user.id); // S'assurer que l'utilisateur peut seulement supprimer ses propres annonces
 
     if (error) {
-      throw new Error(`Erreur lors de la suppression: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la suppression de l\'annonce:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la suppression: ${errorMsg}`);
     }
   } catch (error) {
     console.error('Erreur dans deleteAnnouncementAPI:', error);
@@ -440,7 +530,25 @@ export const fetchCategoriesAPI = async (): Promise<string[]> => {
       .eq('is_hidden', false);
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des catégories: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des catégories:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des catégories: ${errorMsg}`);
     }
 
     const categories = [...new Set((data || []).map(a => a.category))].sort();
@@ -462,7 +570,25 @@ export const fetchLocationsAPI = async (): Promise<string[]> => {
       .eq('is_hidden', false);
 
     if (error) {
-      throw new Error(`Erreur lors de la récupération des localisations: ${error.message}`);
+      const errorInfo = {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusText: (error as any)?.statusText,
+        errorString: error?.toString?.() || String(error),
+        errorKeys: Object.keys(error || {}),
+        fullError: error
+      };
+      console.error('Erreur lors de la récupération des localisations:', errorInfo);
+      
+      const errorMsg = error?.message || 
+                      (error as any)?.statusText || 
+                      error?.toString?.() || 
+                      JSON.stringify(error) || 
+                      'Erreur inconnue';
+      throw new Error(`Erreur lors de la récupération des localisations: ${errorMsg}`);
     }
 
     const locations = [...new Set((data || []).map(a => a.location))].sort();
@@ -648,7 +774,8 @@ export const useCreateAnnouncementMutation = () => {
       }
 
       console.error('Erreur lors de la création de l\'annonce:', error);
-      toast.error(`Erreur lors de la publication: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la publication: ${errorMsg}`);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: announcementKeys.lists() });
@@ -686,7 +813,8 @@ export const useUpdateAnnouncementMutation = () => {
     },
     onError: (error) => {
       console.error('Erreur lors de la modification de l\'annonce:', error);
-      toast.error(`Erreur lors de la modification: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la modification: ${errorMsg}`);
     },
     onSettled: (updatedAnnouncement) => {
       if (updatedAnnouncement) {
@@ -735,7 +863,8 @@ export const useDeleteAnnouncementMutation = () => {
       }
 
       console.error('Erreur lors de la suppression de l\'annonce:', error);
-      toast.error(`Erreur lors de la suppression: ${error.message}`);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      toast.error(`Erreur lors de la suppression: ${errorMsg}`);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: announcementKeys.lists() });

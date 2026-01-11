@@ -115,14 +115,31 @@ async function addFavoriteAPI(userId: string, announcementId: string): Promise<F
     });
 
   if (error) {
-    console.error('TanStack Query: Erreur lors de l\'ajout du favori:', error);
+    const errorInfo = {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+      status: error?.status,
+      statusText: (error as any)?.statusText,
+      errorString: error?.toString?.() || String(error),
+      errorKeys: Object.keys(error || {}),
+      fullError: error
+    };
+    console.error('TanStack Query: Erreur lors de l\'ajout du favori:', errorInfo);
     // Si c'est une contrainte unique (déjà en favori), ce n'est pas vraiment une erreur
     if (error.code === '23505') {
       return { success: true };
     }
+    
+    const errorMsg = error?.message || 
+                    (error as any)?.statusText || 
+                    error?.toString?.() || 
+                    JSON.stringify(error) || 
+                    'Erreur inconnue';
     return { 
       success: false, 
-      error: error.message 
+      error: errorMsg
     };
   }
 
@@ -141,10 +158,27 @@ async function removeFavoriteAPI(userId: string, announcementId: string): Promis
     .eq('announcement_id', announcementId);
 
   if (error) {
-    console.error('TanStack Query: Erreur lors de la suppression du favori:', error);
+    const errorInfo = {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+      status: error?.status,
+      statusText: (error as any)?.statusText,
+      errorString: error?.toString?.() || String(error),
+      errorKeys: Object.keys(error || {}),
+      fullError: error
+    };
+    console.error('TanStack Query: Erreur lors de la suppression du favori:', errorInfo);
+    
+    const errorMsg = error?.message || 
+                    (error as any)?.statusText || 
+                    error?.toString?.() || 
+                    JSON.stringify(error) || 
+                    'Erreur inconnue';
     return { 
       success: false, 
-      error: error.message 
+      error: errorMsg
     };
   }
 

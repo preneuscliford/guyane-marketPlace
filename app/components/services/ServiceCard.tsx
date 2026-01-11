@@ -15,7 +15,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/AvatarComponent";
-import { MapPin, Star, Phone, Clock, DollarSign, User } from "lucide-react";
+import { MapPin, Star, Phone, Clock, DollarSign, User, Crown } from "lucide-react";
 import { ServiceViewsSimple } from "./ServiceViewsDisplay";
 import { ServiceWithProfile } from "@/types/services";
 import { formatDistanceToNow } from "date-fns";
@@ -201,11 +201,19 @@ export function ServiceCard({
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
-                {service.profiles.full_name ||
-                  service.profiles.username ||
-                  "Utilisateur"}
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-medium truncate">
+                  {service.profiles.full_name ||
+                    service.profiles.username ||
+                    "Utilisateur"}
+                </p>
+                {service.profiles.is_admin && (
+                  <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
+                    <Crown className="h-3 w-3" />
+                    Admin
+                  </span>
+                )}
+              </div>
               {service.profiles.location && (
                 <p className="text-xs text-gray-500 truncate">
                   {service.profiles.location}

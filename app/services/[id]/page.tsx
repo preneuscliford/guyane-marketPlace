@@ -23,6 +23,7 @@ import {
   Clock,
   User,
   MessageCircle,
+  Crown,
 } from "lucide-react";
 import { useServices } from "@/hooks/useServices.query";
 import { useAuth } from "@/hooks/useAuth";
@@ -461,11 +462,19 @@ export default function ServiceDetailPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <h4 className="font-semibold">
-                      {service.profiles.full_name ||
-                        service.profiles.username ||
-                        "Utilisateur"}
-                    </h4>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h4 className="font-semibold">
+                        {service.profiles.full_name ||
+                          service.profiles.username ||
+                          "Utilisateur"}
+                      </h4>
+                      {service.profiles.is_admin && (
+                        <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-semibold">
+                          <Crown className="h-3 w-3" />
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     {service.profiles.location && (
                       <p className="text-sm text-gray-500 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
